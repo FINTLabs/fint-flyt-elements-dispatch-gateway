@@ -5,6 +5,7 @@ import no.fint.model.resource.arkiv.noark.JournalpostResource;
 import no.fint.model.resource.arkiv.noark.KorrespondansepartResource;
 import no.fint.model.resource.arkiv.noark.SakResource;
 import no.fintlabs.model.CreationStrategy;
+import no.fintlabs.model.Status;
 import no.fintlabs.model.mappedinstance.MappedInstance;
 import org.springframework.stereotype.Service;
 
@@ -21,7 +22,7 @@ public class DispatchService {
         this.dispatchClient = dispatchClient;
     }
 
-    public Object dispatch(MappedInstance mappedInstance) {
+    public Status dispatch(MappedInstance mappedInstance) {
         CreationStrategy creationStrategy = CreationStrategy.valueOf(
                 mappedInstance
                         .getElement("case")
@@ -35,7 +36,7 @@ public class DispatchService {
         };
     }
 
-    private Object dispatchNewCase(MappedInstance mappedInstance) {
+    private Status dispatchNewCase(MappedInstance mappedInstance) {
         SakResource sakResource = mappingService.toSakResource(mappedInstance.getElement("case"));
         JournalpostResource journalpostResource = createJournalpostResource(mappedInstance);
         sakResource.setJournalpost(List.of(journalpostResource));
@@ -43,7 +44,7 @@ public class DispatchService {
         return dispatchClient.dispatchNewCase(sakResource);
     }
 
-    private Object dispatchToCollectionCase(MappedInstance mappedInstance) {
+    private Status dispatchToCollectionCase(MappedInstance mappedInstance) {
         String collectionCaseId = mappedInstance
                 .getElement("case")
                 .getFieldValue("saksnummer");
@@ -53,8 +54,8 @@ public class DispatchService {
         return dispatchClient.dispatchToCollectionCase(collectionCaseId, journalpostResource);
     }
 
-    private Object dispatchToExistingOrNewCase(MappedInstance mappedInstance) {
-        return new Object();
+    private Status dispatchToExistingOrNewCase(MappedInstance mappedInstance) {
+        return Status.DECLINED;
     }
 
     private JournalpostResource createJournalpostResource(MappedInstance mappedInstance) {
