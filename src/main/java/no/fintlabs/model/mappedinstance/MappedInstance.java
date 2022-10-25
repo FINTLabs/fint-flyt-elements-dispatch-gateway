@@ -5,6 +5,8 @@ import lombok.NoArgsConstructor;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -18,7 +20,7 @@ public class MappedInstance {
     private Collection<Document> documents;
 
     public MappedInstanceElement getElement(String key) {
-        return elementPerKey.get(key);
+        return Optional.ofNullable(elementPerKey.get(key)).orElseThrow(NoSuchElementException::new);
     }
 
     public void setElements(Collection<MappedInstanceElement> elements) {
