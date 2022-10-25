@@ -120,7 +120,7 @@ public class MappingService {
             MappedInstanceElement documentInstanceElement
     ) {
         DokumentbeskrivelseResource dokumentbeskrivelseResource = new DokumentbeskrivelseResource();
-        dokumentbeskrivelseResource.setTittel(documentInstanceElement.getFieldValue("title") + "_" + document.getName());
+        dokumentbeskrivelseResource.setTittel(documentInstanceElement.getFieldValue("tittel") + "_" + document.getName());
         dokumentbeskrivelseResource.addDokumentstatus(Link.with(documentInstanceElement.getFieldValue("dokumentStatus")));
 
         DokumentobjektResource dokumentobjektResource = new DokumentobjektResource();
