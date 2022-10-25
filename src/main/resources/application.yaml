@@ -1,6 +1,9 @@
+fint:
+  application-id: fint-flyt-discovery-service
+server:
+  max-http-header-size: 40KB
 spring:
-  security:
-    oauth2:
-      resourceserver:
-        jwt:
-          issuer-uri: https://idp.felleskomponent.no/nidp/oauth/nam
+  profiles:
+    include:
+      - flyt-kafka
+      - flyt-logging
