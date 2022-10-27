@@ -4,10 +4,12 @@ import no.fint.model.resource.arkiv.noark.DokumentbeskrivelseResource;
 import no.fint.model.resource.arkiv.noark.JournalpostResource;
 import no.fint.model.resource.arkiv.noark.KorrespondansepartResource;
 import no.fint.model.resource.arkiv.noark.SakResource;
+import no.fintlabs.mapping.MappingService;
 import no.fintlabs.model.CreationStrategy;
-import no.fintlabs.model.Status;
+import no.fintlabs.model.Result;
 import no.fintlabs.model.mappedinstance.MappedInstance;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 
@@ -22,11 +24,12 @@ public class DispatchService {
         this.dispatchClient = dispatchClient;
     }
 
-    public Status dispatch(MappedInstance mappedInstance) {
+    public Mono<Result> dispatch(MappedInstance mappedInstance) {
         CreationStrategy creationStrategy = CreationStrategy.valueOf(
                 mappedInstance
                         .getElement("case")
-                        .getFieldValue("creationStrategy")
+                        .flatMap(mappedInstanceElement -> mappedInstanceElement.getFieldValue("creationStrategy"))
+                        .orElseThrow()
         );
 
         return switch (creationStrategy) {
@@ -36,38 +39,45 @@ public class DispatchService {
         };
     }
 
-    private Status dispatchNewCase(MappedInstance mappedInstance) {
-        SakResource sakResource = mappingService.toSakResource(mappedInstance.getElement("case"));
+    private Mono<Result> dispatchNewCase(MappedInstance mappedInstance) {
+        SakResource sakResource = mappingService.toSakResource(
+                mappedInstance.getElement("case").orElseThrow()
+        );
         JournalpostResource journalpostResource = createJournalpostResource(mappedInstance);
         sakResource.setJournalpost(List.of(journalpostResource));
 
         return dispatchClient.dispatchNewCase(sakResource);
     }
 
-    private Status dispatchToCollectionCase(MappedInstance mappedInstance) {
+    private Mono<Result> dispatchToCollectionCase(MappedInstance mappedInstance) {
         String collectionCaseId = mappedInstance
                 .getElement("case")
-                .getFieldValue("saksnummer");
+                .flatMap(mappedInstanceElement -> mappedInstanceElement.getFieldValue("saksnummer"))
+                .orElseThrow();
 
         JournalpostResource journalpostResource = createJournalpostResource(mappedInstance);
 
         return dispatchClient.dispatchToCollectionCase(collectionCaseId, journalpostResource);
     }
 
-    private Status dispatchToExistingOrNewCase(MappedInstance mappedInstance) {
-        return Status.DECLINED;
+    private Mono<Result> dispatchToExistingOrNewCase(MappedInstance mappedInstance) {
+        SakResource sakResource = mappingService.toSakResource(mappedInstance.getElement("case").orElseThrow());
+        JournalpostResource journalpostResource = createJournalpostResource(mappedInstance);
+        sakResource.setJournalpost(List.of(journalpostResource));
+
+        return dispatchClient.dispatchToExistingOrAsNewCase(sakResource);
     }
 
     private JournalpostResource createJournalpostResource(MappedInstance mappedInstance) {
-        JournalpostResource journalpostResource = mappingService.toJournalpostResource(mappedInstance.getElement("record"));
+        JournalpostResource journalpostResource = mappingService.toJournalpostResource(mappedInstance.getElement("record").orElseThrow());
 
         List<DokumentbeskrivelseResource> dokumentbeskrivelseResources = mappingService.toDokumentbeskrivelseResources(
                 mappedInstance.getDocuments(),
-                mappedInstance.getElement("document")
+                mappedInstance.getElement("document").orElseThrow()
         );
 
         KorrespondansepartResource korrespondansepartResource = mappingService.toKorrespondansepartResource(
-                mappedInstance.getElement("applicant")
+                mappedInstance.getElement("applicant").orElseThrow()
         );
 
         journalpostResource.setKorrespondansepart(List.of(korrespondansepartResource));

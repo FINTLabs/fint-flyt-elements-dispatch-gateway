@@ -64,3 +64,5 @@ spec:
             - { name: TZ, value: Europe/Oslo }
             - { name: JAVA_TOOL_OPTIONS, value: '-XX:+ExitOnOutOfMemoryError -Xmx480M -verbose:gc' }
             - { name: fint.org-id, value: 'viken.no' }
+            - { name: fint.client.base-url, value: 'https://beta.felleskomponent.no' }
+            - { name: fint.dispatch-gateway.authorization.enable, value: "true" }

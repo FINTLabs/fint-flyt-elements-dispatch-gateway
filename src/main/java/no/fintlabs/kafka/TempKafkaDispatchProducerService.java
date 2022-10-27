@@ -25,8 +25,7 @@ public class TempKafkaDispatchProducerService {
 
         eventTopicService.ensureTopic(topicNameParameters, 0);
 
-        newSakResourceEventProducer = eventProducerFactory
-                .createProducer(SakResource.class);
+        newSakResourceEventProducer = eventProducerFactory.createProducer(SakResource.class);
     }
 
     public void publish(SakResource sakResource) {

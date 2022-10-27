@@ -5,7 +5,6 @@ import lombok.NoArgsConstructor;
 
 import java.util.Collection;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -23,16 +22,14 @@ public class MappedInstanceElement {
         return elementPerKey.get(key);
     }
 
-    public String getFieldValue(String key) {
+    public Optional<String> getFieldValue(String key) {
         return Optional.ofNullable(fieldPerKey.get(key))
-                .map(MappedInstanceField::getValue)
-                .orElseThrow(NoSuchElementException::new);
+                .map(MappedInstanceField::getValue);
     }
 
-    public Collection<String> getCollectionFieldValues(String key) {
+    public Optional<Collection<String>> getCollectionFieldValues(String key) {
         return Optional.ofNullable(collectionFieldPerKey.get(key))
-                .map(MappedInstanceCollectionField::getValues)
-                .orElseThrow(NoSuchElementException::new);
+                .map(MappedInstanceCollectionField::getValues);
     }
 
     public void setElements(Collection<MappedInstanceElement> elements) {

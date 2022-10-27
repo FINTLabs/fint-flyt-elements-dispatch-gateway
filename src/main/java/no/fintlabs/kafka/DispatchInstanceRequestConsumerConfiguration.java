@@ -6,7 +6,7 @@ import no.fintlabs.kafka.requestreply.ReplyProducerRecord;
 import no.fintlabs.kafka.requestreply.RequestConsumerFactoryService;
 import no.fintlabs.kafka.requestreply.topic.RequestTopicNameParameters;
 import no.fintlabs.kafka.requestreply.topic.RequestTopicService;
-import no.fintlabs.model.Status;
+import no.fintlabs.model.Result;
 import no.fintlabs.model.mappedinstance.MappedInstance;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -31,11 +31,14 @@ public class DispatchInstanceRequestConsumerConfiguration {
 
         return requestConsumerFactoryService.createFactory(
                 MappedInstance.class,
-                Status.class,
-                consumerRecord -> ReplyProducerRecord
-                        .<Status>builder()
-                        .value(dispatchService.dispatch(consumerRecord.value()))
-                        .build(),
+                Result.class,
+                consumerRecord -> {
+                    Result result = dispatchService.dispatch(consumerRecord.value()).block();
+                    return ReplyProducerRecord
+                            .<Result>builder()
+                            .value(result)
+                            .build();
+                },
                 new CommonLoggingErrorHandler()
         ).createContainer(requestTopicNameParameters);
 

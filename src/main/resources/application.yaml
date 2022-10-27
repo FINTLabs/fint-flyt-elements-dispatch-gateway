@@ -7,3 +7,4 @@ spring:
     include:
       - flyt-kafka
       - flyt-logging
+      - fint-client

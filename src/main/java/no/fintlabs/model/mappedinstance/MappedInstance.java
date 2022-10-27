@@ -19,8 +19,8 @@ public class MappedInstance {
     @Getter
     private Collection<Document> documents;
 
-    public MappedInstanceElement getElement(String key) {
-        return Optional.ofNullable(elementPerKey.get(key)).orElseThrow(NoSuchElementException::new);
+    public Optional<MappedInstanceElement> getElement(String key) {
+        return Optional.ofNullable(elementPerKey.get(key));
     }
 
     public void setElements(Collection<MappedInstanceElement> elements) {

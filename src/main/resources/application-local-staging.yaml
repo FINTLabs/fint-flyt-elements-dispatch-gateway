@@ -1,7 +1,15 @@
 fint:
   org-id: fintlabs.no
+  dispatch-gateway:
+    authorization:
+      enable: true
+  client:
+    base-url: https://beta.felleskomponent.no
   kafka:
     default-replicas: 1
 spring:
   kafka:
     bootstrap-servers: localhost:29092
+logging:
+  level:
+    reactor.netty.http.client: debug
