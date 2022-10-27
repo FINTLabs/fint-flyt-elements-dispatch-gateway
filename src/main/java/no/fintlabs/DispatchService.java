@@ -4,7 +4,10 @@ import no.fint.model.resource.arkiv.noark.DokumentbeskrivelseResource;
 import no.fint.model.resource.arkiv.noark.JournalpostResource;
 import no.fint.model.resource.arkiv.noark.KorrespondansepartResource;
 import no.fint.model.resource.arkiv.noark.SakResource;
-import no.fintlabs.mapping.MappingService;
+import no.fintlabs.mapping.ApplicantMappingService;
+import no.fintlabs.mapping.CaseMappingService;
+import no.fintlabs.mapping.DocumentMappingService;
+import no.fintlabs.mapping.RecordMappingService;
 import no.fintlabs.model.CreationStrategy;
 import no.fintlabs.model.Result;
 import no.fintlabs.model.mappedinstance.MappedInstance;
@@ -16,11 +19,23 @@ import java.util.List;
 @Service
 public class DispatchService {
 
-    private final MappingService mappingService;
+    private final CaseMappingService caseMappingService;
+    private final RecordMappingService recordMappingService;
+    private final ApplicantMappingService applicantMappingService;
+    private final DocumentMappingService documentMappingService;
     private final DispatchClient dispatchClient;
 
-    public DispatchService(MappingService mappingService, DispatchClient dispatchClient) {
-        this.mappingService = mappingService;
+    public DispatchService(
+            CaseMappingService caseMappingService,
+            RecordMappingService recordMappingService,
+            ApplicantMappingService applicantMappingService,
+            DocumentMappingService documentMappingService,
+            DispatchClient dispatchClient
+    ) {
+        this.caseMappingService = caseMappingService;
+        this.recordMappingService = recordMappingService;
+        this.applicantMappingService = applicantMappingService;
+        this.documentMappingService = documentMappingService;
         this.dispatchClient = dispatchClient;
     }
 
@@ -31,16 +46,15 @@ public class DispatchService {
                         .flatMap(mappedInstanceElement -> mappedInstanceElement.getFieldValue("creationStrategy"))
                         .orElseThrow()
         );
-
         return switch (creationStrategy) {
-            case NEW -> dispatchNewCase(mappedInstance);
-            case COLLECTION -> dispatchToCollectionCase(mappedInstance);
-            case EXISTING -> dispatchToExistingOrNewCase(mappedInstance);
+            case NEW -> processAsNewCase(mappedInstance);
+            case COLLECTION -> processAsNewRecordForCollectionCase(mappedInstance);
+            case EXISTING -> processAsNewRecordForExistingCaseOrNewCase(mappedInstance);
         };
     }
 
-    private Mono<Result> dispatchNewCase(MappedInstance mappedInstance) {
-        SakResource sakResource = mappingService.toSakResource(
+    private Mono<Result> processAsNewCase(MappedInstance mappedInstance) {
+        SakResource sakResource = caseMappingService.toSakResource(
                 mappedInstance.getElement("case").orElseThrow()
         );
         JournalpostResource journalpostResource = createJournalpostResource(mappedInstance);
@@ -49,7 +63,7 @@ public class DispatchService {
         return dispatchClient.dispatchNewCase(sakResource);
     }
 
-    private Mono<Result> dispatchToCollectionCase(MappedInstance mappedInstance) {
+    private Mono<Result> processAsNewRecordForCollectionCase(MappedInstance mappedInstance) {
         String collectionCaseId = mappedInstance
                 .getElement("case")
                 .flatMap(mappedInstanceElement -> mappedInstanceElement.getFieldValue("saksnummer"))
@@ -60,8 +74,8 @@ public class DispatchService {
         return dispatchClient.dispatchToCollectionCase(collectionCaseId, journalpostResource);
     }
 
-    private Mono<Result> dispatchToExistingOrNewCase(MappedInstance mappedInstance) {
-        SakResource sakResource = mappingService.toSakResource(mappedInstance.getElement("case").orElseThrow());
+    private Mono<Result> processAsNewRecordForExistingCaseOrNewCase(MappedInstance mappedInstance) {
+        SakResource sakResource = caseMappingService.toSakResource(mappedInstance.getElement("case").orElseThrow());
         JournalpostResource journalpostResource = createJournalpostResource(mappedInstance);
         sakResource.setJournalpost(List.of(journalpostResource));
 
@@ -69,14 +83,14 @@ public class DispatchService {
     }
 
     private JournalpostResource createJournalpostResource(MappedInstance mappedInstance) {
-        JournalpostResource journalpostResource = mappingService.toJournalpostResource(mappedInstance.getElement("record").orElseThrow());
+        JournalpostResource journalpostResource = recordMappingService.toJournalpostResource(mappedInstance.getElement("record").orElseThrow());
 
-        List<DokumentbeskrivelseResource> dokumentbeskrivelseResources = mappingService.toDokumentbeskrivelseResources(
+        List<DokumentbeskrivelseResource> dokumentbeskrivelseResources = documentMappingService.toDokumentbeskrivelseResources(
                 mappedInstance.getDocuments(),
                 mappedInstance.getElement("document").orElseThrow()
         );
 
-        KorrespondansepartResource korrespondansepartResource = mappingService.toKorrespondansepartResource(
+        KorrespondansepartResource korrespondansepartResource = applicantMappingService.toKorrespondansepartResource(
                 mappedInstance.getElement("applicant").orElseThrow()
         );
 

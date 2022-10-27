@@ -22,6 +22,7 @@ public class DispatchClient {
 
 
     private final WebClient webClient;
+    // TODO: 27/10/2022 Remove
     private final TempKafkaDispatchProducerService tempKafkaDispatchProducerService;
 
     public DispatchClient(WebClient webClient, TempKafkaDispatchProducerService tempKafkaDispatchProducerService) {
@@ -30,7 +31,7 @@ public class DispatchClient {
     }
 
     public Mono<Result> dispatchNewCase(SakResource sakResource) {
-        tempKafkaDispatchProducerService.publish(sakResource);
+        tempKafkaDispatchProducerService.publishNewCaseData(sakResource);
         return postCase(sakResource)
                 .delayElement(Duration.ofMillis(200))
                 .flatMap(this::getCreatedRedirect)
@@ -93,13 +94,13 @@ public class DispatchClient {
     }
 
     public Mono<Result> dispatchToCollectionCase(String collectionCaseId, JournalpostResource journalpostResource) {
+        tempKafkaDispatchProducerService.publishCollectionCaseData(collectionCaseId, journalpostResource);
         log.info("Dispatching to collection case: collectionCaseId= '" + collectionCaseId + "' journalpostResource=" + journalpostResource.toString());
         return Mono.just(new Result(Status.FAILED, null));
     }
 
     public Mono<Result> dispatchToExistingOrAsNewCase(SakResource sakResource) {
         log.info("Dispatching to existing or as new case: sakResource=" + sakResource.toString());
-        tempKafkaDispatchProducerService.publish(sakResource);
         return Mono.just(new Result(Status.FAILED, null));
     }
 

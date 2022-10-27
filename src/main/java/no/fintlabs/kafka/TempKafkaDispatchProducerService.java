@@ -1,5 +1,10 @@
 package no.fintlabs.kafka;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import no.fint.model.resource.arkiv.noark.JournalpostResource;
 import no.fint.model.resource.arkiv.noark.SakResource;
 import no.fintlabs.kafka.event.EventProducer;
 import no.fintlabs.kafka.event.EventProducerFactory;
@@ -11,29 +16,56 @@ import org.springframework.stereotype.Service;
 @Service
 public class TempKafkaDispatchProducerService {
 
-    EventProducer<SakResource> newSakResourceEventProducer;
-    EventTopicNameParameters topicNameParameters;
+    EventProducer<SakResource> newCaseDataEventProducer;
+    EventTopicNameParameters newCaseDataEventTopicNameParameters;
+
+    EventProducer<CollectionCaseDataWrapper> collectionCaseDataEventProducer;
+    EventTopicNameParameters collectionCaseDataEventTopicNameParameters;
 
     public TempKafkaDispatchProducerService(
             EventTopicService eventTopicService,
             EventProducerFactory eventProducerFactory
     ) {
-        topicNameParameters = EventTopicNameParameters
+        newCaseDataEventTopicNameParameters = EventTopicNameParameters
                 .builder()
-                .eventName("temp-dispatch-new-case-to-elements")
+                .eventName("temp-new-case-data")
                 .build();
+        eventTopicService.ensureTopic(newCaseDataEventTopicNameParameters, 0);
+        newCaseDataEventProducer = eventProducerFactory.createProducer(SakResource.class);
 
-        eventTopicService.ensureTopic(topicNameParameters, 0);
-
-        newSakResourceEventProducer = eventProducerFactory.createProducer(SakResource.class);
+        collectionCaseDataEventTopicNameParameters = EventTopicNameParameters
+                .builder()
+                .eventName("temp-collection-case-data")
+                .build();
+        eventTopicService.ensureTopic(collectionCaseDataEventTopicNameParameters, 0);
+        collectionCaseDataEventProducer = eventProducerFactory.createProducer(CollectionCaseDataWrapper.class);
     }
 
-    public void publish(SakResource sakResource) {
-        newSakResourceEventProducer.send(
+    public void publishNewCaseData(SakResource sakResource) {
+        newCaseDataEventProducer.send(
                 EventProducerRecord
                         .<SakResource>builder()
-                        .topicNameParameters(topicNameParameters)
+                        .topicNameParameters(newCaseDataEventTopicNameParameters)
                         .value(sakResource)
+                        .build()
+        );
+    }
+
+    @Data
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    private static class CollectionCaseDataWrapper {
+        private String archiveCollectionCaseId;
+        private JournalpostResource journalpostResource;
+    }
+
+    public void publishCollectionCaseData(String archiveCollectionCaseId, JournalpostResource journalpostResource) {
+        collectionCaseDataEventProducer.send(
+                EventProducerRecord
+                        .<CollectionCaseDataWrapper>builder()
+                        .topicNameParameters(collectionCaseDataEventTopicNameParameters)
+                        .value(new CollectionCaseDataWrapper(archiveCollectionCaseId, journalpostResource))
                         .build()
         );
     }
