@@ -39,7 +39,7 @@ public class DispatchService {
         this.dispatchClient = dispatchClient;
     }
 
-    public Mono<Result> dispatch(MappedInstance mappedInstance) {
+    public Mono<Result> process(MappedInstance mappedInstance) {
         CreationStrategy creationStrategy = CreationStrategy.valueOf(
                 mappedInstance
                         .getElement("case")

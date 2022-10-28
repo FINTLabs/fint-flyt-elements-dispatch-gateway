@@ -18,9 +18,6 @@ public class RecordMappingService {
         JournalpostResource journalpostResource = new JournalpostResource();
         recordInstanceElement.getFieldValue("tittel").ifPresent(journalpostResource::setTittel);
         recordInstanceElement.getFieldValue("offentligTittel").ifPresent(journalpostResource::setOffentligTittel);
-
-        // TODO: 25/10/2022 Dokumenttype?
-
         recordInstanceElement.getFieldValue("administrativenhet").map(Link::with).ifPresent(journalpostResource::addAdministrativEnhet);
         recordInstanceElement.getFieldValue("journalstatus").map(Link::with).ifPresent(journalpostResource::addJournalstatus);
         recordInstanceElement.getFieldValue("journalposttype").map(Link::with).ifPresent(journalpostResource::addJournalposttype);

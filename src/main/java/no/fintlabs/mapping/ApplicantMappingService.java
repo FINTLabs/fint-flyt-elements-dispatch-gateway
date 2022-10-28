@@ -1,6 +1,7 @@
 package no.fintlabs.mapping;
 
 import no.fint.model.felles.kompleksedatatyper.Kontaktinformasjon;
+import no.fint.model.resource.Link;
 import no.fint.model.resource.arkiv.noark.KorrespondansepartResource;
 import no.fint.model.resource.felles.kompleksedatatyper.AdresseResource;
 import no.fintlabs.model.mappedinstance.MappedInstanceElement;
@@ -21,9 +22,9 @@ public class ApplicantMappingService {
 
     public KorrespondansepartResource toKorrespondansepartResource(MappedInstanceElement applicantInstanceElement) {
         KorrespondansepartResource korrespondansepartResource = new KorrespondansepartResource();
-        // TODO: 25/10/2022 type -- må ha link fra FINT?
 
-        // TODO: 25/10/2022 Filtrer bort den som ikke skal settes?
+        // TODO: 28/10/2022 Replace with field in configuration
+        korrespondansepartResource.addKorrespondanseparttype(Link.with("https://beta.felleskomponent.no/arkiv/kodeverk/korrespondanseparttype/systemid/EA"));
 
         applicantInstanceElement.getFieldValue("organisasjonsnummer").ifPresent(korrespondansepartResource::setOrganisasjonsnummer);
         applicantInstanceElement.getFieldValue("fødselsnummer").ifPresent(korrespondansepartResource::setFodselsnummer);

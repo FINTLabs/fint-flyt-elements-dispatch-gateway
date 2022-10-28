@@ -33,13 +33,18 @@ public class DocumentMappingService {
                         + document.getName()
         );
         documentInstanceElement.getFieldValue("dokumentStatus").map(Link::with).ifPresent(dokumentbeskrivelseResource::addDokumentstatus);
+        documentInstanceElement.getFieldValue("dokumentType").map(Link::with).ifPresent(dokumentbeskrivelseResource::addDokumentType);
 
         DokumentobjektResource dokumentobjektResource = new DokumentobjektResource();
-        documentInstanceElement.getFieldValue("DokumentBeskrivelse.dokumentObjekt.variantFormat")
+        documentInstanceElement.getFieldValue("dokumentObjekt.variantFormat")
                 .map(Link::with)
                 .ifPresent(dokumentobjektResource::addVariantFormat);
 
         // TODO: 25/10/2022 Add file
+        // Post to https://beta.felleskomponent.no/arkiv/noark/dokumentfil
+        // Redirect to https://beta.felleskomponent.no/arkiv/noark/dokumentfil/systemid/I_20222911622004
+//        dokumentobjektResource.addReferanseDokumentfil();
+
         dokumentbeskrivelseResource.setDokumentobjekt(List.of(dokumentobjektResource));
         return dokumentbeskrivelseResource;
     }

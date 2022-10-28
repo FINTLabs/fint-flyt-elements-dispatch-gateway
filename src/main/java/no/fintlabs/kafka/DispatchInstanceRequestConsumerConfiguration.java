@@ -33,7 +33,7 @@ public class DispatchInstanceRequestConsumerConfiguration {
                 MappedInstance.class,
                 Result.class,
                 consumerRecord -> {
-                    Result result = dispatchService.dispatch(consumerRecord.value()).block();
+                    Result result = dispatchService.process(consumerRecord.value()).block();
                     return ReplyProducerRecord
                             .<Result>builder()
                             .value(result)
