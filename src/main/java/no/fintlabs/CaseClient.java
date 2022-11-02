@@ -3,7 +3,6 @@ package no.fintlabs;
 import lombok.extern.slf4j.Slf4j;
 import no.fint.model.resource.arkiv.noark.SakResource;
 import no.fintlabs.model.Result;
-import no.fintlabs.model.Status;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -67,7 +66,7 @@ public class CaseClient {
                 .delayElement(Duration.ofMillis(200))
                 .flatMap(this::pollForCreatedLocation)
                 .flatMap(this::getCase)
-                .map(resultSakResource -> new Result(Status.ACCEPTED, resultSakResource.getMappeId().getIdentifikatorverdi()))
+                .map(resultSakResource -> Result.accepted(resultSakResource.getMappeId().getIdentifikatorverdi()))
                 .doOnError(e -> {
                     if (e instanceof WebClientResponseException) {
                         log.error(e + " body=" + ((WebClientResponseException) e).getResponseBodyAsString());
@@ -76,14 +75,9 @@ public class CaseClient {
                     }
                 })
                 .onErrorResume(WebClientResponseException.class, e ->
-                        Mono.just(new Result(
-                                e.getStatusCode().is4xxClientError()
-                                        ? Status.DECLINED
-                                        : Status.FAILED,
-                                null
-                        ))
+                        Mono.just(Result.declined(e.getResponseBodyAsString()))
                 )
-                .onErrorReturn(RuntimeException.class, new Result(Status.FAILED, null));
+                .onErrorReturn(RuntimeException.class, Result.failed());
     }
 
     private Mono<URI> pollForCreatedLocation(URI uri) {

@@ -5,7 +5,6 @@ import no.fint.model.resource.arkiv.noark.JournalpostResource;
 import no.fint.model.resource.arkiv.noark.SakResource;
 import no.fintlabs.kafka.TempKafkaDispatchProducerService;
 import no.fintlabs.model.Result;
-import no.fintlabs.model.Status;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
@@ -39,7 +38,7 @@ public class DispatchClient {
 
     public Mono<Result> dispatchToExistingOrAsNewCase(SakResource sakResource) {
         log.info("Dispatching to existing or as new case: sakResource=" + sakResource.toString());
-        return Mono.just(new Result(Status.FAILED, null));
+        return Mono.just(Result.failed());
     }
 
 }
