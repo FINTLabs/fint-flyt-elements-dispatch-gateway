@@ -12,9 +12,11 @@ import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.client.*;
-import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
-import org.springframework.security.oauth2.client.web.reactive.function.client.ServletOAuth2AuthorizedClientExchangeFilterFunction;
+import org.springframework.security.oauth2.client.registration.ReactiveClientRegistrationRepository;
+import org.springframework.security.oauth2.client.web.reactive.function.client.ServerOAuth2AuthorizedClientExchangeFilterFunction;
 import org.springframework.web.reactive.function.client.ExchangeStrategies;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 import reactor.netty.http.client.HttpClient;
 import reactor.netty.resources.ConnectionProvider;
 
@@ -43,16 +45,16 @@ public class WebClientConfiguration {
 
     @Bean
     @ConditionalOnProperty(name = "fint.dispatch-gateway.authorization.enable", havingValue = "true")
-    public OAuth2AuthorizedClientManager authorizedClientManager(ClientRegistrationRepository clientRegistrationRepository,
-                                                                 OAuth2AuthorizedClientService authorizedClientService) {
+    public ReactiveOAuth2AuthorizedClientManager authorizedClientManager(ReactiveClientRegistrationRepository clientRegistrationRepository,
+                                                                         ReactiveOAuth2AuthorizedClientService authorizedClientService) {
 
-        OAuth2AuthorizedClientProvider authorizedClientProvider = OAuth2AuthorizedClientProviderBuilder.builder()
+        ReactiveOAuth2AuthorizedClientProvider authorizedClientProvider = ReactiveOAuth2AuthorizedClientProviderBuilder.builder()
                 .password()
                 .refreshToken()
                 .build();
 
-        AuthorizedClientServiceOAuth2AuthorizedClientManager authorizedClientManager =
-                new AuthorizedClientServiceOAuth2AuthorizedClientManager(clientRegistrationRepository, authorizedClientService);
+        AuthorizedClientServiceReactiveOAuth2AuthorizedClientManager authorizedClientManager =
+                new AuthorizedClientServiceReactiveOAuth2AuthorizedClientManager(clientRegistrationRepository, authorizedClientService);
 
         authorizedClientManager.setAuthorizedClientProvider(authorizedClientProvider);
 
@@ -61,12 +63,12 @@ public class WebClientConfiguration {
         return authorizedClientManager;
     }
 
-    private Function<OAuth2AuthorizeRequest, Map<String, Object>> contextAttributesMapper() {
+    private Function<OAuth2AuthorizeRequest, Mono<Map<String, Object>>> contextAttributesMapper() {
         return authorizeRequest -> {
             Map<String, Object> contextAttributes = new HashMap<>();
             contextAttributes.put(OAuth2AuthorizationContext.USERNAME_ATTRIBUTE_NAME, username);
             contextAttributes.put(OAuth2AuthorizationContext.PASSWORD_ATTRIBUTE_NAME, password);
-            return contextAttributes;
+            return Mono.just(contextAttributes);
         };
     }
 
@@ -84,19 +86,21 @@ public class WebClientConfiguration {
     }
 
     @Bean
-    public org.springframework.web.reactive.function.client.WebClient webClient(org.springframework.web.reactive.function.client.WebClient.Builder builder, Optional<OAuth2AuthorizedClientManager> authorizedClientManager, ClientHttpConnector clientHttpConnector) {
+    public WebClient webClient(Optional<ReactiveOAuth2AuthorizedClientManager> authorizedClientManager, ClientHttpConnector clientHttpConnector) {
         ExchangeStrategies exchangeStrategies = ExchangeStrategies.builder()
                 .codecs(configurer -> configurer.defaultCodecs().maxInMemorySize(-1))
                 .build();
 
+        WebClient.Builder webClientBuilder = WebClient.builder();
+
         authorizedClientManager.ifPresent(presentAuthorizedClientManager -> {
-            ServletOAuth2AuthorizedClientExchangeFilterFunction authorizedClientExchangeFilterFunction =
-                    new ServletOAuth2AuthorizedClientExchangeFilterFunction(presentAuthorizedClientManager);
+            ServerOAuth2AuthorizedClientExchangeFilterFunction authorizedClientExchangeFilterFunction =
+                    new ServerOAuth2AuthorizedClientExchangeFilterFunction(presentAuthorizedClientManager);
             authorizedClientExchangeFilterFunction.setDefaultClientRegistrationId(registrationId);
-            builder.filter(authorizedClientExchangeFilterFunction);
+            webClientBuilder.filter(authorizedClientExchangeFilterFunction);
         });
 
-        return builder
+        return webClientBuilder
                 .clientConnector(clientHttpConnector)
                 .exchangeStrategies(exchangeStrategies)
                 .baseUrl(baseUrl)
@@ -104,4 +108,3 @@ public class WebClientConfiguration {
     }
 
 }
-
