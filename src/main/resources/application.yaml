@@ -8,3 +8,4 @@ spring:
       - flyt-kafka
       - flyt-logging
       - fint-client
+      - flyt-file-client

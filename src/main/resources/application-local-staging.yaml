@@ -1,5 +1,7 @@
 fint:
   org-id: fintlabs.no
+  flyt:
+    base-url: http://localhost:8091
   dispatch-gateway:
     authorization:
       enable: true

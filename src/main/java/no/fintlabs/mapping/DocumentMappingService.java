@@ -1,5 +1,6 @@
 package no.fintlabs.mapping;
 
+import lombok.extern.slf4j.Slf4j;
 import no.fint.model.resource.Link;
 import no.fint.model.resource.arkiv.noark.DokumentbeskrivelseResource;
 import no.fint.model.resource.arkiv.noark.DokumentobjektResource;
@@ -9,24 +10,30 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
+@Slf4j
 @Service
 public class DocumentMappingService {
 
     public List<DokumentbeskrivelseResource> toDokumentbeskrivelseResources(
             Collection<Document> documents,
-            MappedInstanceElement documentInstanceElement
+            MappedInstanceElement documentInstanceElement,
+            Map<UUID, Link> dokumentfilResourceLinkPerFileId
     ) {
         return documents
                 .stream()
-                .map(document -> toDokumentBeskrivelseResource(document, documentInstanceElement))
+                .map(document -> toDokumentBeskrivelseResource(document, documentInstanceElement, dokumentfilResourceLinkPerFileId))
                 .toList();
     }
 
     private DokumentbeskrivelseResource toDokumentBeskrivelseResource(
             Document document,
-            MappedInstanceElement documentInstanceElement
+            MappedInstanceElement documentInstanceElement,
+            Map<UUID, Link> dokumentfilResourceLinkPerFileId
     ) {
+
         DokumentbeskrivelseResource dokumentbeskrivelseResource = new DokumentbeskrivelseResource();
         dokumentbeskrivelseResource.setTittel(
                 documentInstanceElement.getFieldValue("tittel").map(value -> value + "_").orElse("")
@@ -36,14 +43,10 @@ public class DocumentMappingService {
         documentInstanceElement.getFieldValue("dokumentType").map(Link::with).ifPresent(dokumentbeskrivelseResource::addDokumentType);
 
         DokumentobjektResource dokumentobjektResource = new DokumentobjektResource();
-        documentInstanceElement.getFieldValue("dokumentObjekt.variantFormat")
-                .map(Link::with)
-                .ifPresent(dokumentobjektResource::addVariantFormat);
-
-        // TODO: 25/10/2022 Add file
-        // Post to https://beta.felleskomponent.no/arkiv/noark/dokumentfil
-        // Redirect to https://beta.felleskomponent.no/arkiv/noark/dokumentfil/systemid/I_20222911622004
-//        dokumentobjektResource.addReferanseDokumentfil();
+        documentInstanceElement.getFieldValue("dokumentObjekt.variantFormat").map(Link::with).ifPresent(dokumentobjektResource::addVariantFormat);
+        dokumentobjektResource.addReferanseDokumentfil(
+                dokumentfilResourceLinkPerFileId.get(document.getFileId())
+        );
 
         dokumentbeskrivelseResource.setDokumentobjekt(List.of(dokumentobjektResource));
         return dokumentbeskrivelseResource;

@@ -1,30 +1,49 @@
-package no.fintlabs;
+package no.fintlabs.web.archive;
 
 import lombok.extern.slf4j.Slf4j;
+import no.fint.model.resource.arkiv.noark.DokumentfilResource;
 import no.fint.model.resource.arkiv.noark.SakResource;
 import no.fintlabs.model.Result;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.util.retry.Retry;
 
 import java.net.URI;
 import java.time.Duration;
 
 @Slf4j
 @Service
-public class CaseClient {
+public class FintArchiveClient {
 
-    private final WebClient webClient;
+    private final WebClient fintWebClient;
 
-    public CaseClient(WebClient webClient) {
-        this.webClient = webClient;
+    public FintArchiveClient(@Qualifier("fintWebClient") WebClient fintWebClient) {
+        this.fintWebClient = fintWebClient;
+    }
+
+    public Mono<URI> postFile(DokumentfilResource dokumentfilResource) {
+        return pollForCreatedLocation(fintWebClient
+                .post()
+                .uri("/arkiv/noark/dokumentfil")
+                .bodyValue(dokumentfilResource)
+                .header("Content-Disposition", "attachment; filename='" + dokumentfilResource.getFilnavn() + "'")
+                .retrieve()
+        ).doOnError(e -> {
+            if (e instanceof WebClientResponseException) {
+                log.error(e + " body=" + ((WebClientResponseException) e).getResponseBodyAsString());
+            } else {
+                log.error(e.toString());
+            }
+        }).retryWhen(Retry.backoff(5, Duration.ofSeconds(1)));
     }
 
     public Mono<SakResource> getCase(String archiveCaseId) {
-        return webClient
+        return fintWebClient
                 .get()
                 .uri("/arkiv/noark/sak/" + archiveCaseId)
                 .retrieve()
@@ -32,8 +51,8 @@ public class CaseClient {
     }
 
     public Mono<Result> postCase(SakResource sakResource) {
-        return pollForResult(
-                webClient
+        return pollForCaseResult(
+                fintWebClient
                         .post()
                         .uri("/arkiv/noark/sak")
                         .bodyValue(sakResource)
@@ -42,8 +61,8 @@ public class CaseClient {
     }
 
     public Mono<Result> putCase(String archiveCaseId, SakResource sakResource) {
-        return pollForResult(
-                webClient
+        return pollForCaseResult(
+                fintWebClient
                         .put()
                         .uri("/arkiv/noark/sak/" + archiveCaseId)
                         .bodyValue(sakResource)
@@ -51,20 +70,8 @@ public class CaseClient {
         );
     }
 
-    private Mono<Result> pollForResult(WebClient.ResponseSpec responseSpec) {
-        return responseSpec
-                .toBodilessEntity()
-                .<URI>handle((entity, sink) -> {
-                            if (HttpStatus.ACCEPTED.equals(entity.getStatusCode())
-                                    && entity.getHeaders().getLocation() != null) {
-                                sink.next(entity.getHeaders().getLocation());
-                            } else {
-                                sink.error(new RuntimeException("Expected 202 Accepted response with redirect header"));
-                            }
-                        }
-                )
-                .delayElement(Duration.ofMillis(200))
-                .flatMap(this::pollForCreatedLocation)
+    private Mono<Result> pollForCaseResult(WebClient.ResponseSpec responseSpec) {
+        return pollForCreatedLocation(responseSpec)
                 .flatMap(this::getCase)
                 .map(resultSakResource -> Result.accepted(resultSakResource.getMappeId().getIdentifikatorverdi()))
                 .doOnError(e -> {
@@ -80,10 +87,30 @@ public class CaseClient {
                 .onErrorReturn(RuntimeException.class, Result.failed());
     }
 
-    private Mono<URI> pollForCreatedLocation(URI uri) {
-        return webClient
+    private Mono<URI> pollForCreatedLocation(WebClient.ResponseSpec responseSpec) {
+        return getStatusLocation(responseSpec)
+                .delayElement(Duration.ofMillis(200))
+                .flatMap(this::pollForCreatedLocation);
+    }
+
+    private Mono<URI> getStatusLocation(WebClient.ResponseSpec responseSpec) {
+        return responseSpec
+                .toBodilessEntity()
+                .handle((entity, sink) -> {
+                            if (HttpStatus.ACCEPTED.equals(entity.getStatusCode())
+                                    && entity.getHeaders().getLocation() != null) {
+                                sink.next(entity.getHeaders().getLocation());
+                            } else {
+                                sink.error(new RuntimeException("Expected 202 Accepted response with redirect header"));
+                            }
+                        }
+                );
+    }
+
+    private Mono<URI> pollForCreatedLocation(URI statusUri) {
+        return fintWebClient
                 .get()
-                .uri(uri)
+                .uri(statusUri)
                 .retrieve()
                 .toBodilessEntity()
                 .filter(entity -> HttpStatus.CREATED.equals(entity.getStatusCode()) && entity.getHeaders().getLocation() != null)
@@ -93,7 +120,7 @@ public class CaseClient {
     }
 
     private Mono<SakResource> getCase(URI uri) {
-        return webClient
+        return fintWebClient
                 .get()
                 .uri(uri)
                 .retrieve()
