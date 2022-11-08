@@ -27,11 +27,16 @@ public class FileClient {
                 .uri("/" + fileId)
                 .retrieve()
                 .bodyToMono(File.class)
-                .doOnEach(fileSignal -> log.info(fileSignal.toString()))
-                .retryWhen(Retry.backoff(5, Duration.ofSeconds(1)))
-                .doOnError(
-                        e -> log.error("Could not find file with id=" + fileId, e)
-                );
+                .retryWhen(Retry
+                        .backoff(5, Duration.ofSeconds(1))
+                        .doBeforeRetry(retrySignal -> log.warn(
+                                "Could not retrieve file with id=" + fileId +
+                                        " -- performing retry " + (retrySignal.totalRetries() + 1),
+                                retrySignal.failure())
+                        )
+                )
+                .doOnNext(file -> log.info("Retrieved file with id=" + fileId))
+                .doOnError(e -> log.error("Could not retrieve file with id=" + fileId, e));
     }
 
 }
