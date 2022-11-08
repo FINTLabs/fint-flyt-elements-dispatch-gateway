@@ -78,3 +78,4 @@ spec:
             - { name: fint.client.base-url, value: 'https://beta.felleskomponent.no' }
             - { name: fint.flyt.base-url, value: 'https://viken-no-skjema.vigoiks.no' }
             - { name: fint.dispatch-gateway.authorization.enable, value: "true" }
+            - { name: logging.level.reactor.netty.http.client, value: 'debug' }
