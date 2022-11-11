@@ -39,20 +39,21 @@ public class CaseMappingService {
     }
 
     private List<KlasseResource> toKlasser(MappedInstanceElement caseInstanceField) {
+        AtomicInteger order = new AtomicInteger();
         return Stream.of(
-                        toKlasse(caseInstanceField, "sekundar")
-                                .map(klasseResource -> {
-                                    klasseResource.setRekkefolge(1);
-                                    return klasseResource;
-                                }),
                         toKlasse(caseInstanceField, "primar")
                                 .map(klasseResource -> {
-                                    klasseResource.setRekkefolge(2);
+                                    klasseResource.setRekkefolge(order.getAndIncrement());
+                                    return klasseResource;
+                                }),
+                        toKlasse(caseInstanceField, "sekundar")
+                                .map(klasseResource -> {
+                                    klasseResource.setRekkefolge(order.getAndIncrement());
                                     return klasseResource;
                                 }),
                         toKlasse(caseInstanceField, "tertiar")
                                 .map(klasseResource -> {
-                                    klasseResource.setRekkefolge(0);
+                                    klasseResource.setRekkefolge(order.getAndIncrement());
                                     return klasseResource;
                                 })
                 ).filter(Optional::isPresent)
