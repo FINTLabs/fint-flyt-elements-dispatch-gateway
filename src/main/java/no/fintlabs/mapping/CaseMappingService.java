@@ -40,14 +40,14 @@ public class CaseMappingService {
 
     private List<KlasseResource> toKlasser(MappedInstanceElement caseInstanceField) {
         return Stream.of(
-                        toKlasse(caseInstanceField, "primar")
-                                .map(klasseResource -> {
-                                    klasseResource.setRekkefolge(2);
-                                    return klasseResource;
-                                }),
                         toKlasse(caseInstanceField, "sekundar")
                                 .map(klasseResource -> {
                                     klasseResource.setRekkefolge(1);
+                                    return klasseResource;
+                                }),
+                        toKlasse(caseInstanceField, "primar")
+                                .map(klasseResource -> {
+                                    klasseResource.setRekkefolge(2);
                                     return klasseResource;
                                 }),
                         toKlasse(caseInstanceField, "tertiar")
