@@ -33,7 +33,7 @@ public class FintArchiveClient {
                 .post()
                 .uri("/arkiv/noark/dokumentfil")
                 .contentType(getMediaType(file.getType()))
-                .bodyValue(file.getBase64Contents())
+                .bodyValue(file.getContents())
                 .header("Content-Disposition", "attachment; filename='" + file.getName() + "'")
                 .retrieve()
         ).doOnError(e -> {
