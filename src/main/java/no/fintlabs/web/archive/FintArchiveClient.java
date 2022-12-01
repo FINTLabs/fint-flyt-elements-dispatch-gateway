@@ -64,7 +64,7 @@ public class FintArchiveClient {
         return pollForCaseResult(
                 fintWebClient
                         .put()
-                        .uri("/arkiv/noark/sak/" + archiveCaseId)
+                        .uri("/arkiv/noark/sak/mappeid/" + archiveCaseId)
                         .bodyValue(sakResource)
                         .retrieve()
         );
