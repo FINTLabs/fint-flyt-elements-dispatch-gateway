@@ -45,7 +45,7 @@ public class FintArchiveClient {
     public Mono<SakResource> getCase(String archiveCaseId) {
         return fintWebClient
                 .get()
-                .uri("/arkiv/noark/sak/mappeid" + archiveCaseId)
+                .uri("/arkiv/noark/sak/mappeid/" + archiveCaseId)
                 .retrieve()
                 .bodyToMono(SakResource.class);
     }
