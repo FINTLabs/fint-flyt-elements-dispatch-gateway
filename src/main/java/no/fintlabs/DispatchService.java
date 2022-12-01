@@ -5,7 +5,10 @@ import no.fint.model.resource.arkiv.noark.DokumentbeskrivelseResource;
 import no.fint.model.resource.arkiv.noark.JournalpostResource;
 import no.fint.model.resource.arkiv.noark.KorrespondansepartResource;
 import no.fint.model.resource.arkiv.noark.SakResource;
-import no.fintlabs.mapping.*;
+import no.fintlabs.mapping.ApplicantMappingService;
+import no.fintlabs.mapping.CaseMappingService;
+import no.fintlabs.mapping.DocumentMappingService;
+import no.fintlabs.mapping.RecordMappingService;
 import no.fintlabs.model.CreationStrategy;
 import no.fintlabs.model.Result;
 import no.fintlabs.model.mappedinstance.Document;
@@ -24,7 +27,6 @@ import java.util.UUID;
 @Service
 public class DispatchService {
 
-    private final FileMappingService fileMappingService;
     private final CaseMappingService caseMappingService;
     private final RecordMappingService recordMappingService;
     private final ApplicantMappingService applicantMappingService;
@@ -33,7 +35,6 @@ public class DispatchService {
     private final FintArchiveService fintArchiveService;
 
     public DispatchService(
-            FileMappingService fileMappingService,
             CaseMappingService caseMappingService,
             RecordMappingService recordMappingService,
             ApplicantMappingService applicantMappingService,
@@ -41,7 +42,6 @@ public class DispatchService {
             FileClient fileClient,
             FintArchiveService fintArchiveService
     ) {
-        this.fileMappingService = fileMappingService;
         this.caseMappingService = caseMappingService;
         this.recordMappingService = recordMappingService;
         this.applicantMappingService = applicantMappingService;
@@ -73,9 +73,7 @@ public class DispatchService {
                 .map(Document::getFileId)
                 .flatMap(fileId -> Mono.zip(
                         Mono.just(fileId),
-                        fileClient.getFile(fileId)
-                                .map(fileMappingService::mapToDokumentfilResource)
-                                .flatMap(fintArchiveService::dispatchFile)
+                        fileClient.getFile(fileId).flatMap(fintArchiveService::dispatchFile)
                 ))
                 .collectMap(Tuple2::getT1, Tuple2::getT2);
     }

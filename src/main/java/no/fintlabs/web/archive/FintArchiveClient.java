@@ -1,11 +1,13 @@
 package no.fintlabs.web.archive;
 
 import lombok.extern.slf4j.Slf4j;
-import no.fint.model.resource.arkiv.noark.DokumentfilResource;
 import no.fint.model.resource.arkiv.noark.SakResource;
+import no.fintlabs.model.File;
 import no.fintlabs.model.Result;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.InvalidMediaTypeException;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
@@ -26,12 +28,13 @@ public class FintArchiveClient {
         this.fintWebClient = fintWebClient;
     }
 
-    public Mono<URI> postFile(DokumentfilResource dokumentfilResource) {
+    public Mono<URI> postFile(File file) {
         return pollForCreatedLocation(fintWebClient
                 .post()
                 .uri("/arkiv/noark/dokumentfil")
-                .bodyValue(dokumentfilResource)
-                .header("Content-Disposition", "attachment; filename='" + dokumentfilResource.getFilnavn() + "'")
+                .contentType(getMediaType(file.getType()))
+                .bodyValue(file.getBase64Contents())
+                .header("Content-Disposition", "attachment; filename='" + file.getName() + "'")
                 .retrieve()
         ).doOnError(e -> {
             if (e instanceof WebClientResponseException) {
@@ -40,6 +43,14 @@ public class FintArchiveClient {
                 log.error(e.toString());
             }
         }).retryWhen(Retry.backoff(5, Duration.ofSeconds(1)));
+    }
+
+    private MediaType getMediaType(String mediaType) {
+        try {
+            return MediaType.parseMediaType(mediaType);
+        } catch (InvalidMediaTypeException e) {
+            return MediaType.APPLICATION_OCTET_STREAM;
+        }
     }
 
     public Mono<SakResource> getCase(String archiveCaseId) {

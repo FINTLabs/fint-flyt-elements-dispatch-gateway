@@ -6,6 +6,7 @@ import no.fint.model.resource.arkiv.noark.DokumentfilResource;
 import no.fint.model.resource.arkiv.noark.JournalpostResource;
 import no.fint.model.resource.arkiv.noark.SakResource;
 import no.fintlabs.kafka.TempKafkaDispatchProducerService;
+import no.fintlabs.model.File;
 import no.fintlabs.model.Result;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
@@ -25,8 +26,8 @@ public class FintArchiveService {
         this.tempKafkaDispatchProducerService = tempKafkaDispatchProducerService;
     }
 
-    public Mono<Link> dispatchFile(DokumentfilResource dokumentfilResource) {
-        return fintArchiveClient.postFile(dokumentfilResource)
+    public Mono<Link> dispatchFile(File file) {
+        return fintArchiveClient.postFile(file)
                 .map(URI::toString)
                 .map(Link::with);
     }
