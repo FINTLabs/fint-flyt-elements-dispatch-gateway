@@ -3,10 +3,7 @@ package no.fintlabs.model.mappedinstance;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.Collection;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -17,7 +14,7 @@ public class MappedInstance {
     private Map<String, MappedInstanceElement> elementPerKey;
 
     @Getter
-    private Collection<Document> documents;
+    private List<Document> documents;
 
     public Optional<MappedInstanceElement> getElement(String key) {
         return Optional.ofNullable(elementPerKey.get(key));

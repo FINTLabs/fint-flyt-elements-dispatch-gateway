@@ -8,42 +8,50 @@ import no.fintlabs.model.mappedinstance.Document;
 import no.fintlabs.model.mappedinstance.MappedInstanceElement;
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.IntStream;
 
 @Slf4j
 @Service
 public class DocumentMappingService {
 
     public List<DokumentbeskrivelseResource> toDokumentbeskrivelseResources(
-            Collection<Document> documents,
+            List<Document> documents,
             MappedInstanceElement documentInstanceElement,
             Map<UUID, Link> dokumentfilResourceLinkPerFileId
     ) {
-        return documents
-                .stream()
-                .map(document -> toDokumentBeskrivelseResource(document, documentInstanceElement, dokumentfilResourceLinkPerFileId))
+        return IntStream.range(0, documents.size())
+                .mapToObj(i -> toDokumentBeskrivelseResource(
+                        documents.get(i),
+                        i == 0,
+                        documentInstanceElement,
+                        dokumentfilResourceLinkPerFileId
+                ))
                 .toList();
     }
 
     private DokumentbeskrivelseResource toDokumentBeskrivelseResource(
             Document document,
+            boolean mainDocument,
             MappedInstanceElement documentInstanceElement,
             Map<UUID, Link> dokumentfilResourceLinkPerFileId
     ) {
         DokumentbeskrivelseResource dokumentbeskrivelseResource = new DokumentbeskrivelseResource();
+        dokumentbeskrivelseResource.addTilknyttetRegistreringSom(Link.with(
+                mainDocument
+                        ? "https://beta.felleskomponent.no/arkiv/kodeverk/tilknyttetregistreringsom/systemid/H"
+                        : "https://beta.felleskomponent.no/arkiv/kodeverk/tilknyttetregistreringsom/systemid/V"
+        ));
         dokumentbeskrivelseResource.setTittel(
                 documentInstanceElement.getFieldValue("tittel").map(value -> value + "_").orElse("")
                         + document.getName()
         );
         documentInstanceElement.getFieldValue("dokumentStatus").map(Link::with).ifPresent(dokumentbeskrivelseResource::addDokumentstatus);
-        documentInstanceElement.getFieldValue("dokumentType").map(Link::with).ifPresent(dokumentbeskrivelseResource::addDokumentType);
 
         DokumentobjektResource dokumentobjektResource = new DokumentobjektResource();
         documentInstanceElement.getFieldValue("dokumentObjekt.variantFormat").map(Link::with).ifPresent(dokumentobjektResource::addVariantFormat);
-        dokumentobjektResource.setFormat("PDF");
         dokumentobjektResource.addFilformat(Link.with("https://beta.felleskomponent.no/arkiv/kodeverk/format/systemid/PDF"));
         dokumentobjektResource.addReferanseDokumentfil(
                 dokumentfilResourceLinkPerFileId.get(document.getFileId())
