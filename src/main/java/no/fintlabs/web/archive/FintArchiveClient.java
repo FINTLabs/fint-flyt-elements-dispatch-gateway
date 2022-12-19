@@ -3,7 +3,6 @@ package no.fintlabs.web.archive;
 import lombok.extern.slf4j.Slf4j;
 import no.fint.model.resource.arkiv.noark.SakResource;
 import no.fintlabs.model.File;
-import no.fintlabs.model.Result;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.InvalidMediaTypeException;
@@ -61,7 +60,7 @@ public class FintArchiveClient {
                 .bodyToMono(SakResource.class);
     }
 
-    public Mono<Result> postCase(SakResource sakResource) {
+    public Mono<SakResource> postCase(SakResource sakResource) {
         return pollForCaseResult(
                 fintWebClient
                         .post()
@@ -71,31 +70,27 @@ public class FintArchiveClient {
         );
     }
 
-    public Mono<Result> putCase(String archiveCaseId, SakResource sakResource) {
+    public Mono<SakResource> putCase(SakResource sakResource) {
         return pollForCaseResult(
                 fintWebClient
                         .put()
-                        .uri("/arkiv/noark/sak/mappeid/" + archiveCaseId)
+                        .uri("/arkiv/noark/sak/mappeid/" + sakResource.getMappeId().getIdentifikatorverdi())
                         .bodyValue(sakResource)
                         .retrieve()
         );
     }
 
-    private Mono<Result> pollForCaseResult(WebClient.ResponseSpec responseSpec) {
+    private Mono<SakResource> pollForCaseResult(WebClient.ResponseSpec responseSpec) {
         return pollForCreatedLocation(responseSpec)
                 .flatMap(this::getCase)
-                .map(resultSakResource -> Result.accepted(resultSakResource.getMappeId().getIdentifikatorverdi()))
                 .doOnError(e -> {
                     if (e instanceof WebClientResponseException) {
                         log.error(e + " body=" + ((WebClientResponseException) e).getResponseBodyAsString());
                     } else {
                         log.error(e.toString());
                     }
-                })
-                .onErrorResume(WebClientResponseException.class, e ->
-                        Mono.just(Result.declined(e.getResponseBodyAsString()))
-                )
-                .onErrorReturn(RuntimeException.class, Result.failed());
+                });
+
     }
 
     private Mono<URI> pollForCreatedLocation(WebClient.ResponseSpec responseSpec) {

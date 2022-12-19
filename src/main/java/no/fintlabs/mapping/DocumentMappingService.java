@@ -33,7 +33,6 @@ public class DocumentMappingService {
             MappedInstanceElement documentInstanceElement,
             Map<UUID, Link> dokumentfilResourceLinkPerFileId
     ) {
-
         DokumentbeskrivelseResource dokumentbeskrivelseResource = new DokumentbeskrivelseResource();
         dokumentbeskrivelseResource.setTittel(
                 documentInstanceElement.getFieldValue("tittel").map(value -> value + "_").orElse("")
@@ -44,6 +43,7 @@ public class DocumentMappingService {
 
         DokumentobjektResource dokumentobjektResource = new DokumentobjektResource();
         documentInstanceElement.getFieldValue("dokumentObjekt.variantFormat").map(Link::with).ifPresent(dokumentobjektResource::addVariantFormat);
+        dokumentobjektResource.addFilformat(Link.with("https://beta.felleskomponent.no/arkiv/kodeverk/format/systemid/PROD"));
         dokumentobjektResource.addReferanseDokumentfil(
                 dokumentfilResourceLinkPerFileId.get(document.getFileId())
         );

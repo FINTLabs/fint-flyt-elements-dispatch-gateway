@@ -9,19 +9,22 @@ import no.fintlabs.mapping.ApplicantMappingService;
 import no.fintlabs.mapping.CaseMappingService;
 import no.fintlabs.mapping.DocumentMappingService;
 import no.fintlabs.mapping.RecordMappingService;
-import no.fintlabs.model.CreationStrategy;
+import no.fintlabs.model.CaseDispatchType;
 import no.fintlabs.model.Result;
 import no.fintlabs.model.mappedinstance.Document;
 import no.fintlabs.model.mappedinstance.MappedInstance;
-import no.fintlabs.web.archive.FintArchiveService;
+import no.fintlabs.web.archive.FintArchiveClient;
 import no.fintlabs.web.file.FileClient;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple2;
 
+import java.net.URI;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -32,7 +35,7 @@ public class DispatchService {
     private final ApplicantMappingService applicantMappingService;
     private final DocumentMappingService documentMappingService;
     private final FileClient fileClient;
-    private final FintArchiveService fintArchiveService;
+    private final FintArchiveClient fintArchiveClient;
 
     public DispatchService(
             CaseMappingService caseMappingService,
@@ -40,32 +43,78 @@ public class DispatchService {
             ApplicantMappingService applicantMappingService,
             DocumentMappingService documentMappingService,
             FileClient fileClient,
-            FintArchiveService fintArchiveService
+            FintArchiveClient fintArchiveClient
     ) {
         this.caseMappingService = caseMappingService;
         this.recordMappingService = recordMappingService;
         this.applicantMappingService = applicantMappingService;
         this.documentMappingService = documentMappingService;
         this.fileClient = fileClient;
-        this.fintArchiveService = fintArchiveService;
+        this.fintArchiveClient = fintArchiveClient;
     }
 
     public Mono<Result> process(MappedInstance mappedInstance) {
-        return processFiles(mappedInstance)
-                .flatMap(dokumentfilResourceLinkPerFileId ->
-                        switch (getCreationStrategy(mappedInstance)) {
-                            case NEW -> processAsNewCase(mappedInstance, dokumentfilResourceLinkPerFileId);
-                            case COLLECTION -> processAsNewRecordForCollectionCase(mappedInstance, dokumentfilResourceLinkPerFileId);
-                            case EXISTING -> processAsNewRecordForExistingCaseOrNewCase(mappedInstance, dokumentfilResourceLinkPerFileId);
-                        });
+        return getCase(mappedInstance)
+                .flatMap(sakResource -> addRecord(sakResource, mappedInstance))
+                .map(resultSakResource -> Result.accepted(resultSakResource.getMappeId().getIdentifikatorverdi()))
+                .onErrorResume(WebClientResponseException.class, e ->
+                        Mono.just(Result.declined(e.getResponseBodyAsString()))
+                )
+                .onErrorReturn(RuntimeException.class, Result.failed());
     }
 
-    private CreationStrategy getCreationStrategy(MappedInstance mappedInstance) {
-        return CreationStrategy.valueOf(mappedInstance
+    private Mono<SakResource> getCase(MappedInstance mappedInstance) {
+        return switch (getCaseDispatchType(mappedInstance)) {
+            case NEW -> createNewCase(mappedInstance);
+            case BY_ID -> getCaseById(mappedInstance);
+            case BY_SEARCH_OR_NEW -> getCaseBySearch(mappedInstance)
+                    .flatMap(optionalCase -> optionalCase
+                            .map(Mono::just)
+                            .orElse(createNewCase(mappedInstance)));
+        };
+    }
+
+    private CaseDispatchType getCaseDispatchType(MappedInstance mappedInstance) {
+        return CaseDispatchType.valueOf(mappedInstance
                 .getElement("case")
-                .flatMap(mappedInstanceElement -> mappedInstanceElement.getFieldValue("creationStrategy"))
+                .flatMap(mappedInstanceElement -> mappedInstanceElement.getFieldValue("type"))
                 .orElseThrow()
         );
+    }
+
+    private Mono<SakResource> createNewCase(MappedInstance mappedInstance) {
+        SakResource sakResource = caseMappingService.toSakResource(
+                mappedInstance.getElement("case").orElseThrow()
+        );
+        return fintArchiveClient.postCase(sakResource);
+    }
+
+    private Mono<SakResource> getCaseById(MappedInstance mappedInstance) {
+        String archiveCaseId = mappedInstance
+                .getElement("case")
+                .flatMap(mappedInstanceElement -> mappedInstanceElement.getFieldValue("id"))
+                .orElseThrow();
+        return fintArchiveClient.getCase(archiveCaseId);
+    }
+
+    private Mono<Optional<SakResource>> getCaseBySearch(MappedInstance mappedInstance) {
+        throw new UnsupportedOperationException();
+    }
+
+    private Mono<SakResource> addRecord(SakResource sakResource, MappedInstance mappedInstance) {
+        return addNewRecord(sakResource, mappedInstance);
+    }
+
+    private Mono<SakResource> addNewRecord(SakResource sakResource, MappedInstance mappedInstance) {
+        return processFiles(mappedInstance)
+                .map(dokumentfilResourceLinkPerFileId ->
+                        createJournalpostResource(mappedInstance, dokumentfilResourceLinkPerFileId)
+                )
+                .map(journalpostResource -> {
+                    sakResource.getJournalpost().add(journalpostResource);
+                    return sakResource;
+                })
+                .flatMap(fintArchiveClient::putCase);
     }
 
     private Mono<Map<UUID, Link>> processFiles(MappedInstance mappedInstance) {
@@ -73,47 +122,13 @@ public class DispatchService {
                 .map(Document::getFileId)
                 .flatMap(fileId -> Mono.zip(
                         Mono.just(fileId),
-                        fileClient.getFile(fileId).flatMap(fintArchiveService::dispatchFile)
+                        fileClient.getFile(fileId).flatMap(
+                                file -> fintArchiveClient.postFile(file)
+                                        .map(URI::toString)
+                                        .map(Link::with)
+                        )
                 ))
                 .collectMap(Tuple2::getT1, Tuple2::getT2);
-    }
-
-    private Mono<Result> processAsNewCase(
-            MappedInstance mappedInstance,
-            Map<UUID, Link> dokumentfilResourceLinkPerFileId
-    ) {
-        SakResource sakResource = caseMappingService.toSakResource(
-                mappedInstance.getElement("case").orElseThrow()
-        );
-        JournalpostResource journalpostResource = createJournalpostResource(mappedInstance, dokumentfilResourceLinkPerFileId);
-        sakResource.setJournalpost(List.of(journalpostResource));
-
-        return fintArchiveService.dispatchNewCase(sakResource);
-    }
-
-    private Mono<Result> processAsNewRecordForCollectionCase(
-            MappedInstance mappedInstance,
-            Map<UUID, Link> dokumentfilResourceLinkPerFileId
-    ) {
-        String collectionCaseId = mappedInstance
-                .getElement("case")
-                .flatMap(mappedInstanceElement -> mappedInstanceElement.getFieldValue("saksnummer"))
-                .orElseThrow();
-
-        JournalpostResource journalpostResource = createJournalpostResource(mappedInstance, dokumentfilResourceLinkPerFileId);
-
-        return fintArchiveService.dispatchToCollectionCase(collectionCaseId, journalpostResource);
-    }
-
-    private Mono<Result> processAsNewRecordForExistingCaseOrNewCase(
-            MappedInstance mappedInstance,
-            Map<UUID, Link> dokumentfilResourceLinkPerFileId
-    ) {
-        SakResource sakResource = caseMappingService.toSakResource(mappedInstance.getElement("case").orElseThrow());
-        JournalpostResource journalpostResource = createJournalpostResource(mappedInstance, dokumentfilResourceLinkPerFileId);
-        sakResource.setJournalpost(List.of(journalpostResource));
-
-        return fintArchiveService.dispatchToExistingOrAsNewCase(sakResource);
     }
 
     private JournalpostResource createJournalpostResource(
@@ -137,4 +152,5 @@ public class DispatchService {
 
         return journalpostResource;
     }
+
 }
