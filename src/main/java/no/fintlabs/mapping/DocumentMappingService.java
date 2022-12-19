@@ -52,7 +52,7 @@ public class DocumentMappingService {
 
         DokumentobjektResource dokumentobjektResource = new DokumentobjektResource();
         documentInstanceElement.getFieldValue("dokumentObjekt.variantFormat").map(Link::with).ifPresent(dokumentobjektResource::addVariantFormat);
-        dokumentobjektResource.addFilformat(Link.with("https://beta.felleskomponent.no/arkiv/kodeverk/format/systemid/PROD"));
+        dokumentobjektResource.addFilformat(Link.with("https://beta.felleskomponent.no/arkiv/kodeverk/format/systemid/PDF"));
         dokumentobjektResource.addReferanseDokumentfil(
                 dokumentfilResourceLinkPerFileId.get(document.getFileId())
         );
