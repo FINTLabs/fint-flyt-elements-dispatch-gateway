@@ -3,6 +3,7 @@ package no.fintlabs.web.archive;
 import lombok.extern.slf4j.Slf4j;
 import no.fint.model.resource.arkiv.noark.SakResource;
 import no.fintlabs.model.File;
+import no.fintlabs.model.JournalpostWrapper;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.InvalidMediaTypeException;
@@ -70,12 +71,12 @@ public class FintArchiveClient {
         );
     }
 
-    public Mono<SakResource> putCase(SakResource sakResource) {
+    public Mono<SakResource> putRecord(String caseId, JournalpostWrapper journalpostWrapper) {
         return pollForCaseResult(
                 fintWebClient
                         .put()
-                        .uri("/arkiv/noark/sak/mappeid/" + sakResource.getMappeId().getIdentifikatorverdi())
-                        .bodyValue(sakResource)
+                        .uri("/arkiv/noark/sak/mappeid/" + caseId)
+                        .bodyValue(journalpostWrapper)
                         .retrieve()
         );
     }

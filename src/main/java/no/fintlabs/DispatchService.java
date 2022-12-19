@@ -1,16 +1,15 @@
 package no.fintlabs;
 
 import lombok.extern.slf4j.Slf4j;
+import no.fint.model.felles.kompleksedatatyper.Identifikator;
 import no.fint.model.resource.Link;
-import no.fint.model.resource.arkiv.noark.DokumentbeskrivelseResource;
-import no.fint.model.resource.arkiv.noark.JournalpostResource;
-import no.fint.model.resource.arkiv.noark.KorrespondansepartResource;
-import no.fint.model.resource.arkiv.noark.SakResource;
+import no.fint.model.resource.arkiv.noark.*;
 import no.fintlabs.mapping.ApplicantMappingService;
 import no.fintlabs.mapping.CaseMappingService;
 import no.fintlabs.mapping.DocumentMappingService;
 import no.fintlabs.mapping.RecordMappingService;
 import no.fintlabs.model.CaseDispatchType;
+import no.fintlabs.model.JournalpostWrapper;
 import no.fintlabs.model.Result;
 import no.fintlabs.model.mappedinstance.Document;
 import no.fintlabs.model.mappedinstance.MappedInstance;
@@ -56,8 +55,8 @@ public class DispatchService {
     }
 
     public Mono<Result> process(MappedInstance mappedInstance) {
-        return getCase(mappedInstance)
-                .flatMap(sakResource -> addRecord(sakResource, mappedInstance))
+        return getCaseId(mappedInstance)
+                .flatMap(caseId -> addRecord(caseId, mappedInstance))
                 .map(resultSakResource -> Result.accepted(resultSakResource.getMappeId().getIdentifikatorverdi()))
                 .onErrorResume(WebClientResponseException.class, e ->
                         Mono.just(Result.declined(e.getResponseBodyAsString()))
@@ -65,14 +64,18 @@ public class DispatchService {
                 .onErrorReturn(RuntimeException.class, Result.failed());
     }
 
-    private Mono<SakResource> getCase(MappedInstance mappedInstance) {
+    private Mono<String> getCaseId(MappedInstance mappedInstance) {
         return switch (getCaseDispatchType(mappedInstance)) {
-            case NEW -> createNewCase(mappedInstance);
-            case BY_ID -> getCaseById(mappedInstance);
+            case NEW -> createNewCase(mappedInstance)
+                    .map(SaksmappeResource::getMappeId)
+                    .map(Identifikator::getIdentifikatorverdi);
+            case BY_ID -> getCaseIdValue(mappedInstance);
             case BY_SEARCH_OR_NEW -> getCaseBySearch(mappedInstance)
                     .flatMap(optionalCase -> optionalCase
                             .map(Mono::just)
-                            .orElse(createNewCase(mappedInstance)));
+                            .orElse(createNewCase(mappedInstance)))
+                    .map(SaksmappeResource::getMappeId)
+                    .map(Identifikator::getIdentifikatorverdi);
         };
     }
 
@@ -93,35 +96,30 @@ public class DispatchService {
                 .doOnNext(result -> log.debug("Created new case: {}", result));
     }
 
-    private Mono<SakResource> getCaseById(MappedInstance mappedInstance) {
-        String archiveCaseId = mappedInstance
+    private Mono<String> getCaseIdValue(MappedInstance mappedInstance) {
+        return Mono.just(mappedInstance
                 .getElement("case")
                 .flatMap(mappedInstanceElement -> mappedInstanceElement.getFieldValue("id"))
-                .orElseThrow();
-        return fintArchiveClient.getCase(archiveCaseId)
-                .doOnNext(result -> log.debug("Found case by case id={}: {}", archiveCaseId, result));
+                .orElseThrow()
+        );
     }
 
     private Mono<Optional<SakResource>> getCaseBySearch(MappedInstance mappedInstance) {
         throw new UnsupportedOperationException();
     }
 
-    private Mono<SakResource> addRecord(SakResource sakResource, MappedInstance mappedInstance) {
-        return addNewRecord(sakResource, mappedInstance);
+    private Mono<SakResource> addRecord(String caseId, MappedInstance mappedInstance) {
+        return addNewRecord(caseId, mappedInstance);
     }
 
-    private Mono<SakResource> addNewRecord(SakResource sakResource, MappedInstance mappedInstance) {
+    private Mono<SakResource> addNewRecord(String caseId, MappedInstance mappedInstance) {
         return processFiles(mappedInstance)
                 .map(dokumentfilResourceLinkPerFileId ->
                         createJournalpostResource(mappedInstance, dokumentfilResourceLinkPerFileId)
                 )
                 .doOnNext(journalpostResource -> log.debug("Created record: {}", journalpostResource))
-                .map(journalpostResource -> {
-                    sakResource.getJournalpost().add(journalpostResource);
-                    return sakResource;
-                })
-                .doOnNext(sakResourceWithRecord -> log.debug("Added record to case: {}", sakResourceWithRecord))
-                .flatMap(fintArchiveClient::putCase);
+                .map(JournalpostWrapper::new)
+                .flatMap(journalpostWrapper -> fintArchiveClient.putRecord(caseId, journalpostWrapper));
     }
 
     private Mono<Map<UUID, Link>> processFiles(MappedInstance mappedInstance) {
