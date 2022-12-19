@@ -1,5 +1,6 @@
 package no.fintlabs;
 
+import lombok.extern.slf4j.Slf4j;
 import no.fint.model.resource.Link;
 import no.fint.model.resource.arkiv.noark.DokumentbeskrivelseResource;
 import no.fint.model.resource.arkiv.noark.JournalpostResource;
@@ -27,6 +28,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
+@Slf4j
 @Service
 public class DispatchService {
 
@@ -86,7 +88,9 @@ public class DispatchService {
         SakResource sakResource = caseMappingService.toSakResource(
                 mappedInstance.getElement("case").orElseThrow()
         );
-        return fintArchiveClient.postCase(sakResource);
+
+        return fintArchiveClient.postCase(sakResource)
+                .doOnNext(result -> log.debug("Created new case: {}", result));
     }
 
     private Mono<SakResource> getCaseById(MappedInstance mappedInstance) {
@@ -94,7 +98,8 @@ public class DispatchService {
                 .getElement("case")
                 .flatMap(mappedInstanceElement -> mappedInstanceElement.getFieldValue("id"))
                 .orElseThrow();
-        return fintArchiveClient.getCase(archiveCaseId);
+        return fintArchiveClient.getCase(archiveCaseId)
+                .doOnNext(result -> log.debug("Found case by case id={}: {}", archiveCaseId, result));
     }
 
     private Mono<Optional<SakResource>> getCaseBySearch(MappedInstance mappedInstance) {
@@ -110,10 +115,12 @@ public class DispatchService {
                 .map(dokumentfilResourceLinkPerFileId ->
                         createJournalpostResource(mappedInstance, dokumentfilResourceLinkPerFileId)
                 )
+                .doOnNext(journalpostResource -> log.debug("Created record: {}", journalpostResource))
                 .map(journalpostResource -> {
                     sakResource.getJournalpost().add(journalpostResource);
                     return sakResource;
                 })
+                .doOnNext(sakResourceWithRecord -> log.debug("Added record to case: {}", sakResourceWithRecord))
                 .flatMap(fintArchiveClient::putCase);
     }
 
