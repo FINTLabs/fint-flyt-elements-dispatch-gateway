@@ -1,7 +1,7 @@
 apiVersion: "fintlabs.no/v1alpha1"
 kind: KafkaUserAndAcl
 metadata:
-  name: fint-flyt-file-service
+  name: fint-flyt-elements-dispatch-gateway
 spec:
   acls:
     - permission: admin

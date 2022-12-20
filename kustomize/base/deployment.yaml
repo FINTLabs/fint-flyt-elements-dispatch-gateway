@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: fint-flyt-file-service
+  name: fint-flyt-elements-dispatch-gateway
 spec:
   replicas: 1
   strategy:
@@ -12,10 +12,10 @@ spec:
       volumes:
         - name: credentials
           secret:
-            secretName: fint-flyt-file-service-kafka-certificates
+            secretName: fint-flyt-elements-dispatch-gateway-kafka-certificates
       containers:
-        - image: ghcr.io/fintlabs/fint-flyt-file-service:sha-0000000
-          name: fint-flyt-file-service
+        - image: ghcr.io/fintlabs/fint-flyt-elements-dispatch-gateway:sha-0000000
+          name: fint-flyt-elements-dispatch-gateway
           volumeMounts:
             - name: credentials
               mountPath: /credentials
@@ -30,6 +30,6 @@ spec:
             - containerPort: 8080
           envFrom:
             - secretRef:
-                name: fint-flyt-file-service-kafka
+                name: fint-flyt-elements-dispatch-gateway-kafka
             - configMapRef:
-                name: fint-flyt-file-service
+                name: fint-flyt-elements-dispatch-gateway

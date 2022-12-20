@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: fint-flyt-file-service
+  name: fint-flyt-elements-dispatch-gateway
 spec:
   ports:
     - port: 8080
