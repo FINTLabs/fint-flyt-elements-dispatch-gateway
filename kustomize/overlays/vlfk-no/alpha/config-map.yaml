@@ -4,6 +4,9 @@ metadata:
   name: fint-flyt-file-service
 data:
   TZ: 'Europe/Oslo'
-  JAVA_TOOL_OPTIONS: '-XX:+ExitOnOutOfMemoryError -Xmx1840M'
+  JAVA_TOOL_OPTIONS: '-XX:+ExitOnOutOfMemoryError -Xmx480M -verbose:gc'
   fint.org-id: 'vlfk.no'
   spring.webflux.base-path: 'alpha/vlfk-no'
+  fint.client.base-url: 'https://beta.felleskomponent.no'
+  fint.flyt.base-url: 'https://viken-no-skjema.vigoiks.no'
+  fint.dispatch-gateway.authorization.enable: "true"
