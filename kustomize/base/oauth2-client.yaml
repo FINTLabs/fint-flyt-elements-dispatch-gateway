@@ -1,0 +1,15 @@
+apiVersion: "fintlabs.no/v1alpha1"
+kind: NamOAuthClientApplicationResource
+metadata:
+  name: oauth2-client-flyt-archive-dispatch-gateway
+  labels:
+    app.kubernetes.io/name: oauth2-client-flyt-archive-dispatch-gateway
+    app.kubernetes.io/instance: oauth2-client-flyt-archive-dispatch-gateway
+    app.kubernetes.io/version: latest
+    app.kubernetes.io/component: oauth-client
+    app.kubernetes.io/part-of: fint-flyt
+    fintlabs.no/team: flyt
+    fintlabs.no/org-id: vlfk.no
+spec:
+  grantTypes:
+    - client_credentials

@@ -6,8 +6,8 @@ resources:
 patchesStrategicMerge:
   - config-map.yaml
 commonLabels:
-  app.kubernetes.io/name: fint-flyt-elements-dispatch-gateway
-  app.kubernetes.io/instance: fint-flyt-elements-dispatch-gateway_vlfk-no
+  app.kubernetes.io/name: fint-flyt-archive-dispatch-gateway
+  app.kubernetes.io/instance: fint-flyt-archive-dispatch-gateway_vlfk-no
   app.kubernetes.io/version: latest
   app.kubernetes.io/component: backend
   app.kubernetes.io/part-of: fint-flyt
@@ -20,12 +20,12 @@ patches:
         value: "Host(`flyt.vigoiks.no`) && PathPrefix(`/alpha/vlfk-no/api/intern-klient/filer`)"
     target:
       kind: IngressRoute
-      name: fint-flyt-elements-dispatch-gateway
+      name: fint-flyt-archive-dispatch-gateway
   - patch: |-
       - op: replace
         path: "/spec/acls/0/topic"
         value: "vlfk-no.flyt.*"
     target:
       kind: KafkaUserAndAcl
-      name: fint-flyt-elements-dispatch-gateway
+      name: fint-flyt-archive-dispatch-gateway
 
