@@ -33,5 +33,7 @@ spec:
                 name: fint-flyt-archive-dispatch-gateway-kafka
             - secretRef:
                 name: oauth2-client-flyt-archive-dispatch-gateway
+            - secretRef:
+                name: vlfk-no-fint-flyt-archive-dispatch-gateway
             - configMapRef:
                 name: fint-flyt-archive-dispatch-gateway
