@@ -1,9 +1,9 @@
 apiVersion: onepassword.com/v1
 kind: OnePasswordItem
 metadata:
-  name: vlfk-no-fint-flyt-elements-dispatch-gateway
+  name: vlfk-no-fint-flyt-archive-dispatch-gateway
 spec:
-  itemPath: "vaults/aks-alpha-vault/items/vlfk-no-fint-flyt-elements-dispatch-gateway"
+  itemPath: "vaults/aks-alpha-vault/items/vlfk-no-fint-flyt-archive-dispatch-gateway"
 ---
 apiVersion: v1
 kind: ConfigMap
