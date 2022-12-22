@@ -1,3 +1,10 @@
+apiVersion: onepassword.com/v1
+kind: OnePasswordItem
+metadata:
+  name: vlfk-no-fint-flyt-elements-dispatch-gateway
+spec:
+  itemPath: "vaults/aks-alpha-vault/items/vlfk-no-fint-flyt-elements-dispatch-gateway"
+---
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -8,5 +15,5 @@ data:
   fint.org-id: 'vlfk.no'
   spring.webflux.base-path: 'alpha/vlfk-no'
   fint.client.base-url: 'https://beta.felleskomponent.no'
-  fint.flyt.base-url: 'https://viken-no-skjema.vigoiks.no'
+  fint.flyt.base-url: 'flyt.vigoiks.no/alpha/vlfk-no'
   fint.dispatch-gateway.authorization.enable: "true"
