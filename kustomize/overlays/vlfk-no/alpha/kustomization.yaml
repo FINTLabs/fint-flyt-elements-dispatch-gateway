@@ -6,7 +6,6 @@ resources:
   - one-password-item.yaml
 patchesStrategicMerge:
   - config-map.yaml
-  - deployment.yaml
 commonLabels:
   app.kubernetes.io/name: fint-flyt-archive-dispatch-gateway
   app.kubernetes.io/instance: fint-flyt-archive-dispatch-gateway_vlfk-no
