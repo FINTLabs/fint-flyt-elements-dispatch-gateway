@@ -122,7 +122,7 @@ public class FintArchiveClient {
                 .toBodilessEntity()
                 .filter(entity -> HttpStatus.CREATED.equals(entity.getStatusCode()) && entity.getHeaders().getLocation() != null)
                 .mapNotNull(entity -> entity.getHeaders().getLocation())
-                .repeatWhenEmpty(10, longFlux -> Flux.interval(Duration.ofSeconds(1)))
+                .repeatWhenEmpty(10, longFlux -> Flux.interval(Duration.ofSeconds(10)))
                 .switchIfEmpty(Mono.error(new RuntimeException("Reached max number of retries for polling for 201 Created location header")));
     }
 
