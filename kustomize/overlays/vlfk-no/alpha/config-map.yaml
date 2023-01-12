@@ -8,5 +8,4 @@ data:
   fint.org-id: 'vlfk.no'
   spring.webflux.base-path: 'alpha/vlfk-no'
   fint.client.base-url: 'https://beta.felleskomponent.no'
-  fint.flyt.base-url: 'flyt.vigoiks.no/alpha/vlfk-no'
   fint.dispatch-gateway.authorization.enable: "true"

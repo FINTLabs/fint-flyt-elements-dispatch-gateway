@@ -8,5 +8,4 @@ data:
   fint.org-id: 'viken.no'
   spring.webflux.base-path: 'alpha/viken-no'
   fint.client.base-url: 'https://beta.felleskomponent.no'
-  fint.flyt.base-url: 'flyt.vigoiks.no/alpha/viken-no'
   fint.dispatch-gateway.authorization.enable: "true"

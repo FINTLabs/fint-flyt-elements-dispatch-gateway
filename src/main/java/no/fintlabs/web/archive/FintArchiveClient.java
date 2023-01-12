@@ -29,20 +29,24 @@ public class FintArchiveClient {
     }
 
     public Mono<URI> postFile(File file) {
-        return pollForCreatedLocation(fintWebClient
-                .post()
-                .uri("/arkiv/noark/dokumentfil")
-                .contentType(getMediaType(file.getType()))
-                .bodyValue(file.getContents())
-                .header("Content-Disposition", "attachment; filename='" + file.getName() + "'")
-                .retrieve()
-        ).doOnError(e -> {
-            if (e instanceof WebClientResponseException) {
-                log.error(e + " body=" + ((WebClientResponseException) e).getResponseBodyAsString());
-            } else {
-                log.error(e.toString());
-            }
-        }).retryWhen(Retry.backoff(5, Duration.ofSeconds(1)));
+        return pollForCreatedLocation(
+                fintWebClient
+                        .post()
+                        .uri("/arkiv/noark/dokumentfil")
+                        .contentType(getMediaType(file.getType()))
+                        .bodyValue(file.getContents())
+                        .header("Content-Disposition", "attachment; filename='" + file.getName() + "'")
+                        .retrieve()
+        )
+                .doOnNext(uri -> log.info("Successfully posted file with name={} on uri={}", file.getName(), uri))
+                .doOnError(e -> {
+                    if (e instanceof WebClientResponseException) {
+                        log.error(e + " body=" + ((WebClientResponseException) e).getResponseBodyAsString());
+                    } else {
+                        log.error(e.toString());
+                    }
+                })
+                .retryWhen(Retry.backoff(5, Duration.ofSeconds(1)));
     }
 
     private MediaType getMediaType(String mediaType) {
@@ -54,11 +58,19 @@ public class FintArchiveClient {
     }
 
     public Mono<SakResource> getCase(String archiveCaseId) {
-        return fintWebClient
-                .get()
-                .uri("/arkiv/noark/sak/mappeid/" + archiveCaseId)
-                .retrieve()
-                .bodyToMono(SakResource.class);
+        return Mono.just(fintWebClient
+                        .get()
+                        .uri("/arkiv/noark/sak/mappeid/" + archiveCaseId))
+                .map(WebClient.RequestHeadersSpec::retrieve)
+                .flatMap(responseSpec -> responseSpec.bodyToMono(SakResource.class))
+                .doOnNext(sakResource -> log.info("Successfully retrieved case with id={}", archiveCaseId))
+                .doOnError(e -> {
+                    if (e instanceof WebClientResponseException) {
+                        log.error(e + " body=" + ((WebClientResponseException) e).getResponseBodyAsString());
+                    } else {
+                        log.error(e.toString());
+                    }
+                });
     }
 
     public Mono<SakResource> postCase(SakResource sakResource) {
