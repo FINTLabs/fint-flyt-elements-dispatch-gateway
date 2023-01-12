@@ -9,3 +9,7 @@ spring:
       - flyt-logging
       - fint-client
       - flyt-file-client
+logging:
+  level:
+    reactor:
+      netty: DEBUG
