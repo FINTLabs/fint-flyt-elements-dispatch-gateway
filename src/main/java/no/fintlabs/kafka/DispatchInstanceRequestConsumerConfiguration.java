@@ -1,9 +1,9 @@
 package no.fintlabs.kafka;
 
 import no.fintlabs.DispatchService;
+import no.fintlabs.flyt.kafka.requestreply.InstanceFlowReplyProducerRecord;
+import no.fintlabs.flyt.kafka.requestreply.InstanceFlowRequestConsumerFactoryService;
 import no.fintlabs.kafka.common.topic.TopicCleanupPolicyParameters;
-import no.fintlabs.kafka.requestreply.ReplyProducerRecord;
-import no.fintlabs.kafka.requestreply.RequestConsumerFactoryService;
 import no.fintlabs.kafka.requestreply.topic.RequestTopicNameParameters;
 import no.fintlabs.kafka.requestreply.topic.RequestTopicService;
 import no.fintlabs.model.Result;
@@ -19,7 +19,7 @@ public class DispatchInstanceRequestConsumerConfiguration {
     @Bean
     ConcurrentMessageListenerContainer<String, MappedInstance> dispatchInstanceRequestConsumer(
             RequestTopicService requestTopicService,
-            RequestConsumerFactoryService requestConsumerFactoryService,
+            InstanceFlowRequestConsumerFactoryService instanceFlowRequestConsumerFactoryService,
             DispatchService dispatchService
     ) {
         RequestTopicNameParameters requestTopicNameParameters = RequestTopicNameParameters
@@ -29,12 +29,15 @@ public class DispatchInstanceRequestConsumerConfiguration {
 
         requestTopicService.ensureTopic(requestTopicNameParameters, 0, TopicCleanupPolicyParameters.builder().build());
 
-        return requestConsumerFactoryService.createFactory(
+        return instanceFlowRequestConsumerFactoryService.createFactory(
                 MappedInstance.class,
                 Result.class,
-                consumerRecord -> {
-                    Result result = dispatchService.process(consumerRecord.value()).block();
-                    return ReplyProducerRecord
+                instanceFlowConsumerRecord -> {
+                    Result result = dispatchService.process(
+                            instanceFlowConsumerRecord.getInstanceFlowHeaders(),
+                            instanceFlowConsumerRecord.getConsumerRecord().value()
+                    ).block();
+                    return InstanceFlowReplyProducerRecord
                             .<Result>builder()
                             .value(result)
                             .build();

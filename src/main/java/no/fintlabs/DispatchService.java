@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import no.fint.model.felles.kompleksedatatyper.Identifikator;
 import no.fint.model.resource.Link;
 import no.fint.model.resource.arkiv.noark.*;
+import no.fintlabs.flyt.kafka.headers.InstanceFlowHeaders;
 import no.fintlabs.mapping.ApplicantMappingService;
 import no.fintlabs.mapping.CaseMappingService;
 import no.fintlabs.mapping.DocumentMappingService;
@@ -38,6 +39,7 @@ public class DispatchService {
     private final FileClient fileClient;
     private final FintArchiveClient fintArchiveClient;
 
+
     public DispatchService(
             CaseMappingService caseMappingService,
             RecordMappingService recordMappingService,
@@ -54,13 +56,14 @@ public class DispatchService {
         this.fintArchiveClient = fintArchiveClient;
     }
 
-    public Mono<Result> process(MappedInstance mappedInstance) {
+    public Mono<Result> process(InstanceFlowHeaders instanceFlowHeaders, MappedInstance mappedInstance) {
         return getCaseId(mappedInstance)
                 .flatMap(caseId -> addRecord(caseId, mappedInstance))
                 .map(resultSakResource -> Result.accepted(resultSakResource.getMappeId().getIdentifikatorverdi()))
                 .onErrorResume(WebClientResponseException.class, e ->
                         Mono.just(Result.declined(e.getResponseBodyAsString()))
                 )
+                .doOnError(e -> log.error("Failed to dispatch instance with headers=" + instanceFlowHeaders, e))
                 .onErrorReturn(RuntimeException.class, Result.failed());
     }
 
