@@ -39,6 +39,7 @@ public class DispatchInstanceRequestConsumerConfiguration {
                     ).block();
                     return InstanceFlowReplyProducerRecord
                             .<Result>builder()
+                            .instanceFlowHeaders(instanceFlowConsumerRecord.getInstanceFlowHeaders())
                             .value(result)
                             .build();
                 },
