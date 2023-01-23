@@ -6,6 +6,5 @@ data:
   TZ: 'Europe/Oslo'
   JAVA_TOOL_OPTIONS: '-XX:+ExitOnOutOfMemoryError -Xmx480M -verbose:gc'
   fint.org-id: 'viken.no'
-  spring.webflux.base-path: 'alpha/viken-no'
   fint.client.base-url: 'https://beta.felleskomponent.no'
   fint.dispatch-gateway.authorization.enable: "true"
