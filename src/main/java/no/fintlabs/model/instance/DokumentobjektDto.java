@@ -16,6 +16,6 @@ import java.util.UUID;
 public class DokumentobjektDto {
     private Link variantformat;
     private Link filformat;
-    @JsonProperty(namespace = "file")
+    @JsonProperty(value = "file")
     private UUID fileId;
 }
