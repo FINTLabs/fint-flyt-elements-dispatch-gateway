@@ -18,7 +18,6 @@ public class ArchiveInstance {
     @NotNull
     private SakDto sak;
 
-    @Valid
     private JournalpostDto journalpost;
 
 }
