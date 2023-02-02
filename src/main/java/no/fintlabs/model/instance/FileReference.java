@@ -1,4 +1,4 @@
-package no.fintlabs.model.mappedinstance;
+package no.fintlabs.model.instance;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,9 +11,6 @@ import java.util.UUID;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class Document {
-    private String name;
-    private String type;
-    private String encoding;
+public class FileReference {
     private UUID fileId;
 }
