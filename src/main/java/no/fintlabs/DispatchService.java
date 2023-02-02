@@ -96,7 +96,7 @@ public class DispatchService {
                         .stream()
                         .map(DokumentbeskrivelseDto::getDokumentobjekt)
                         .flatMap(Collection::stream)
-                        .map(DokumentobjektDto::getFileReference)
+                        .map(DokumentobjektDto::getFileId)
                         .toList()
         );
     }

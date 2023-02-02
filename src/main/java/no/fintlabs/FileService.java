@@ -1,7 +1,6 @@
 package no.fintlabs;
 
 import no.fint.model.resource.Link;
-import no.fintlabs.model.instance.FileReference;
 import no.fintlabs.web.archive.FintArchiveClient;
 import no.fintlabs.web.file.FileClient;
 import org.springframework.stereotype.Service;
@@ -25,9 +24,8 @@ public class FileService {
         this.fintArchiveClient = fintArchiveClient;
     }
 
-    public Mono<Map<UUID, Link>> dispatchFiles(Collection<FileReference> fileReferences) {
-        return Flux.fromIterable(fileReferences)
-                .map(FileReference::getFileId)
+    public Mono<Map<UUID, Link>> dispatchFiles(Collection<UUID> fileIds) {
+        return Flux.fromIterable(fileIds)
                 .flatMap(fileId -> Mono.zip(
                         Mono.just(fileId),
                         archiveFile(fileId)

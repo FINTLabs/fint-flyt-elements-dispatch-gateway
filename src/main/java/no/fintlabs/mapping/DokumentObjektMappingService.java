@@ -31,7 +31,7 @@ public class DokumentObjektMappingService {
         dokumentobjektResource.addVariantFormat(dokumentobjektDto.getVariantformat());
         dokumentobjektResource.addFilformat(dokumentobjektDto.getFilformat());
         dokumentobjektResource.addReferanseDokumentfil(
-                fileArchiveLinkPerFileId.get(dokumentobjektDto.getFileReference().getFileId())
+                fileArchiveLinkPerFileId.get(dokumentobjektDto.getFileId())
         );
         return dokumentobjektResource;
     }
