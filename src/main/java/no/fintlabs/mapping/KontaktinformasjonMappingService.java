@@ -8,6 +8,9 @@ import org.springframework.stereotype.Service;
 public class KontaktinformasjonMappingService {
 
     public Kontaktinformasjon toKontaktinformasjon(KontaktinformasjonDto kontaktinformasjonDto) {
+        if (kontaktinformasjonDto == null) {
+            return null;
+        }
         Kontaktinformasjon kontaktinformasjon = new Kontaktinformasjon();
         kontaktinformasjon.setEpostadresse(kontaktinformasjonDto.getEpostadresse());
         kontaktinformasjon.setTelefonnummer(kontaktinformasjonDto.getTelefonnummer());
