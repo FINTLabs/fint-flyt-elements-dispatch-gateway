@@ -31,6 +31,7 @@ public class KlasseMappingService {
                 .ifPresent(klasseResource::setSkjerming);
         klasseResource.setTittel(klasseDto.getTittel());
         klasseResource.addKlassifikasjonssystem(klasseDto.getKlassifikasjonssystem());
+        klasseResource.setRekkefolge(klasseDto.getRekkefølge());
         return klasseResource;
     }
 

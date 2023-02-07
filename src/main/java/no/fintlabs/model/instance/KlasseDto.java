@@ -15,4 +15,5 @@ public class KlasseDto {
     private SkjermingDto skjerming;
     private String tittel;
     private Link klassifikasjonssystem;
+    private Integer rekkefølge;
 }
