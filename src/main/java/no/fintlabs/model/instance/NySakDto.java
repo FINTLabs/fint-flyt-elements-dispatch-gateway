@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import no.fint.model.resource.Link;
 
 import java.util.List;
 
@@ -15,12 +14,12 @@ import java.util.List;
 public class NySakDto {
     private String tittel;
     private String offentligTittel;
-    private Link saksmappetype;
-    private Link saksstatus;
-    private Link journalenhet;
-    private Link administrativenhet;
-    private Link saksansvarlig;
-    private Link arkivdel;
+    private LinkDto saksmappetype;
+    private LinkDto saksstatus;
+    private LinkDto journalenhet;
+    private LinkDto administrativenhet;
+    private LinkDto saksansvarlig;
+    private LinkDto arkivdel;
     private SkjermingDto skjerming;
     private List<KlasseDto> klasse;
 }

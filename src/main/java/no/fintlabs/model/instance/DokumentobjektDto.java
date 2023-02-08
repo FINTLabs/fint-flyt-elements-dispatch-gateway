@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import no.fint.model.resource.Link;
 
 import java.util.UUID;
 
@@ -14,8 +13,8 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class DokumentobjektDto {
-    private Link variantformat;
-    private Link filformat;
+    private LinkDto variantformat;
+    private LinkDto filformat;
     @JsonProperty(value = "file")
     private UUID fileId;
 }

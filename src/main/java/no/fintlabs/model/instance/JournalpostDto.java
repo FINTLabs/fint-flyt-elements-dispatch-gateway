@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import no.fint.model.resource.Link;
 
 import java.util.Collection;
 
@@ -15,10 +14,10 @@ import java.util.Collection;
 public class JournalpostDto {
     private String tittel;
     private String offentligTittel;
-    private Link journalstatus;
-    private Link saksbehandler;
-    private Link journalposttype;
-    private Link administrativenhet;
+    private LinkDto journalstatus;
+    private LinkDto saksbehandler;
+    private LinkDto journalposttype;
+    private LinkDto administrativenhet;
     private SkjermingDto skjerming;
     private Collection<KorrespondansepartDto> korrespondansepart;
     private Collection<DokumentbeskrivelseDto> dokumentbeskrivelse;

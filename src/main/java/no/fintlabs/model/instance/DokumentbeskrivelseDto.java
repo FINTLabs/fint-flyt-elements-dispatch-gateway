@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import no.fint.model.resource.Link;
 
 import java.util.Collection;
 
@@ -14,8 +13,8 @@ import java.util.Collection;
 @NoArgsConstructor
 public class DokumentbeskrivelseDto {
     private String tittel;
-    private Link dokumentType;
-    private Link tilknyttetRegistreringSom;
-    private Link dokumentstatus;
+    private LinkDto dokumentType;
+    private LinkDto tilknyttetRegistreringSom;
+    private LinkDto dokumentstatus;
     private Collection<DokumentobjektDto> dokumentobjekt;
 }
