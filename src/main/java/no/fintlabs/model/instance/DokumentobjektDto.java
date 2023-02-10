@@ -15,17 +15,17 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class DokumentobjektDto {
-    private LinkDto variantformat;
-    private LinkDto filformat;
+    private String variantformat;
+    private String filformat;
     @JsonProperty(value = "file")
     @NotNull
     private UUID fileId;
 
-    public Optional<LinkDto> getVariantformat() {
+    public Optional<String> getVariantformat() {
         return Optional.ofNullable(variantformat);
     }
 
-    public Optional<LinkDto> getFilformat() {
+    public Optional<String> getFilformat() {
         return Optional.ofNullable(filformat);
     }
 

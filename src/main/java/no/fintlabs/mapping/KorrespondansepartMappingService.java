@@ -1,5 +1,6 @@
 package no.fintlabs.mapping;
 
+import no.fint.model.resource.Link;
 import no.fint.model.resource.arkiv.noark.KorrespondansepartResource;
 import no.fintlabs.model.instance.KorrespondansepartDto;
 import org.springframework.stereotype.Service;
@@ -39,7 +40,7 @@ public class KorrespondansepartMappingService {
                 .map(adresseMappingService::toAdresseResource)
                 .ifPresent(korrespondansepartResource::setAdresse);
 
-        korrespondansepartDto.getKorrespondanseparttype().ifPresent(korrespondansepartResource::addKorrespondanseparttype);
+        korrespondansepartDto.getKorrespondanseparttype().map(Link::with).ifPresent(korrespondansepartResource::addKorrespondanseparttype);
         korrespondansepartDto.getKontaktperson().ifPresent(korrespondansepartResource::setKontaktperson);
 
         korrespondansepartDto.getKontaktinformasjon()

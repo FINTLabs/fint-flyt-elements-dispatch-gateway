@@ -16,7 +16,7 @@ public class KorrespondansepartDto {
     private String organisasjonsnummer;
     private String korrespondansepartNavn;
     private AdresseDto adresse;
-    private LinkDto korrespondanseparttype;
+    private String korrespondanseparttype;
     private String kontaktperson;
     private KontaktinformasjonDto kontaktinformasjon;
     private SkjermingDto skjerming;
@@ -37,7 +37,7 @@ public class KorrespondansepartDto {
         return Optional.ofNullable(adresse);
     }
 
-    public Optional<LinkDto> getKorrespondanseparttype() {
+    public Optional<String> getKorrespondanseparttype() {
         return Optional.ofNullable(korrespondanseparttype);
     }
 

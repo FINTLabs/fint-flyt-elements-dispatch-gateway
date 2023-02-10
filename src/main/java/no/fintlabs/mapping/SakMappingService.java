@@ -1,5 +1,6 @@
 package no.fintlabs.mapping;
 
+import no.fint.model.resource.Link;
 import no.fint.model.resource.arkiv.noark.SakResource;
 import no.fintlabs.model.instance.NySakDto;
 import org.springframework.stereotype.Service;
@@ -25,12 +26,12 @@ public class SakMappingService {
         SakResource sakResource = new SakResource();
         nySakDto.getTittel().ifPresent(sakResource::setTittel);
         nySakDto.getOffentligTittel().ifPresent(sakResource::setOffentligTittel);
-        nySakDto.getSaksmappetype().ifPresent(sakResource::addSaksmappetype);
-        nySakDto.getSaksstatus().ifPresent(sakResource::addSaksstatus);
-        nySakDto.getJournalenhet().ifPresent(sakResource::addJournalenhet);
-        nySakDto.getAdministrativenhet().ifPresent(sakResource::addAdministrativEnhet);
-        nySakDto.getSaksansvarlig().ifPresent(sakResource::addSaksansvarlig);
-        nySakDto.getArkivdel().ifPresent(sakResource::addArkivdel);
+        nySakDto.getSaksmappetype().map(Link::with).ifPresent(sakResource::addSaksmappetype);
+        nySakDto.getSaksstatus().map(Link::with).ifPresent(sakResource::addSaksstatus);
+        nySakDto.getJournalenhet().map(Link::with).ifPresent(sakResource::addJournalenhet);
+        nySakDto.getAdministrativenhet().map(Link::with).ifPresent(sakResource::addAdministrativEnhet);
+        nySakDto.getSaksansvarlig().map(Link::with).ifPresent(sakResource::addSaksansvarlig);
+        nySakDto.getArkivdel().map(Link::with).ifPresent(sakResource::addArkivdel);
         nySakDto.getKlasse()
                 .map(klasseMappingService::toKlasse)
                 .ifPresent(sakResource::setKlasse);

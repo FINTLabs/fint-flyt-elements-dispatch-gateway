@@ -12,14 +12,14 @@ import java.util.Optional;
 @NoArgsConstructor
 @AllArgsConstructor
 public class SkjermingDto {
-    private LinkDto tilgangsrestriksjon;
-    private LinkDto skjermingshjemmel;
+    private String tilgangsrestriksjon;
+    private String skjermingshjemmel;
 
-    public Optional<LinkDto> getTilgangsrestriksjon() {
+    public Optional<String> getTilgangsrestriksjon() {
         return Optional.ofNullable(tilgangsrestriksjon);
     }
 
-    public Optional<LinkDto> getSkjermingshjemmel() {
+    public Optional<String> getSkjermingshjemmel() {
         return Optional.ofNullable(skjermingshjemmel);
     }
 

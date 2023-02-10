@@ -15,10 +15,10 @@ import java.util.Optional;
 public class JournalpostDto {
     private String tittel;
     private String offentligTittel;
-    private LinkDto journalstatus;
-    private LinkDto saksbehandler;
-    private LinkDto journalposttype;
-    private LinkDto administrativenhet;
+    private String journalstatus;
+    private String saksbehandler;
+    private String journalposttype;
+    private String administrativenhet;
     private SkjermingDto skjerming;
     private Collection<KorrespondansepartDto> korrespondansepart;
     private Collection<DokumentbeskrivelseDto> dokumentbeskrivelse;
@@ -31,19 +31,19 @@ public class JournalpostDto {
         return Optional.ofNullable(offentligTittel);
     }
 
-    public Optional<LinkDto> getJournalstatus() {
+    public Optional<String> getJournalstatus() {
         return Optional.ofNullable(journalstatus);
     }
 
-    public Optional<LinkDto> getSaksbehandler() {
+    public Optional<String> getSaksbehandler() {
         return Optional.ofNullable(saksbehandler);
     }
 
-    public Optional<LinkDto> getJournalposttype() {
+    public Optional<String> getJournalposttype() {
         return Optional.ofNullable(journalposttype);
     }
 
-    public Optional<LinkDto> getAdministrativenhet() {
+    public Optional<String> getAdministrativenhet() {
         return Optional.ofNullable(administrativenhet);
     }
 

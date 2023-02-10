@@ -34,9 +34,9 @@ public class DokumentbeskrivelseMappingService {
     ) {
         DokumentbeskrivelseResource dokumentbeskrivelseResource = new DokumentbeskrivelseResource();
         dokumentbeskrivelseDto.getTittel().ifPresent(dokumentbeskrivelseResource::setTittel);
-        dokumentbeskrivelseDto.getDokumentType().ifPresent(dokumentbeskrivelseResource::addDokumentType);
-        dokumentbeskrivelseDto.getTilknyttetRegistreringSom().ifPresent(dokumentbeskrivelseResource::addTilknyttetRegistreringSom);
-        dokumentbeskrivelseDto.getDokumentstatus().ifPresent(dokumentbeskrivelseResource::addDokumentstatus);
+        dokumentbeskrivelseDto.getDokumentType().map(Link::with).ifPresent(dokumentbeskrivelseResource::addDokumentType);
+        dokumentbeskrivelseDto.getTilknyttetRegistreringSom().map(Link::with).ifPresent(dokumentbeskrivelseResource::addTilknyttetRegistreringSom);
+        dokumentbeskrivelseDto.getDokumentstatus().map(Link::with).ifPresent(dokumentbeskrivelseResource::addDokumentstatus);
         dokumentbeskrivelseDto.getDokumentobjekt()
                 .map(dokumentobjektDtos -> dokumentObjektMappingService.toDokumentobjektResource(
                         dokumentobjektDtos,

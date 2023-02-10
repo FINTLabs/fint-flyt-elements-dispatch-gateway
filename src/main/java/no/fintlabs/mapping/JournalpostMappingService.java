@@ -34,9 +34,9 @@ public class JournalpostMappingService {
 
         journalpostDto.getTittel().ifPresent(journalpostResource::setTittel);
         journalpostDto.getOffentligTittel().ifPresent(journalpostResource::setOffentligTittel);
-        journalpostDto.getSaksbehandler().ifPresent(journalpostResource::addSaksbehandler);
-        journalpostDto.getJournalposttype().ifPresent(journalpostResource::addJournalposttype);
-        journalpostDto.getAdministrativenhet().ifPresent(journalpostResource::addAdministrativEnhet);
+        journalpostDto.getSaksbehandler().map(Link::with).ifPresent(journalpostResource::addSaksbehandler);
+        journalpostDto.getJournalposttype().map(Link::with).ifPresent(journalpostResource::addJournalposttype);
+        journalpostDto.getAdministrativenhet().map(Link::with).ifPresent(journalpostResource::addAdministrativEnhet);
 
         journalpostDto.getSkjerming()
                 .map(skjermingMappingService::toSkjermingResource)

@@ -1,5 +1,6 @@
 package no.fintlabs.mapping;
 
+import no.fint.model.resource.Link;
 import no.fint.model.resource.arkiv.noark.KlasseResource;
 import no.fintlabs.model.instance.KlasseDto;
 import org.springframework.stereotype.Service;
@@ -29,7 +30,7 @@ public class KlasseMappingService {
                 .map(skjermingMappingService::toSkjermingResource)
                 .ifPresent(klasseResource::setSkjerming);
         klasseDto.getTittel().ifPresent(klasseResource::setTittel);
-        klasseDto.getKlassifikasjonssystem().ifPresent(klasseResource::addKlassifikasjonssystem);
+        klasseDto.getKlassifikasjonssystem().map(Link::with).ifPresent(klasseResource::addKlassifikasjonssystem);
         klasseDto.getRekkefølge().ifPresent(klasseResource::setRekkefolge);
         return klasseResource;
     }

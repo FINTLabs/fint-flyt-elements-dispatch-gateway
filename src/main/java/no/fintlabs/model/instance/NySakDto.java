@@ -15,12 +15,12 @@ import java.util.Optional;
 public class NySakDto {
     private String tittel;
     private String offentligTittel;
-    private LinkDto saksmappetype;
-    private LinkDto saksstatus;
-    private LinkDto journalenhet;
-    private LinkDto administrativenhet;
-    private LinkDto saksansvarlig;
-    private LinkDto arkivdel;
+    private String saksmappetype;
+    private String saksstatus;
+    private String journalenhet;
+    private String administrativenhet;
+    private String saksansvarlig;
+    private String arkivdel;
     private SkjermingDto skjerming;
     private List<KlasseDto> klasse;
 
@@ -32,27 +32,27 @@ public class NySakDto {
         return Optional.ofNullable(offentligTittel);
     }
 
-    public Optional<LinkDto> getSaksmappetype() {
+    public Optional<String> getSaksmappetype() {
         return Optional.ofNullable(saksmappetype);
     }
 
-    public Optional<LinkDto> getSaksstatus() {
+    public Optional<String> getSaksstatus() {
         return Optional.ofNullable(saksstatus);
     }
 
-    public Optional<LinkDto> getJournalenhet() {
+    public Optional<String> getJournalenhet() {
         return Optional.ofNullable(journalenhet);
     }
 
-    public Optional<LinkDto> getAdministrativenhet() {
+    public Optional<String> getAdministrativenhet() {
         return Optional.ofNullable(administrativenhet);
     }
 
-    public Optional<LinkDto> getSaksansvarlig() {
+    public Optional<String> getSaksansvarlig() {
         return Optional.ofNullable(saksansvarlig);
     }
 
-    public Optional<LinkDto> getArkivdel() {
+    public Optional<String> getArkivdel() {
         return Optional.ofNullable(arkivdel);
     }
 

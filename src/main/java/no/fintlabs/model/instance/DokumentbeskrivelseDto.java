@@ -14,24 +14,24 @@ import java.util.Optional;
 @NoArgsConstructor
 public class DokumentbeskrivelseDto {
     private String tittel;
-    private LinkDto dokumentType;
-    private LinkDto tilknyttetRegistreringSom;
-    private LinkDto dokumentstatus;
+    private String dokumentType;
+    private String tilknyttetRegistreringSom;
+    private String dokumentstatus;
     private Collection<DokumentobjektDto> dokumentobjekt;
 
     public Optional<String> getTittel() {
         return Optional.ofNullable(tittel);
     }
 
-    public Optional<LinkDto> getDokumentType() {
+    public Optional<String> getDokumentType() {
         return Optional.ofNullable(dokumentType);
     }
 
-    public Optional<LinkDto> getTilknyttetRegistreringSom() {
+    public Optional<String> getTilknyttetRegistreringSom() {
         return Optional.ofNullable(tilknyttetRegistreringSom);
     }
 
-    public Optional<LinkDto> getDokumentstatus() {
+    public Optional<String> getDokumentstatus() {
         return Optional.ofNullable(dokumentstatus);
     }
 

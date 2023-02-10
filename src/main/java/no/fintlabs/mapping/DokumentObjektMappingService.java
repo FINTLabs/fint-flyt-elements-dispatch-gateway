@@ -28,8 +28,8 @@ public class DokumentObjektMappingService {
             Map<UUID, Link> fileArchiveLinkPerFileId
     ) {
         DokumentobjektResource dokumentobjektResource = new DokumentobjektResource();
-        dokumentobjektDto.getVariantformat().ifPresent(dokumentobjektResource::addVariantFormat);
-        dokumentobjektDto.getFilformat().ifPresent(dokumentobjektResource::addFilformat);
+        dokumentobjektDto.getVariantformat().map(Link::with).ifPresent(dokumentobjektResource::addVariantFormat);
+        dokumentobjektDto.getFilformat().map(Link::with).ifPresent(dokumentobjektResource::addFilformat);
         dokumentobjektDto.getFileId()
                 .map(fileArchiveLinkPerFileId::get)
                 .ifPresent(dokumentobjektResource::addReferanseDokumentfil);

@@ -15,7 +15,7 @@ public class KlasseDto {
     private String klasseId;
     private SkjermingDto skjerming;
     private String tittel;
-    private LinkDto klassifikasjonssystem;
+    private String klassifikasjonssystem;
     private Integer rekkefølge;
 
     public Optional<String> getKlasseId() {
@@ -30,7 +30,7 @@ public class KlasseDto {
         return Optional.ofNullable(tittel);
     }
 
-    public Optional<LinkDto> getKlassifikasjonssystem() {
+    public Optional<String> getKlassifikasjonssystem() {
         return Optional.ofNullable(klassifikasjonssystem);
     }
 
