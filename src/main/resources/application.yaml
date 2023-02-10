@@ -13,3 +13,4 @@ logging:
   level:
     reactor:
       netty: DEBUG
+    no.fintlabs.DispatchService: DEBUG

@@ -77,6 +77,7 @@ public class DispatchService {
 
     private Mono<SakResource> createNewCase(NySakDto nySakDto) {
         SakResource sakResource = sakMappingService.toSakResource(nySakDto);
+        log.debug("Creating new case: {}", sakResource);
         return fintArchiveClient.postCase(sakResource)
                 .doOnNext(result -> log.info("Created new case with id={}", result.getMappeId().getIdentifikatorverdi()));
     }
@@ -90,9 +91,10 @@ public class DispatchService {
                 .map(dokumentfilResourceLinkPerFileId ->
                         journalpostMappingService.toJournalpostResource(journalpostDto, dokumentfilResourceLinkPerFileId)
                 )
-                .doOnNext(journalpostResource -> log.info("Created record with number={}", journalpostResource.getJournalPostnummer()))
+                .doOnNext(journalpostResource -> log.debug("Creating new record: {}", journalpostResource))
                 .map(JournalpostWrapper::new)
-                .flatMap(journalpostWrapper -> fintArchiveClient.putRecord(caseId, journalpostWrapper));
+                .flatMap(journalpostWrapper -> fintArchiveClient.putRecord(caseId, journalpostWrapper))
+                .doOnNext(result -> log.info("Added new record on case with id={}", result.getMappeId().getIdentifikatorverdi()));
     }
 
     private Mono<Map<UUID, Link>> dispatchFiles(JournalpostDto journalpostDto) {
