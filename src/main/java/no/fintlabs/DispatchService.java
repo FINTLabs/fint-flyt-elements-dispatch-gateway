@@ -45,8 +45,14 @@ public class DispatchService {
 
     public Mono<Result> process(InstanceFlowHeaders instanceFlowHeaders, @Valid ArchiveInstance archiveInstance) {
         return getCaseId(archiveInstance.getSak())
-                .flatMap(caseId -> addNewRecord(caseId, archiveInstance.getJournalpost()))
-                .map(resultSakResource -> Result.accepted(resultSakResource.getMappeId().getIdentifikatorverdi()))
+                .flatMap(caseId -> archiveInstance.getJournalpost()
+                        .map(journalpost -> addNewRecord(caseId, journalpost)
+                                .map(SakResource::getMappeId)
+                                .map(Identifikator::getIdentifikatorverdi)
+                        )
+                        .orElse(Mono.just(caseId))
+                )
+                .map(Result::accepted)
                 .onErrorResume(WebClientResponseException.class, e ->
                         Mono.just(Result.declined(e.getResponseBodyAsString()))
                 )
@@ -90,13 +96,22 @@ public class DispatchService {
     }
 
     private Mono<Map<UUID, Link>> dispatchFiles(JournalpostDto journalpostDto) {
+        return journalpostDto.getDokumentbeskrivelse()
+                .map(this::dispatchFiles)
+                .orElse(Mono.just(Map.of()));
+    }
+
+    private Mono<Map<UUID, Link>> dispatchFiles(Collection<DokumentbeskrivelseDto> dokumentbeskrivelseDtos) {
         return fileClient.dispatchFiles(
-                journalpostDto
-                        .getDokumentbeskrivelse()
+                dokumentbeskrivelseDtos
                         .stream()
                         .map(DokumentbeskrivelseDto::getDokumentobjekt)
+                        .filter(Optional::isPresent)
+                        .map(Optional::get)
                         .flatMap(Collection::stream)
                         .map(DokumentobjektDto::getFileId)
+                        .filter(Optional::isPresent)
+                        .map(Optional::get)
                         .toList()
         );
     }

@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Optional;
+
 @Data
 @Builder
 @AllArgsConstructor
@@ -15,4 +17,25 @@ public class KlasseDto {
     private String tittel;
     private LinkDto klassifikasjonssystem;
     private Integer rekkefølge;
+
+    public Optional<String> getKlasseId() {
+        return Optional.ofNullable(klasseId);
+    }
+
+    public Optional<SkjermingDto> getSkjerming() {
+        return Optional.ofNullable(skjerming);
+    }
+
+    public Optional<String> getTittel() {
+        return Optional.ofNullable(tittel);
+    }
+
+    public Optional<LinkDto> getKlassifikasjonssystem() {
+        return Optional.ofNullable(klassifikasjonssystem);
+    }
+
+    public Optional<Integer> getRekkefølge() {
+        return Optional.ofNullable(rekkefølge);
+    }
+
 }

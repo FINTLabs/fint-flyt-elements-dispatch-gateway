@@ -11,9 +11,9 @@ public class AdresseMappingService {
 
     public AdresseResource toAdresseResource(AdresseDto adresseDto) {
         AdresseResource adresseResource = new AdresseResource();
-        adresseResource.setAdresselinje(List.of(adresseDto.getAdresselinje()));
-        adresseResource.setPostnummer(adresseDto.getPostnummer());
-        adresseResource.setPoststed(adresseDto.getPoststed());
+        adresseDto.getAdresselinje().map(List::of).ifPresent(adresseResource::setAdresselinje);
+        adresseDto.getPostnummer().ifPresent(adresseResource::setPostnummer);
+        adresseDto.getPoststed().ifPresent(adresseResource::setPoststed);
         return adresseResource;
     }
 

@@ -5,7 +5,6 @@ import no.fintlabs.model.instance.KlasseDto;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class KlasseMappingService {
@@ -25,13 +24,13 @@ public class KlasseMappingService {
 
     private KlasseResource toKlasse(KlasseDto klasseDto) {
         KlasseResource klasseResource = new KlasseResource();
-        klasseResource.setKlasseId(klasseDto.getKlasseId());
-        Optional.ofNullable(klasseDto.getSkjerming())
+        klasseDto.getKlasseId().ifPresent(klasseResource::setKlasseId);
+        klasseDto.getSkjerming()
                 .map(skjermingMappingService::toSkjermingResource)
                 .ifPresent(klasseResource::setSkjerming);
-        klasseResource.setTittel(klasseDto.getTittel());
-        klasseResource.addKlassifikasjonssystem(klasseDto.getKlassifikasjonssystem());
-        klasseResource.setRekkefolge(klasseDto.getRekkefølge());
+        klasseDto.getTittel().ifPresent(klasseResource::setTittel);
+        klasseDto.getKlassifikasjonssystem().ifPresent(klasseResource::addKlassifikasjonssystem);
+        klasseDto.getRekkefølge().ifPresent(klasseResource::setRekkefolge);
         return klasseResource;
     }
 

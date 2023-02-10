@@ -28,11 +28,11 @@ public class DokumentObjektMappingService {
             Map<UUID, Link> fileArchiveLinkPerFileId
     ) {
         DokumentobjektResource dokumentobjektResource = new DokumentobjektResource();
-        dokumentobjektResource.addVariantFormat(dokumentobjektDto.getVariantformat());
-        dokumentobjektResource.addFilformat(dokumentobjektDto.getFilformat());
-        dokumentobjektResource.addReferanseDokumentfil(
-                fileArchiveLinkPerFileId.get(dokumentobjektDto.getFileId())
-        );
+        dokumentobjektDto.getVariantformat().ifPresent(dokumentobjektResource::addVariantFormat);
+        dokumentobjektDto.getFilformat().ifPresent(dokumentobjektResource::addFilformat);
+        dokumentobjektDto.getFileId()
+                .map(fileArchiveLinkPerFileId::get)
+                .ifPresent(dokumentobjektResource::addReferanseDokumentfil);
         return dokumentobjektResource;
     }
 

@@ -33,16 +33,16 @@ public class DokumentbeskrivelseMappingService {
             Map<UUID, Link> fileArchiveLinkPerFileId
     ) {
         DokumentbeskrivelseResource dokumentbeskrivelseResource = new DokumentbeskrivelseResource();
-        dokumentbeskrivelseResource.setTittel(dokumentbeskrivelseDto.getTittel());
-        dokumentbeskrivelseResource.addDokumentType(dokumentbeskrivelseDto.getDokumentType());
-        dokumentbeskrivelseResource.addTilknyttetRegistreringSom(dokumentbeskrivelseDto.getTilknyttetRegistreringSom());
-        dokumentbeskrivelseResource.addDokumentstatus(dokumentbeskrivelseDto.getDokumentstatus());
-        dokumentbeskrivelseResource.setDokumentobjekt(
-                dokumentObjektMappingService.toDokumentobjektResource(
-                        dokumentbeskrivelseDto.getDokumentobjekt(),
+        dokumentbeskrivelseDto.getTittel().ifPresent(dokumentbeskrivelseResource::setTittel);
+        dokumentbeskrivelseDto.getDokumentType().ifPresent(dokumentbeskrivelseResource::addDokumentType);
+        dokumentbeskrivelseDto.getTilknyttetRegistreringSom().ifPresent(dokumentbeskrivelseResource::addTilknyttetRegistreringSom);
+        dokumentbeskrivelseDto.getDokumentstatus().ifPresent(dokumentbeskrivelseResource::addDokumentstatus);
+        dokumentbeskrivelseDto.getDokumentobjekt()
+                .map(dokumentobjektDtos -> dokumentObjektMappingService.toDokumentobjektResource(
+                        dokumentobjektDtos,
                         fileArchiveLinkPerFileId
-                )
-        );
+                ))
+                .ifPresent(dokumentbeskrivelseResource::setDokumentobjekt);
         return dokumentbeskrivelseResource;
     }
 

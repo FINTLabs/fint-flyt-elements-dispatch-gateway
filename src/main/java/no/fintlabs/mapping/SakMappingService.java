@@ -23,16 +23,20 @@ public class SakMappingService {
             return null;
         }
         SakResource sakResource = new SakResource();
-        sakResource.setTittel(nySakDto.getTittel());
-        sakResource.setOffentligTittel(nySakDto.getOffentligTittel());
-        sakResource.addSaksmappetype(nySakDto.getSaksmappetype());
-        sakResource.addSaksstatus(nySakDto.getSaksstatus());
-        sakResource.addJournalenhet(nySakDto.getJournalenhet());
-        sakResource.addAdministrativEnhet(nySakDto.getAdministrativenhet());
-        sakResource.addSaksansvarlig(nySakDto.getSaksansvarlig());
-        sakResource.addArkivdel(nySakDto.getArkivdel());
-        sakResource.setKlasse(klasseMappingService.toKlasse(nySakDto.getKlasse()));
-        sakResource.setSkjerming(skjermingMappingService.toSkjermingResource(nySakDto.getSkjerming()));
+        nySakDto.getTittel().ifPresent(sakResource::setTittel);
+        nySakDto.getOffentligTittel().ifPresent(sakResource::setOffentligTittel);
+        nySakDto.getSaksmappetype().ifPresent(sakResource::addSaksmappetype);
+        nySakDto.getSaksstatus().ifPresent(sakResource::addSaksstatus);
+        nySakDto.getJournalenhet().ifPresent(sakResource::addJournalenhet);
+        nySakDto.getAdministrativenhet().ifPresent(sakResource::addAdministrativEnhet);
+        nySakDto.getSaksansvarlig().ifPresent(sakResource::addSaksansvarlig);
+        nySakDto.getArkivdel().ifPresent(sakResource::addArkivdel);
+        nySakDto.getKlasse()
+                .map(klasseMappingService::toKlasse)
+                .ifPresent(sakResource::setKlasse);
+        nySakDto.getSkjerming()
+                .map(skjermingMappingService::toSkjermingResource)
+                .ifPresent(sakResource::setSkjerming);
         return sakResource;
     }
 

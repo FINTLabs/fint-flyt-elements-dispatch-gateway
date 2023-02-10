@@ -1,9 +1,6 @@
 package no.fintlabs.model.instance;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import no.fintlabs.model.CaseDispatchType;
 import no.fintlabs.validation.groups.CaseByIdValidationGroup;
 import no.fintlabs.validation.groups.CaseBySearchValidationGroup;
@@ -12,7 +9,9 @@ import no.fintlabs.validation.groups.NewCaseValidationGroup;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
-@Data
+
+@Setter
+@Getter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor

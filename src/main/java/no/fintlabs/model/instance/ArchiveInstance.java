@@ -1,14 +1,12 @@
 package no.fintlabs.model.instance;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import java.util.Optional;
 
-@Data
+@Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -16,8 +14,13 @@ public class ArchiveInstance {
 
     @Valid
     @NotNull
+    @Getter
     private SakDto sak;
 
     private JournalpostDto journalpost;
+
+    public Optional<JournalpostDto> getJournalpost() {
+        return Optional.ofNullable(journalpost);
+    }
 
 }

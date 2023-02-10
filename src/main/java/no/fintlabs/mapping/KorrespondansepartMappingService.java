@@ -30,20 +30,26 @@ public class KorrespondansepartMappingService {
 
     public KorrespondansepartResource toKorrespondansepartResource(KorrespondansepartDto korrespondansepartDto) {
         KorrespondansepartResource korrespondansepartResource = new KorrespondansepartResource();
-        korrespondansepartResource.setFodselsnummer(korrespondansepartDto.getFodselsnummer());
-        korrespondansepartResource.setOrganisasjonsnummer(korrespondansepartDto.getOrganisasjonsnummer());
-        korrespondansepartResource.setKorrespondansepartNavn(korrespondansepartDto.getKorrespondansepartNavn());
-        korrespondansepartResource.setAdresse(
-                adresseMappingService.toAdresseResource(korrespondansepartDto.getAdresse())
-        );
-        korrespondansepartResource.addKorrespondanseparttype(korrespondansepartDto.getKorrespondanseparttype());
-        korrespondansepartResource.setKontaktperson(korrespondansepartDto.getKontaktperson());
-        korrespondansepartResource.setKontaktinformasjon(
-                kontaktinformasjonMappingService.toKontaktinformasjon(korrespondansepartDto.getKontaktinformasjon())
-        );
-        korrespondansepartResource.setSkjerming(
-                skjermingMappingService.toSkjermingResource(korrespondansepartDto.getSkjerming())
-        );
+
+        korrespondansepartDto.getFodselsnummer().ifPresent(korrespondansepartResource::setFodselsnummer);
+        korrespondansepartDto.getOrganisasjonsnummer().ifPresent(korrespondansepartResource::setOrganisasjonsnummer);
+        korrespondansepartDto.getKorrespondansepartNavn().ifPresent(korrespondansepartResource::setKorrespondansepartNavn);
+
+        korrespondansepartDto.getAdresse()
+                .map(adresseMappingService::toAdresseResource)
+                .ifPresent(korrespondansepartResource::setAdresse);
+
+        korrespondansepartDto.getKorrespondanseparttype().ifPresent(korrespondansepartResource::addKorrespondanseparttype);
+        korrespondansepartDto.getKontaktperson().ifPresent(korrespondansepartResource::setKontaktperson);
+
+        korrespondansepartDto.getKontaktinformasjon()
+                .map(kontaktinformasjonMappingService::toKontaktinformasjon)
+                .ifPresent(korrespondansepartResource::setKontaktinformasjon);
+
+        korrespondansepartDto.getSkjerming()
+                .map(skjermingMappingService::toSkjermingResource)
+                .ifPresent(korrespondansepartResource::setSkjerming);
+
         return korrespondansepartResource;
     }
 }
