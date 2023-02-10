@@ -31,21 +31,27 @@ public class JournalpostMappingService {
             Map<UUID, Link> fileArchiveLinkPerFileId
     ) {
         JournalpostResource journalpostResource = new JournalpostResource();
-        journalpostResource.setTittel(journalpostDto.getTittel());
-        journalpostResource.setOffentligTittel(journalpostDto.getOffentligTittel());
-        journalpostResource.addSaksbehandler(journalpostDto.getSaksbehandler());
-        journalpostResource.addJournalposttype(journalpostDto.getJournalposttype());
-        journalpostResource.addAdministrativEnhet(journalpostDto.getAdministrativenhet());
-        journalpostResource.setSkjerming(skjermingMappingService.toSkjermingResource(journalpostDto.getSkjerming()));
-        journalpostResource.setKorrespondansepart(
-                korrespondanseparMappingService.toKorrespondansepartResource(journalpostDto.getKorrespondansepart())
-        );
-        journalpostResource.setDokumentbeskrivelse(
-                dokumentbeskrivelseMappingService.toDokumentbeskrivelseResource(
-                        journalpostDto.getDokumentbeskrivelse(),
-                        fileArchiveLinkPerFileId
-                )
-        );
+
+        journalpostDto.getTittel().ifPresent(journalpostResource::setTittel);
+        journalpostDto.getOffentligTittel().ifPresent(journalpostResource::setOffentligTittel);
+        journalpostDto.getSaksbehandler().ifPresent(journalpostResource::addSaksbehandler);
+        journalpostDto.getJournalposttype().ifPresent(journalpostResource::addJournalposttype);
+        journalpostDto.getAdministrativenhet().ifPresent(journalpostResource::addAdministrativEnhet);
+
+        journalpostDto.getSkjerming()
+                .map(skjermingMappingService::toSkjermingResource)
+                .ifPresent(journalpostResource::setSkjerming);
+
+        journalpostDto.getKorrespondansepart()
+                .map(korrespondanseparMappingService::toKorrespondansepartResource)
+                .ifPresent(journalpostResource::setKorrespondansepart);
+
+        journalpostDto.getDokumentbeskrivelse()
+                .map(dokumentBeskrivelseDtos -> dokumentbeskrivelseMappingService.toDokumentbeskrivelseResource(
+                        dokumentBeskrivelseDtos, fileArchiveLinkPerFileId
+                ))
+                .ifPresent(journalpostResource::setDokumentbeskrivelse);
+
         return journalpostResource;
     }
 

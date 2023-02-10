@@ -12,8 +12,8 @@ public class SkjermingMappingService {
             return null;
         }
         SkjermingResource skjermingResource = new SkjermingResource();
-        skjermingResource.addTilgangsrestriksjon(skjermingDto.getTilgangsrestriksjon());
-        skjermingResource.addSkjermingshjemmel(skjermingDto.getSkjermingshjemmel());
+        skjermingDto.getTilgangsrestriksjon().ifPresent(skjermingResource::addTilgangsrestriksjon);
+        skjermingDto.getSkjermingshjemmel().ifPresent(skjermingResource::addSkjermingshjemmel);
         return skjermingResource;
     }
 

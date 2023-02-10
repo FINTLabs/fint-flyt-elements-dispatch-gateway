@@ -12,9 +12,9 @@ public class KontaktinformasjonMappingService {
             return null;
         }
         Kontaktinformasjon kontaktinformasjon = new Kontaktinformasjon();
-        kontaktinformasjon.setEpostadresse(kontaktinformasjonDto.getEpostadresse());
-        kontaktinformasjon.setTelefonnummer(kontaktinformasjonDto.getTelefonnummer());
-        kontaktinformasjon.setMobiltelefonnummer(kontaktinformasjonDto.getMobiltelefonnummer());
+        kontaktinformasjonDto.getEpostadresse().ifPresent(kontaktinformasjon::setEpostadresse);
+        kontaktinformasjonDto.getTelefonnummer().ifPresent(kontaktinformasjon::setTelefonnummer);
+        kontaktinformasjonDto.getMobiltelefonnummer().ifPresent(kontaktinformasjon::setMobiltelefonnummer);
         return kontaktinformasjon;
     }
 

@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Optional;
+
 @Data
 @Builder
 @AllArgsConstructor
@@ -13,4 +15,17 @@ public class KontaktinformasjonDto {
     private String epostadresse;
     private String telefonnummer;
     private String mobiltelefonnummer;
+
+    public Optional<String> getEpostadresse() {
+        return Optional.ofNullable(epostadresse);
+    }
+
+    public Optional<String> getTelefonnummer() {
+        return Optional.ofNullable(telefonnummer);
+    }
+
+    public Optional<String> getMobiltelefonnummer() {
+        return Optional.ofNullable(mobiltelefonnummer);
+    }
+
 }
