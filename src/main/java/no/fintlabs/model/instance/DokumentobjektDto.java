@@ -17,6 +17,7 @@ import java.util.UUID;
 public class DokumentobjektDto {
     private String variantformat;
     private String filformat;
+    private String format;
     @JsonProperty(value = "fil")
     @NotNull
     private UUID fileId;
@@ -27,6 +28,10 @@ public class DokumentobjektDto {
 
     public Optional<String> getFilformat() {
         return Optional.ofNullable(filformat);
+    }
+
+    public Optional<String> getFormat() {
+        return Optional.ofNullable(format);
     }
 
     public Optional<UUID> getFileId() {
