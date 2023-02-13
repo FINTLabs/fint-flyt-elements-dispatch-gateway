@@ -51,7 +51,7 @@ public class FintArchiveClient {
 
     private MediaType getMediaType(String mediaType) {
         try {
-            return MediaType.parseMediaType("application/" + mediaType);
+            return MediaType.parseMediaType(mediaType);
         } catch (InvalidMediaTypeException e) {
             return MediaType.APPLICATION_OCTET_STREAM;
         }
