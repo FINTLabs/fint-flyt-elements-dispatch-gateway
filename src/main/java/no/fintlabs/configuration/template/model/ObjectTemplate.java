@@ -6,7 +6,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Optional;
 
 @Getter
 @EqualsAndHashCode
@@ -24,10 +26,10 @@ public class ObjectTemplate {
             @JsonProperty("objectTemplates") Collection<ElementTemplate<ObjectTemplate>> objectTemplates,
             @JsonProperty("objectCollectionTemplates") Collection<ElementTemplate<ObjectCollectionTemplate>> objectCollectionTemplates
     ) {
-        this.valueTemplates = valueTemplates;
-        this.selectableValueTemplates = selectableValueTemplates;
-        this.objectTemplates = objectTemplates;
-        this.objectCollectionTemplates = objectCollectionTemplates;
+        this.valueTemplates = Optional.ofNullable(valueTemplates).orElse(new ArrayList<>());
+        this.selectableValueTemplates = Optional.ofNullable(selectableValueTemplates).orElse(new ArrayList<>());
+        this.objectTemplates = Optional.ofNullable(objectTemplates).orElse(new ArrayList<>());
+        this.objectCollectionTemplates = Optional.ofNullable(objectCollectionTemplates).orElse(new ArrayList<>());
     }
 
     private final Collection<ElementTemplate<ValueTemplate>> valueTemplates;

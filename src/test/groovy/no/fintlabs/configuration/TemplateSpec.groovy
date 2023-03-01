@@ -32,7 +32,7 @@ class TemplateSpec extends Specification {
         objectMapper = new ObjectMapper()
     }
 
-    def 'abc'() {
+    def 'should create template'() {
         when:
         ObjectTemplate template = archiveTemplateService.createTemplate()
         String templateJson = objectMapper.writeValueAsString(template)
