@@ -73,7 +73,7 @@ public class SakTemplateService {
                                                 .builder()
                                                 .urlTemplate("api/intern/arkiv/saker/{caseId}/tittel")
                                                 .valueKeyPerPathParamKey(Map.of(
-                                                        "id", "caseId"
+                                                        "caseId", "id"
                                                 ))
                                                 .build()
                                 )
