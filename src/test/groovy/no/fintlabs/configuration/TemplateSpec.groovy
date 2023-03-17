@@ -2,6 +2,7 @@ package no.fintlabs.configuration
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import no.fintlabs.configuration.template.*
+import no.fintlabs.configuration.template.model.ElementTemplate
 import no.fintlabs.configuration.template.model.ObjectTemplate
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.test.context.ContextConfiguration
@@ -31,10 +32,8 @@ class TemplateSpec extends Specification {
 
     def 'should create template'() {
         when:
-        ObjectTemplate template = archiveTemplateService.createTemplate()
+        ElementTemplate<ObjectTemplate> template = archiveTemplateService.createTemplate()
         String templateJson = objectMapper.writeValueAsString(template)
-        ObjectTemplate readTemplate = objectMapper.readValue(templateJson, ObjectTemplate.class)
-
         then:
         template == readTemplate
     }

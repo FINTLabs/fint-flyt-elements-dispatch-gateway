@@ -75,7 +75,7 @@ public class DokumentbeskrivelseTemplateService {
                                 .build(),
                         ObjectCollectionTemplate
                                 .builder()
-                                .objectTemplate(dokumentobjektTemplateService.createTemplate())
+                                .elementTemplate(dokumentobjektTemplateService.createTemplate())
                                 .build()
                 )
                 .build();

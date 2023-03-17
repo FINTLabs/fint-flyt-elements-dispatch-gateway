@@ -12,5 +12,5 @@ import lombok.extern.jackson.Jacksonized;
 @Jacksonized
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ObjectCollectionTemplate {
-    private final ObjectTemplate objectTemplate;
+    private final ObjectTemplate elementTemplate;
 }

@@ -53,7 +53,7 @@ public class KlasseringTemplateService {
                                         UrlBuilder
                                                 .builder()
                                                 .urlTemplate("api/intern/arkiv/kodeverk/klasse")
-                                                .valueKeyPerRequestParamKey(Map.of(
+                                                .valueRefPerRequestParamKey(Map.of(
                                                         "klassifikasjonssystemLink", "klassifikasjonssystem"
                                                 ))
                                                 .build()

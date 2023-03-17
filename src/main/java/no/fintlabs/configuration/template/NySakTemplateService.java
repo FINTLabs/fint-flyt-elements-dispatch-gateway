@@ -169,7 +169,7 @@ public class NySakTemplateService {
                                 .build(),
                         ObjectCollectionTemplate
                                 .builder()
-                                .objectTemplate(klasseringTemplateService.createTemplate())
+                                .elementTemplate(klasseringTemplateService.createTemplate())
                                 .build()
                 )
                 .addTemplate(
@@ -181,7 +181,7 @@ public class NySakTemplateService {
                                 .build(),
                         ObjectCollectionTemplate
                                 .builder()
-                                .objectTemplate(journalpostTemplateService.createTemplate())
+                                .elementTemplate(journalpostTemplateService.createTemplate())
                                 .build()
                 )
                 .build();

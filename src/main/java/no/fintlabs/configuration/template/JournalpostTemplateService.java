@@ -128,7 +128,7 @@ public class JournalpostTemplateService {
                                 .build(),
                         ObjectCollectionTemplate
                                 .builder()
-                                .objectTemplate(korrespondansepartTemplateService.createTemplate())
+                                .elementTemplate(korrespondansepartTemplateService.createTemplate())
                                 .build()
                 )
                 .addTemplate(
@@ -140,7 +140,7 @@ public class JournalpostTemplateService {
                                 .build(),
                         ObjectCollectionTemplate
                                 .builder()
-                                .objectTemplate(dokumentbeskrivelseTemplateService.createTemplate())
+                                .elementTemplate(dokumentbeskrivelseTemplateService.createTemplate())
                                 .build()
                 )
                 .build();

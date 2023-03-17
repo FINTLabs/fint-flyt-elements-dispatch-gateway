@@ -4,17 +4,22 @@ import no.fintlabs.configuration.template.model.*;
 import no.fintlabs.model.CaseDispatchType;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+
 
 @Service
 public class SakTemplateService {
 
     private final NySakTemplateService nySakTemplateService;
+    private final JournalpostTemplateService journalpostTemplateService;
 
-    public SakTemplateService(NySakTemplateService nySakTemplateService) {
+    public SakTemplateService(
+            NySakTemplateService nySakTemplateService,
+            JournalpostTemplateService journalpostTemplateService
+    ) {
         this.nySakTemplateService = nySakTemplateService;
+        this.journalpostTemplateService = journalpostTemplateService;
     }
 
     public ObjectTemplate createTemplate() {
@@ -30,53 +35,23 @@ public class SakTemplateService {
                         SelectableValueTemplate
                                 .builder()
                                 .type(SelectableValueTemplate.Type.DROPDOWN)
-                                .selectables(
-                                        Arrays.stream(CaseDispatchType.values())
-                                                .map(Enum::toString)
-                                                .map(enumString -> Selectable
-                                                        .builder()
-                                                        .displayName(enumString)
-                                                        .value(enumString)
-                                                        .build()
-                                                )
-                                                .toList()
-                                )
-                                .build()
-                )
-                .addTemplate(
-                        ElementConfig
-                                .builder()
-                                .key("id")
-                                .displayName("Saksnummer")
-                                .description("")
-                                .showDependency(
-                                        Dependency
+                                .selectables(List.of(
+                                        Selectable
                                                 .builder()
-                                                .hasAnyCombination(List.of(
-                                                        List.of(
-                                                                ValuePredicate
-                                                                        .builder()
-                                                                        .key("type")
-                                                                        .defined(true)
-                                                                        .value("BY_ID")
-                                                                        .build()
-                                                        )
-                                                ))
-                                                .build()
-                                )
-                                .build(),
-                        ValueTemplate
-                                .builder()
-                                .type(ValueTemplate.Type.STRING)
-                                .search(
-                                        UrlBuilder
+                                                .displayName("Ny sak")
+                                                .value(CaseDispatchType.NEW.name())
+                                                .build(),
+//                                        Selectable
+//                                                .builder()
+//                                                .displayName("På søk, eller ny")
+//                                                .value(CaseDispatchType.BY_SEARCH_OR_NEW.name())
+//                                                .build(),
+                                        Selectable
                                                 .builder()
-                                                .urlTemplate("api/intern/arkiv/saker/{caseId}/tittel")
-                                                .valueKeyPerPathParamKey(Map.of(
-                                                        "caseId", "id"
-                                                ))
+                                                .displayName("På saksnummer")
+                                                .value(CaseDispatchType.BY_ID.name())
                                                 .build()
-                                )
+                                ))
                                 .build()
                 )
                 .addTemplate(
@@ -94,7 +69,7 @@ public class SakTemplateService {
                                                                         .builder()
                                                                         .key("type")
                                                                         .defined(true)
-                                                                        .value("NEW")
+                                                                        .value(CaseDispatchType.NEW.name())
                                                                         .build()
                                                         ),
                                                         List.of(
@@ -102,7 +77,7 @@ public class SakTemplateService {
                                                                         .builder()
                                                                         .key("type")
                                                                         .defined(true)
-                                                                        .value("BY_SEARCH_OR_NEW")
+                                                                        .value(CaseDispatchType.BY_SEARCH_OR_NEW.name())
                                                                         .build()
                                                         )
                                                 ))
@@ -110,6 +85,69 @@ public class SakTemplateService {
                                 )
                                 .build(),
                         nySakTemplateService.createTemplate()
+                )
+                .addTemplate(
+                        ElementConfig
+                                .builder()
+                                .key("id")
+                                .displayName("Saksnummer")
+                                .description("")
+                                .showDependency(
+                                        Dependency
+                                                .builder()
+                                                .hasAnyCombination(List.of(
+                                                        List.of(
+                                                                ValuePredicate
+                                                                        .builder()
+                                                                        .key("type")
+                                                                        .defined(true)
+                                                                        .value(CaseDispatchType.BY_ID.name())
+                                                                        .build()
+                                                        )
+                                                ))
+                                                .build()
+                                )
+                                .build(),
+                        ValueTemplate
+                                .builder()
+                                .type(ValueTemplate.Type.DYNAMIC_STRING)
+                                .search(
+                                        UrlBuilder
+                                                .builder()
+                                                .urlTemplate("api/intern/arkiv/saker/{caseId}/tittel")
+                                                .valueRefPerPathParamKey(Map.of(
+                                                        "caseId", "id"
+                                                ))
+                                                .build()
+                                )
+                                .build()
+                )
+                .addTemplate(
+                        ElementConfig
+                                .builder()
+                                .key("journalpost")
+                                .displayName("Journalposter")
+                                .description("")
+                                .showDependency(
+                                        Dependency
+                                                .builder()
+                                                .hasAnyCombination(List.of(
+                                                        List.of(
+                                                                ValuePredicate
+                                                                        .builder()
+                                                                        .key("type")
+                                                                        .defined(true)
+                                                                        .value(CaseDispatchType.BY_ID.name())
+                                                                        .build()
+                                                        )
+                                                ))
+                                                .build()
+                                )
+                                .build(),
+                        ObjectCollectionTemplate
+                                .builder()
+                                .elementTemplate(journalpostTemplateService.createTemplate())
+                                .build()
                 )
                 .build();
     }

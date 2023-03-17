@@ -15,6 +15,6 @@ import java.util.Map;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class UrlBuilder {
     private final String urlTemplate;
-    private final Map<String, String> valueKeyPerPathParamKey;
-    private final Map<String, String> valueKeyPerRequestParamKey;
+    private final Map<String, String> valueRefPerPathParamKey;
+    private final Map<String, String> valueRefPerRequestParamKey;
 }
