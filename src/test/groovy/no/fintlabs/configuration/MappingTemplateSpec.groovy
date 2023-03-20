@@ -2,11 +2,9 @@ package no.fintlabs.configuration
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import no.fintlabs.configuration.template.*
-import no.fintlabs.configuration.template.model.ElementTemplate
-import no.fintlabs.configuration.template.model.ObjectTemplate
+import no.fintlabs.configuration.template.model.MappingTemplate
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.test.context.ContextConfiguration
-import spock.lang.Ignore
 import spock.lang.Specification
 
 @ContextConfiguration(classes = [
@@ -21,9 +19,10 @@ import spock.lang.Specification
         NySakTemplateService.class,
         SakTemplateService.class,
         SkjermingTemplateService.class,
+        PartTemplateService.class,
         ObjectMapper.class
 ])
-class TemplateSpec extends Specification {
+class MappingTemplateSpec extends Specification {
 
     @Autowired
     ArchiveTemplateService archiveTemplateService
@@ -31,10 +30,10 @@ class TemplateSpec extends Specification {
     @Autowired
     ObjectMapper objectMapper
 
-    @Ignore
+//    @Ignore
     def 'should create template'() {
         when:
-        ElementTemplate<ObjectTemplate> template = archiveTemplateService.createTemplate()
+        MappingTemplate template = archiveTemplateService.createTemplate()
         String templateJson = objectMapper.writeValueAsString(template)
         then:
         template == readTemplate

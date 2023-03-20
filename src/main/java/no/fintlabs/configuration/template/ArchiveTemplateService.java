@@ -1,8 +1,6 @@
 package no.fintlabs.configuration.template;
 
-import no.fintlabs.configuration.template.model.ElementConfig;
-import no.fintlabs.configuration.template.model.ElementTemplate;
-import no.fintlabs.configuration.template.model.ObjectTemplate;
+import no.fintlabs.configuration.template.model.MappingTemplate;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -14,19 +12,12 @@ public class ArchiveTemplateService {
         this.sakTemplateService = sakTemplateService;
     }
 
-    public ElementTemplate<ObjectTemplate> createTemplate() {
-        return ElementTemplate
-                .<ObjectTemplate>builder()
-                .order(0)
-                .elementConfig(
-                        ElementConfig
-                                .builder()
-                                .key("sak")
-                                .displayName("Sak")
-                                .description("")
-                                .build()
-                )
-                .template(sakTemplateService.createTemplate())
+    public MappingTemplate createTemplate() {
+        return MappingTemplate
+                .builder()
+                .displayName("Arkivering")
+                .rootObjectTemplate(sakTemplateService.createTemplate())
                 .build();
     }
+
 }

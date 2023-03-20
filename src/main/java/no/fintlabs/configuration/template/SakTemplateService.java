@@ -38,7 +38,7 @@ public class SakTemplateService {
                                 .selectables(List.of(
                                         Selectable
                                                 .builder()
-                                                .displayName("Ny sak")
+                                                .displayName("Ny")
                                                 .value(CaseDispatchType.NEW.name())
                                                 .build(),
 //                                        Selectable
@@ -58,7 +58,7 @@ public class SakTemplateService {
                         ElementConfig
                                 .builder()
                                 .key("new")
-                                .displayName("Ny sak")
+                                .displayName("Sak")
                                 .description("")
                                 .showDependency(
                                         Dependency

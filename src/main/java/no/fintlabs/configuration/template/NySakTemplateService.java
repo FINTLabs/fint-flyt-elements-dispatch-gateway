@@ -11,15 +11,18 @@ public class NySakTemplateService {
     private final KlasseringTemplateService klasseringTemplateService;
     private final SkjermingTemplateService skjermingTemplateService;
     private final JournalpostTemplateService journalpostTemplateService;
+    private final PartTemplateService partTemplateService;
 
     public NySakTemplateService(
             KlasseringTemplateService klasseringTemplateService,
             SkjermingTemplateService skjermingTemplateService,
-            JournalpostTemplateService journalpostTemplateService
+            JournalpostTemplateService journalpostTemplateService,
+            PartTemplateService partTemplateService
     ) {
         this.klasseringTemplateService = klasseringTemplateService;
         this.skjermingTemplateService = skjermingTemplateService;
         this.journalpostTemplateService = journalpostTemplateService;
+        this.partTemplateService = partTemplateService;
     }
 
     public ObjectTemplate createTemplate() {
@@ -139,18 +142,18 @@ public class NySakTemplateService {
                                 ))
                                 .build()
                 )
-//                .addTemplate(
-//                        ElementConfig
-//                                .builder()
-//                                .key("part")
-//                                .displayName("Parter")
-//                                .description("")
-//                                .build(),
-//                        ObjectCollectionTemplate
-//                                .builder()
-//                                .objectTemplate(partTemplateService.createTemplate())
-//                                .build()
-//                )
+                .addTemplate(
+                        ElementConfig
+                                .builder()
+                                .key("part")
+                                .displayName("Parter")
+                                .description("")
+                                .build(),
+                        ObjectCollectionTemplate
+                                .builder()
+                                .elementTemplate(partTemplateService.createTemplate())
+                                .build()
+                )
                 .addTemplate(
                         ElementConfig
                                 .builder()

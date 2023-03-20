@@ -36,7 +36,7 @@ public class KorrespondansepartTemplateService {
                                 .builder()
                                 .type(SelectableValueTemplate.Type.SEARCH_SELECT)
                                 .selectablesSources(List.of(
-                                        UrlBuilder.builder().urlTemplate("api/intern/arkiv/kodeverk/skjermingshjemmel").build()
+                                        UrlBuilder.builder().urlTemplate("api/intern/arkiv/kodeverk/korrespondanseparttype").build()
                                 ))
                                 .build()
                 )
