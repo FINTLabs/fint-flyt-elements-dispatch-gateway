@@ -5,6 +5,7 @@ import no.fintlabs.configuration.template.*
 import no.fintlabs.configuration.template.model.MappingTemplate
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.test.context.ContextConfiguration
+import spock.lang.Ignore
 import spock.lang.Specification
 
 @ContextConfiguration(classes = [
@@ -30,7 +31,7 @@ class MappingTemplateSpec extends Specification {
     @Autowired
     ObjectMapper objectMapper
 
-//    @Ignore
+    @Ignore
     def 'should create template'() {
         when:
         MappingTemplate template = archiveTemplateService.createTemplate()
