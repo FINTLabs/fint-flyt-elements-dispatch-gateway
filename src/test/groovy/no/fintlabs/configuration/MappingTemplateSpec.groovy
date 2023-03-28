@@ -1,12 +1,17 @@
 package no.fintlabs.configuration
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import no.fintlabs.configuration.template.*
-import no.fintlabs.configuration.template.model.MappingTemplate
+import no.fintlabs.template.*
+import no.fintlabs.template.model.MappingTemplate
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.test.context.ContextConfiguration
 import spock.lang.Ignore
 import spock.lang.Specification
+
+import javax.validation.ConstraintViolation
+import javax.validation.Validation
+import javax.validation.Validator
+import javax.validation.ValidatorFactory
 
 @ContextConfiguration(classes = [
         AdresseTemplateService.class,
@@ -31,10 +36,18 @@ class MappingTemplateSpec extends Specification {
     @Autowired
     ObjectMapper objectMapper
 
+    Validator validator
+
+    def setup() {
+        ValidatorFactory factory = Validation.buildDefaultValidatorFactory()
+        validator = factory.getValidator()
+    }
+
     @Ignore
     def 'should create template'() {
         when:
         MappingTemplate template = archiveTemplateService.createTemplate()
+        Set<ConstraintViolation<MappingTemplate>> constraintViolations = validator.validate(template)
         String templateJson = objectMapper.writeValueAsString(template)
         then:
         template == readTemplate
