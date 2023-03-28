@@ -23,7 +23,7 @@ public class SkjermingTemplateService {
                                 .build(),
                         SelectableValueTemplate
                                 .builder()
-                                .type(SelectableValueTemplate.Type.SEARCH_SELECT)
+                                .type(SelectableValueTemplate.Type.DYNAMIC_STRING_OR_SEARCH_SELECT)
                                 .selectablesSources(List.of(
                                         UrlBuilder.builder().urlTemplate("api/intern/arkiv/kodeverk/tilgangsrestriksjon").build()
                                 ))
@@ -38,7 +38,7 @@ public class SkjermingTemplateService {
                                 .build(),
                         SelectableValueTemplate
                                 .builder()
-                                .type(SelectableValueTemplate.Type.SEARCH_SELECT)
+                                .type(SelectableValueTemplate.Type.DYNAMIC_STRING_OR_SEARCH_SELECT)
                                 .selectablesSources(List.of(
                                         UrlBuilder.builder().urlTemplate("api/intern/arkiv/kodeverk/skjermingshjemmel").build()
                                 ))

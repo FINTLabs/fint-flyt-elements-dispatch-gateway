@@ -61,7 +61,7 @@ public class NySakTemplateService {
                                 .build(),
                         SelectableValueTemplate
                                 .builder()
-                                .type(SelectableValueTemplate.Type.SEARCH_SELECT)
+                                .type(SelectableValueTemplate.Type.DYNAMIC_STRING_OR_SEARCH_SELECT)
                                 .selectablesSources(List.of(
                                         UrlBuilder.builder().urlTemplate("api/intern/arkiv/kodeverk/saksmappetype").build()
                                 ))
@@ -76,7 +76,7 @@ public class NySakTemplateService {
                                 .build(),
                         SelectableValueTemplate
                                 .builder()
-                                .type(SelectableValueTemplate.Type.SEARCH_SELECT)
+                                .type(SelectableValueTemplate.Type.DYNAMIC_STRING_OR_SEARCH_SELECT)
                                 .selectablesSources(List.of(
                                         UrlBuilder.builder().urlTemplate("api/intern/arkiv/kodeverk/administrativenhet").build()
                                 ))
@@ -91,7 +91,7 @@ public class NySakTemplateService {
                                 .build(),
                         SelectableValueTemplate
                                 .builder()
-                                .type(SelectableValueTemplate.Type.SEARCH_SELECT)
+                                .type(SelectableValueTemplate.Type.DYNAMIC_STRING_OR_SEARCH_SELECT)
                                 .selectablesSources(List.of(
                                         UrlBuilder.builder().urlTemplate("api/intern/arkiv/kodeverk/administrativenhet").build()
                                 ))
@@ -106,7 +106,7 @@ public class NySakTemplateService {
                                 .build(),
                         SelectableValueTemplate
                                 .builder()
-                                .type(SelectableValueTemplate.Type.SEARCH_SELECT)
+                                .type(SelectableValueTemplate.Type.DYNAMIC_STRING_OR_SEARCH_SELECT)
                                 .selectablesSources(List.of(
                                         UrlBuilder.builder().urlTemplate("api/intern/arkiv/kodeverk/arkivressurs").build()
                                 ))
@@ -121,7 +121,7 @@ public class NySakTemplateService {
                                 .build(),
                         SelectableValueTemplate
                                 .builder()
-                                .type(SelectableValueTemplate.Type.SEARCH_SELECT)
+                                .type(SelectableValueTemplate.Type.DYNAMIC_STRING_OR_SEARCH_SELECT)
                                 .selectablesSources(List.of(
                                         UrlBuilder.builder().urlTemplate("api/intern/arkiv/kodeverk/arkivdel").build()
                                 ))
@@ -136,9 +136,9 @@ public class NySakTemplateService {
                                 .build(),
                         SelectableValueTemplate
                                 .builder()
-                                .type(SelectableValueTemplate.Type.SEARCH_SELECT)
+                                .type(SelectableValueTemplate.Type.DYNAMIC_STRING_OR_SEARCH_SELECT)
                                 .selectablesSources(List.of(
-                                        UrlBuilder.builder().urlTemplate("api/intern/arkiv/kodeverk/saksstatus").build()
+                                        UrlBuilder.builder().urlTemplate("api/intern/arkiv/kodeverk/sakstatus").build()
                                 ))
                                 .build()
                 )

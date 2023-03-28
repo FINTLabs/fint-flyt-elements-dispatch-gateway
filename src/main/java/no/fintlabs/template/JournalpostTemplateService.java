@@ -59,7 +59,7 @@ public class JournalpostTemplateService {
                                 .build(),
                         SelectableValueTemplate
                                 .builder()
-                                .type(SelectableValueTemplate.Type.SEARCH_SELECT)
+                                .type(SelectableValueTemplate.Type.DYNAMIC_STRING_OR_SEARCH_SELECT)
                                 .selectablesSources(List.of(
                                         UrlBuilder.builder().urlTemplate("api/intern/arkiv/kodeverk/journalposttype").build()
                                 ))
@@ -74,7 +74,7 @@ public class JournalpostTemplateService {
                                 .build(),
                         SelectableValueTemplate
                                 .builder()
-                                .type(SelectableValueTemplate.Type.SEARCH_SELECT)
+                                .type(SelectableValueTemplate.Type.DYNAMIC_STRING_OR_SEARCH_SELECT)
                                 .selectablesSources(List.of(
                                         UrlBuilder.builder().urlTemplate("api/intern/arkiv/kodeverk/administrativenhet").build()
                                 ))
@@ -89,7 +89,7 @@ public class JournalpostTemplateService {
                                 .build(),
                         SelectableValueTemplate
                                 .builder()
-                                .type(SelectableValueTemplate.Type.SEARCH_SELECT)
+                                .type(SelectableValueTemplate.Type.DYNAMIC_STRING_OR_SEARCH_SELECT)
                                 .selectablesSources(List.of(
                                         UrlBuilder.builder().urlTemplate("api/intern/arkiv/kodeverk/arkivressurs").build()
                                 ))
@@ -104,7 +104,7 @@ public class JournalpostTemplateService {
                                 .build(),
                         SelectableValueTemplate
                                 .builder()
-                                .type(SelectableValueTemplate.Type.SEARCH_SELECT)
+                                .type(SelectableValueTemplate.Type.DYNAMIC_STRING_OR_SEARCH_SELECT)
                                 .selectablesSources(List.of(
                                         UrlBuilder.builder().urlTemplate("api/intern/arkiv/kodeverk/journalstatus").build()
                                 ))

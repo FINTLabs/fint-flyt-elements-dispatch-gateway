@@ -20,7 +20,7 @@ public class DokumentobjektTemplateService {
                                 .build(),
                         SelectableValueTemplate
                                 .builder()
-                                .type(SelectableValueTemplate.Type.SEARCH_SELECT)
+                                .type(SelectableValueTemplate.Type.DYNAMIC_STRING_OR_SEARCH_SELECT)
                                 .selectablesSources(List.of(
                                         UrlBuilder
                                                 .builder()
@@ -38,7 +38,7 @@ public class DokumentobjektTemplateService {
                                 .build(),
                         SelectableValueTemplate
                                 .builder()
-                                .type(SelectableValueTemplate.Type.SEARCH_SELECT)
+                                .type(SelectableValueTemplate.Type.DYNAMIC_STRING_OR_SEARCH_SELECT)
                                 .selectablesSources(List.of(
                                         UrlBuilder
                                                 .builder()
