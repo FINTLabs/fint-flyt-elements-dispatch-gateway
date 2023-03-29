@@ -22,7 +22,6 @@ import javax.validation.ValidatorFactory
         KlasseringTemplateService.class,
         KontaktinformasjonTemplateService.class,
         KorrespondansepartTemplateService.class,
-        NySakTemplateService.class,
         SakTemplateService.class,
         SkjermingTemplateService.class,
         PartTemplateService.class,
