@@ -69,6 +69,25 @@ public class DokumentbeskrivelseTemplateService {
                 .addTemplate(
                         ElementConfig
                                 .builder()
+                                .key("tilknyttetRegistreringSom")
+                                .displayName("Tilknyttet registrering som")
+                                .description("")
+                                .build(),
+                        SelectableValueTemplate
+                                .builder()
+                                .type(SelectableValueTemplate.Type.DYNAMIC_STRING_OR_SEARCH_SELECT)
+                                .selectablesSources(List.of(
+                                        UrlBuilder
+                                                .builder()
+                                                .urlTemplate("api/intern/kodeverk/tilknyttetregistreringsom")
+                                                .build()
+                                ))
+                                .build()
+
+                )
+                .addTemplate(
+                        ElementConfig
+                                .builder()
                                 .key("dokumentobjekt")
                                 .displayName("Dokumentobjekter")
                                 .description("")

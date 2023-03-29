@@ -14,9 +14,9 @@ import java.util.Optional;
 @NoArgsConstructor
 public class DokumentbeskrivelseDto {
     private String tittel;
+    private String dokumentstatus;
     private String dokumentType;
     private String tilknyttetRegistreringSom;
-    private String dokumentstatus;
     private Collection<DokumentobjektDto> dokumentobjekt;
 
     public Optional<String> getTittel() {

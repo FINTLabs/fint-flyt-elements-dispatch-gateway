@@ -2,7 +2,7 @@ package no.fintlabs.mapping
 
 import no.fint.model.resource.arkiv.noark.SakResource
 import no.fint.model.resource.arkiv.noark.SkjermingResource
-import no.fintlabs.model.instance.NySakDto
+import no.fintlabs.model.instance.SakDto
 import no.fintlabs.model.instance.SkjermingDto
 import spock.lang.Specification
 
@@ -15,7 +15,7 @@ class SakMappingServiceSpec extends Specification {
     def setup() {
         skjermingMappingService = Mock(SkjermingMappingService.class)
         klasseMappingService = Mock(KlasseMappingService.class)
-        sakMappingService = new SakMappingService(skjermingMappingService, klasseMappingService)
+        sakMappingService = new SakMappingService(skjermingMappingService, klasseMappingService, partMappingService)
     }
 
     def 'should map to SakResource'() {
@@ -23,7 +23,7 @@ class SakMappingServiceSpec extends Specification {
         skjermingMappingService.toSkjermingResource(_ as SkjermingDto) >> new SkjermingResource()
         klasseMappingService.toKlasse(_ as List) >> List.of()
 
-        NySakDto nySakDto = NySakDto
+        SakDto nySakDto = SakDto
                 .builder()
                 .tittel("testSakTittel")
                 .offentligTittel("testSakOffentligTittel")

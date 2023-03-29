@@ -9,13 +9,19 @@ import java.util.Map;
 @Service
 public class KlasseringTemplateService {
 
+    private final SkjermingTemplateService skjermingTemplateService;
+
+    public KlasseringTemplateService(SkjermingTemplateService skjermingTemplateService) {
+        this.skjermingTemplateService = skjermingTemplateService;
+    }
+
     public ObjectTemplate createTemplate() {
         return ObjectTemplate
                 .builder()
                 .addTemplate(
                         ElementConfig
                                 .builder()
-                                .key("rekkefølge")
+                                .key("rekkefolge")
                                 .displayName("Rekkefølge")
                                 .description("")
                                 .build(),
@@ -71,6 +77,15 @@ public class KlasseringTemplateService {
                                 .builder()
                                 .type(ValueTemplate.Type.DYNAMIC_STRING)
                                 .build()
+                )
+                .addTemplate(
+                        ElementConfig
+                                .builder()
+                                .key("skjerming")
+                                .displayName("Skjerming")
+                                .description("")
+                                .build(),
+                        skjermingTemplateService.createTemplate()
                 )
                 .build();
     }

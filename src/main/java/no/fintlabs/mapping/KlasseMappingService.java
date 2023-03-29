@@ -31,7 +31,7 @@ public class KlasseMappingService {
                 .ifPresent(klasseResource::setSkjerming);
         klasseDto.getTittel().ifPresent(klasseResource::setTittel);
         klasseDto.getKlassifikasjonssystem().map(Link::with).ifPresent(klasseResource::addKlassifikasjonssystem);
-        klasseDto.getRekkefølge().ifPresent(klasseResource::setRekkefolge);
+        klasseDto.getRekkefolge().ifPresent(klasseResource::setRekkefolge);
         return klasseResource;
     }
 

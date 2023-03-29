@@ -15,10 +15,10 @@ import java.util.Optional;
 public class JournalpostDto {
     private String tittel;
     private String offentligTittel;
-    private String journalstatus;
-    private String saksbehandler;
     private String journalposttype;
     private String administrativenhet;
+    private String saksbehandler;
+    private String journalstatus;
     private SkjermingDto skjerming;
     private Collection<KorrespondansepartDto> korrespondansepart;
     private Collection<DokumentbeskrivelseDto> dokumentbeskrivelse;

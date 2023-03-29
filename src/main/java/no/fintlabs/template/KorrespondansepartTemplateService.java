@@ -67,8 +67,20 @@ public class KorrespondansepartTemplateService {
                 .addTemplate(
                         ElementConfig
                                 .builder()
-                                .key("navn")
+                                .key("korrespondansepartNavn")
                                 .displayName("Navn")
+                                .description("")
+                                .build(),
+                        ValueTemplate
+                                .builder()
+                                .type(ValueTemplate.Type.DYNAMIC_STRING)
+                                .build()
+                )
+                .addTemplate(
+                        ElementConfig
+                                .builder()
+                                .key("kontaktperson")
+                                .displayName("Kontaktperson")
                                 .description("")
                                 .build(),
                         ValueTemplate

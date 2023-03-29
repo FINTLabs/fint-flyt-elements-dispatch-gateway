@@ -13,8 +13,8 @@ import java.util.Optional;
 @NoArgsConstructor
 public class KontaktinformasjonDto {
     private String epostadresse;
-    private String telefonnummer;
     private String mobiltelefonnummer;
+    private String telefonnummer;
 
     public Optional<String> getEpostadresse() {
         return Optional.ofNullable(epostadresse);

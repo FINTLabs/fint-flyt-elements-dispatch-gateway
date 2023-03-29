@@ -12,14 +12,18 @@ import java.util.Optional;
 @AllArgsConstructor
 @NoArgsConstructor
 public class KorrespondansepartDto {
-    private String fodselsnummer;
-    private String organisasjonsnummer;
-    private String korrespondansepartNavn;
-    private AdresseDto adresse;
     private String korrespondanseparttype;
+    private String organisasjonsnummer;
+    private String fodselsnummer;
+    private String korrespondansepartNavn;
     private String kontaktperson;
+    private AdresseDto adresse;
     private KontaktinformasjonDto kontaktinformasjon;
     private SkjermingDto skjerming;
+
+    public Optional<String> getKorrespondanseparttype() {
+        return Optional.ofNullable(korrespondanseparttype);
+    }
 
     public Optional<String> getFodselsnummer() {
         return Optional.ofNullable(fodselsnummer);
@@ -35,10 +39,6 @@ public class KorrespondansepartDto {
 
     public Optional<AdresseDto> getAdresse() {
         return Optional.ofNullable(adresse);
-    }
-
-    public Optional<String> getKorrespondanseparttype() {
-        return Optional.ofNullable(korrespondanseparttype);
     }
 
     public Optional<String> getKontaktperson() {

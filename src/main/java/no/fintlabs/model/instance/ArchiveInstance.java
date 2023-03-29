@@ -1,26 +1,33 @@
 package no.fintlabs.model.instance;
 
-import lombok.*;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.extern.jackson.Jacksonized;
+import no.fintlabs.model.CaseDispatchType;
+import no.fintlabs.model.validation.groups.CaseByIdValidationGroup;
+import no.fintlabs.model.validation.groups.CaseBySearchValidationGroup;
+import no.fintlabs.model.validation.groups.NewCaseValidationGroup;
 
-import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import java.util.Optional;
+import java.util.List;
 
-@Setter
+
+@Getter
 @Builder
-@AllArgsConstructor
-@NoArgsConstructor
+@Jacksonized
 public class ArchiveInstance {
 
-    @Valid
     @NotNull
-    @Getter
-    private SakDto sak;
+    private CaseDispatchType type;
 
-    private JournalpostDto journalpost;
+    @NotNull(groups = {NewCaseValidationGroup.class, CaseBySearchValidationGroup.class})
+    private SakDto newCase;
 
-    public Optional<JournalpostDto> getJournalpost() {
-        return Optional.ofNullable(journalpost);
-    }
+    @NotBlank(groups = CaseByIdValidationGroup.class)
+    private String caseId;
+
+    @NotBlank(groups = CaseByIdValidationGroup.class)
+    private List<JournalpostDto> journalpost;
 
 }

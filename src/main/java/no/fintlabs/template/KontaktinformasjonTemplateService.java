@@ -14,8 +14,8 @@ public class KontaktinformasjonTemplateService {
                 .addTemplate(
                         ElementConfig
                                 .builder()
-                                .key("kontaktperson")
-                                .displayName("Kontaktperson")
+                                .key("epostadresse")
+                                .displayName("E-post")
                                 .description("")
                                 .build(),
                         ValueTemplate
@@ -47,18 +47,7 @@ public class KontaktinformasjonTemplateService {
                                 .type(ValueTemplate.Type.DYNAMIC_STRING)
                                 .build()
                 )
-                .addTemplate(
-                        ElementConfig
-                                .builder()
-                                .key("epost")
-                                .displayName("E-post")
-                                .description("")
-                                .build(),
-                        ValueTemplate
-                                .builder()
-                                .type(ValueTemplate.Type.DYNAMIC_STRING)
-                                .build()
-                )
+
                 .build();
     }
 

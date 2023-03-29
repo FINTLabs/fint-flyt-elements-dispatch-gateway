@@ -12,11 +12,19 @@ import java.util.Optional;
 @AllArgsConstructor
 @NoArgsConstructor
 public class KlasseDto {
-    private String klasseId;
-    private SkjermingDto skjerming;
-    private String tittel;
+    private Integer rekkefolge;
     private String klassifikasjonssystem;
-    private Integer rekkefølge;
+    private String klasseId;
+    private String tittel;
+    private SkjermingDto skjerming;
+
+    public Optional<Integer> getRekkefolge() {
+        return Optional.ofNullable(rekkefolge);
+    }
+
+    public Optional<String> getKlassifikasjonssystem() {
+        return Optional.ofNullable(klassifikasjonssystem);
+    }
 
     public Optional<String> getKlasseId() {
         return Optional.ofNullable(klasseId);
@@ -28,14 +36,6 @@ public class KlasseDto {
 
     public Optional<String> getTittel() {
         return Optional.ofNullable(tittel);
-    }
-
-    public Optional<String> getKlassifikasjonssystem() {
-        return Optional.ofNullable(klassifikasjonssystem);
-    }
-
-    public Optional<Integer> getRekkefølge() {
-        return Optional.ofNullable(rekkefølge);
     }
 
 }

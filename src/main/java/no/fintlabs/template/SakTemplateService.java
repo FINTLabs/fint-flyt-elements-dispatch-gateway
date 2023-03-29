@@ -1,25 +1,29 @@
 package no.fintlabs.template;
 
-import no.fintlabs.model.CaseDispatchType;
 import no.fintlabs.template.model.*;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Map;
 
 
 @Service
 public class SakTemplateService {
 
-    private final NySakTemplateService nySakTemplateService;
+    private final KlasseringTemplateService klasseringTemplateService;
+    private final SkjermingTemplateService skjermingTemplateService;
     private final JournalpostTemplateService journalpostTemplateService;
+    private final PartTemplateService partTemplateService;
 
     public SakTemplateService(
-            NySakTemplateService nySakTemplateService,
-            JournalpostTemplateService journalpostTemplateService
+            KlasseringTemplateService klasseringTemplateService,
+            SkjermingTemplateService skjermingTemplateService,
+            JournalpostTemplateService journalpostTemplateService,
+            PartTemplateService partTemplateService
     ) {
-        this.nySakTemplateService = nySakTemplateService;
+        this.klasseringTemplateService = klasseringTemplateService;
+        this.skjermingTemplateService = skjermingTemplateService;
         this.journalpostTemplateService = journalpostTemplateService;
+        this.partTemplateService = partTemplateService;
     }
 
     public ObjectTemplate createTemplate() {
@@ -28,98 +32,148 @@ public class SakTemplateService {
                 .addTemplate(
                         ElementConfig
                                 .builder()
-                                .key("type")
-                                .displayName("Sakslogikk")
+                                .key("tittel")
+                                .displayName("Tittel")
+                                .description("")
+                                .build(),
+                        ValueTemplate
+                                .builder()
+                                .type(ValueTemplate.Type.DYNAMIC_STRING)
+                                .build()
+                )
+                .addTemplate(
+                        ElementConfig
+                                .builder()
+                                .key("offentligTittel")
+                                .displayName("Offentlig tittel")
+                                .description("")
+                                .build(),
+                        ValueTemplate
+                                .builder()
+                                .type(ValueTemplate.Type.DYNAMIC_STRING)
+                                .build()
+                )
+                .addTemplate(
+                        ElementConfig
+                                .builder()
+                                .key("saksmappetype")
+                                .displayName("Saksmappetype")
                                 .description("")
                                 .build(),
                         SelectableValueTemplate
                                 .builder()
-                                .type(SelectableValueTemplate.Type.DROPDOWN)
-                                .selectables(List.of(
-                                        Selectable
-                                                .builder()
-                                                .displayName("Ny")
-                                                .value(CaseDispatchType.NEW.name())
-                                                .build(),
-//                                        Selectable
-//                                                .builder()
-//                                                .displayName("På søk, eller ny")
-//                                                .value(CaseDispatchType.BY_SEARCH_OR_NEW.name())
-//                                                .build(),
-                                        Selectable
-                                                .builder()
-                                                .displayName("På saksnummer")
-                                                .value(CaseDispatchType.BY_ID.name())
-                                                .build()
+                                .type(SelectableValueTemplate.Type.DYNAMIC_STRING_OR_SEARCH_SELECT)
+                                .selectablesSources(List.of(
+                                        UrlBuilder.builder().urlTemplate("api/intern/arkiv/kodeverk/saksmappetype").build()
                                 ))
                                 .build()
                 )
                 .addTemplate(
                         ElementConfig
                                 .builder()
-                                .key("new")
-                                .displayName("Sak")
+                                .key("journalenhet")
+                                .displayName("Journalenhet")
                                 .description("")
-                                .showDependency(
-                                        Dependency
-                                                .builder()
-                                                .hasAnyCombination(List.of(
-                                                        List.of(
-                                                                ValuePredicate
-                                                                        .builder()
-                                                                        .key("type")
-                                                                        .defined(true)
-                                                                        .value(CaseDispatchType.NEW.name())
-                                                                        .build()
-                                                        ),
-                                                        List.of(
-                                                                ValuePredicate
-                                                                        .builder()
-                                                                        .key("type")
-                                                                        .defined(true)
-                                                                        .value(CaseDispatchType.BY_SEARCH_OR_NEW.name())
-                                                                        .build()
-                                                        )
-                                                ))
-                                                .build()
-                                )
                                 .build(),
-                        nySakTemplateService.createTemplate()
+                        SelectableValueTemplate
+                                .builder()
+                                .type(SelectableValueTemplate.Type.DYNAMIC_STRING_OR_SEARCH_SELECT)
+                                .selectablesSources(List.of(
+                                        UrlBuilder.builder().urlTemplate("api/intern/arkiv/kodeverk/administrativenhet").build()
+                                ))
+                                .build()
                 )
                 .addTemplate(
                         ElementConfig
                                 .builder()
-                                .key("id")
-                                .displayName("Saksnummer")
+                                .key("administrativenhet")
+                                .displayName("Administrativ enhet")
                                 .description("")
-                                .showDependency(
-                                        Dependency
-                                                .builder()
-                                                .hasAnyCombination(List.of(
-                                                        List.of(
-                                                                ValuePredicate
-                                                                        .builder()
-                                                                        .key("type")
-                                                                        .defined(true)
-                                                                        .value(CaseDispatchType.BY_ID.name())
-                                                                        .build()
-                                                        )
-                                                ))
-                                                .build()
-                                )
                                 .build(),
-                        ValueTemplate
+                        SelectableValueTemplate
                                 .builder()
-                                .type(ValueTemplate.Type.DYNAMIC_STRING)
-                                .search(
-                                        UrlBuilder
-                                                .builder()
-                                                .urlTemplate("api/intern/arkiv/saker/{caseId}/tittel")
-                                                .valueRefPerPathParamKey(Map.of(
-                                                        "caseId", "id"
-                                                ))
-                                                .build()
-                                )
+                                .type(SelectableValueTemplate.Type.DYNAMIC_STRING_OR_SEARCH_SELECT)
+                                .selectablesSources(List.of(
+                                        UrlBuilder.builder().urlTemplate("api/intern/arkiv/kodeverk/administrativenhet").build()
+                                ))
+                                .build()
+                )
+                .addTemplate(
+                        ElementConfig
+                                .builder()
+                                .key("saksansvarlig")
+                                .displayName("Saksansvarlig")
+                                .description("")
+                                .build(),
+                        SelectableValueTemplate
+                                .builder()
+                                .type(SelectableValueTemplate.Type.DYNAMIC_STRING_OR_SEARCH_SELECT)
+                                .selectablesSources(List.of(
+                                        UrlBuilder.builder().urlTemplate("api/intern/arkiv/kodeverk/arkivressurs").build()
+                                ))
+                                .build()
+                )
+                .addTemplate(
+                        ElementConfig
+                                .builder()
+                                .key("arkivdel")
+                                .displayName("Arkivdel")
+                                .description("")
+                                .build(),
+                        SelectableValueTemplate
+                                .builder()
+                                .type(SelectableValueTemplate.Type.DYNAMIC_STRING_OR_SEARCH_SELECT)
+                                .selectablesSources(List.of(
+                                        UrlBuilder.builder().urlTemplate("api/intern/arkiv/kodeverk/arkivdel").build()
+                                ))
+                                .build()
+                )
+                .addTemplate(
+                        ElementConfig
+                                .builder()
+                                .key("saksstatus")
+                                .displayName("Saksstatus")
+                                .description("")
+                                .build(),
+                        SelectableValueTemplate
+                                .builder()
+                                .type(SelectableValueTemplate.Type.DYNAMIC_STRING_OR_SEARCH_SELECT)
+                                .selectablesSources(List.of(
+                                        UrlBuilder.builder().urlTemplate("api/intern/arkiv/kodeverk/sakstatus").build()
+                                ))
+                                .build()
+                )
+                .addTemplate(
+                        ElementConfig
+                                .builder()
+                                .key("part")
+                                .displayName("Parter")
+                                .description("")
+                                .build(),
+                        ObjectCollectionTemplate
+                                .builder()
+                                .elementTemplate(partTemplateService.createTemplate())
+                                .build()
+                )
+                .addTemplate(
+                        ElementConfig
+                                .builder()
+                                .key("skjerming")
+                                .displayName("Skjerming")
+                                .description("")
+                                .build(),
+                        skjermingTemplateService.createTemplate()
+                )
+                .addTemplate(
+                        ElementConfig
+                                .builder()
+                                .key("klasse")
+                                .displayName("Klassering")
+                                .description("")
+                                .build(),
+                        ObjectCollectionTemplate
+                                .builder()
+                                .elementTemplate(klasseringTemplateService.createTemplate())
                                 .build()
                 )
                 .addTemplate(
@@ -128,21 +182,6 @@ public class SakTemplateService {
                                 .key("journalpost")
                                 .displayName("Journalposter")
                                 .description("")
-                                .showDependency(
-                                        Dependency
-                                                .builder()
-                                                .hasAnyCombination(List.of(
-                                                        List.of(
-                                                                ValuePredicate
-                                                                        .builder()
-                                                                        .key("type")
-                                                                        .defined(true)
-                                                                        .value(CaseDispatchType.BY_ID.name())
-                                                                        .build()
-                                                        )
-                                                ))
-                                                .build()
-                                )
                                 .build(),
                         ObjectCollectionTemplate
                                 .builder()

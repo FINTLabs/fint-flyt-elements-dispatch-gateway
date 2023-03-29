@@ -25,36 +25,6 @@ public class PartTemplateService {
                 .addTemplate(
                         ElementConfig
                                 .builder()
-                                .key("adresse")
-                                .displayName("Adresse")
-                                .description("")
-                                .build(),
-                        adresseTemplateService.createTemplate()
-                )
-                .addTemplate(
-                        ElementConfig
-                                .builder()
-                                .key("kontaktinformasjon")
-                                .displayName("Kontaktinformasjon")
-                                .description("")
-                                .build(),
-                        kontaktinformasjonTemplateService.createTemplate()
-                )
-                .addTemplate(
-                        ElementConfig
-                                .builder()
-                                .key("kontaktperson")
-                                .displayName("Kontaktperson")
-                                .description("")
-                                .build(),
-                        ValueTemplate
-                                .builder()
-                                .type(ValueTemplate.Type.DYNAMIC_STRING)
-                                .build()
-                )
-                .addTemplate(
-                        ElementConfig
-                                .builder()
                                 .key("partNavn")
                                 .displayName("Navn")
                                 .description("")
@@ -78,6 +48,36 @@ public class PartTemplateService {
                                         UrlBuilder.builder().urlTemplate("api/intern/arkiv/kodeverk/partrolle").build()
                                 ))
                                 .build()
+                )
+                .addTemplate(
+                        ElementConfig
+                                .builder()
+                                .key("kontaktperson")
+                                .displayName("Kontaktperson")
+                                .description("")
+                                .build(),
+                        ValueTemplate
+                                .builder()
+                                .type(ValueTemplate.Type.DYNAMIC_STRING)
+                                .build()
+                )
+                .addTemplate(
+                        ElementConfig
+                                .builder()
+                                .key("adresse")
+                                .displayName("Adresse")
+                                .description("")
+                                .build(),
+                        adresseTemplateService.createTemplate()
+                )
+                .addTemplate(
+                        ElementConfig
+                                .builder()
+                                .key("kontaktinformasjon")
+                                .displayName("Kontaktinformasjon")
+                                .description("")
+                                .build(),
+                        kontaktinformasjonTemplateService.createTemplate()
                 )
                 .build();
     }

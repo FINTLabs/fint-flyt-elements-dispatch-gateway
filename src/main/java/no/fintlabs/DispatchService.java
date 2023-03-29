@@ -8,19 +8,18 @@ import no.fint.model.resource.arkiv.noark.SaksmappeResource;
 import no.fintlabs.flyt.kafka.headers.InstanceFlowHeaders;
 import no.fintlabs.mapping.JournalpostMappingService;
 import no.fintlabs.mapping.SakMappingService;
+import no.fintlabs.model.CaseDispatchType;
 import no.fintlabs.model.JournalpostWrapper;
 import no.fintlabs.model.Result;
 import no.fintlabs.model.instance.*;
 import no.fintlabs.web.archive.FintArchiveClient;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import javax.validation.Valid;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -44,13 +43,20 @@ public class DispatchService {
     }
 
     public Mono<Result> process(InstanceFlowHeaders instanceFlowHeaders, @Valid ArchiveInstance archiveInstance) {
-        return getCaseId(archiveInstance.getSak())
-                .flatMap(caseId -> archiveInstance.getJournalpost()
-                        .map(journalpost -> addNewRecord(caseId, journalpost)
+        return getCaseId(archiveInstance)
+                .flatMap(caseId ->
+                        archiveInstance.getType() == CaseDispatchType.NEW
+
+                                ? archiveInstance.getNewCase().getJournalpost()
+                                .map(journalpostDtos -> addNewRecords(caseId, journalpostDtos)
+                                        .map(SakResource::getMappeId)
+                                        .map(Identifikator::getIdentifikatorverdi)
+                                )
+                                .orElse(Mono.just(caseId))
+
+                                : addNewRecords(caseId, archiveInstance.getJournalpost())
                                 .map(SakResource::getMappeId)
                                 .map(Identifikator::getIdentifikatorverdi)
-                        )
-                        .orElse(Mono.just(caseId))
                 )
                 .map(Result::accepted)
                 .onErrorResume(WebClientResponseException.class, e ->
@@ -60,30 +66,37 @@ public class DispatchService {
                 .onErrorReturn(RuntimeException.class, Result.failed());
     }
 
-    private Mono<String> getCaseId(SakDto sakDto) {
-        return switch (sakDto.getType()) {
-            case NEW -> createNewCase(sakDto.getNy())
+    private Mono<String> getCaseId(ArchiveInstance archiveInstance) {
+        return switch (archiveInstance.getType()) {
+            case NEW -> createNewCase(archiveInstance.getNewCase())
                     .map(SaksmappeResource::getMappeId)
                     .map(Identifikator::getIdentifikatorverdi);
-            case BY_ID -> Mono.just(sakDto.getId());
-            case BY_SEARCH_OR_NEW -> getCaseBySearch(sakDto)
+            case BY_ID -> Mono.just(archiveInstance.getCaseId());
+            case BY_SEARCH_OR_NEW -> getCaseBySearch(archiveInstance)
                     .flatMap(optionalCase -> optionalCase
                             .map(Mono::just)
-                            .orElse(createNewCase(sakDto.getNy())))
+                            .orElse(createNewCase(archiveInstance.getNewCase())))
                     .map(SaksmappeResource::getMappeId)
                     .map(Identifikator::getIdentifikatorverdi);
         };
     }
 
-    private Mono<SakResource> createNewCase(NySakDto nySakDto) {
-        SakResource sakResource = sakMappingService.toSakResource(nySakDto);
+    private Mono<SakResource> createNewCase(SakDto sakDto) {
+        SakResource sakResource = sakMappingService.toSakResource(sakDto);
         log.debug("Creating new case: {}", sakResource);
         return fintArchiveClient.postCase(sakResource)
                 .doOnNext(result -> log.info("Created new case with id={}", result.getMappeId().getIdentifikatorverdi()));
     }
 
-    private Mono<Optional<SakResource>> getCaseBySearch(SakDto sakDto) {
+    private Mono<Optional<SakResource>> getCaseBySearch(ArchiveInstance archiveInstance) {
         throw new UnsupportedOperationException();
+    }
+
+    private Mono<SakResource> addNewRecords(String caseId, List<JournalpostDto> journalpostDtos) {
+        return Flux.fromIterable(journalpostDtos)
+                .concatMap(journalpostDto -> addNewRecord(caseId, journalpostDto))
+                .distinct()
+                .single();
     }
 
     private Mono<SakResource> addNewRecord(String caseId, JournalpostDto journalpostDto) {
