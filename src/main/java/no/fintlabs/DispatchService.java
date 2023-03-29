@@ -20,6 +20,7 @@ import reactor.core.publisher.Mono;
 
 import javax.validation.Valid;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -49,14 +50,16 @@ public class DispatchService {
 
                                 ? archiveInstance.getNewCase().getJournalpost()
                                 .map(journalpostDtos -> addNewRecords(caseId, journalpostDtos)
-                                        .map(SakResource::getMappeId)
-                                        .map(Identifikator::getIdentifikatorverdi)
+                                        .map(journalpostNummer -> caseId)
                                 )
                                 .orElse(Mono.just(caseId))
 
                                 : addNewRecords(caseId, archiveInstance.getJournalpost())
-                                .map(SakResource::getMappeId)
-                                .map(Identifikator::getIdentifikatorverdi)
+                                .map(journalpostNummers -> caseId + journalpostNummers
+                                        .stream()
+                                        .map(Object::toString)
+                                        .collect(Collectors.joining(",", "-[", "]"))
+                                )
                 )
                 .map(Result::accepted)
                 .onErrorResume(WebClientResponseException.class, e ->
@@ -92,14 +95,13 @@ public class DispatchService {
         throw new UnsupportedOperationException();
     }
 
-    private Mono<SakResource> addNewRecords(String caseId, List<JournalpostDto> journalpostDtos) {
+    private Mono<List<Long>> addNewRecords(String caseId, List<JournalpostDto> journalpostDtos) {
         return Flux.fromIterable(journalpostDtos)
                 .concatMap(journalpostDto -> addNewRecord(caseId, journalpostDto))
-                .distinct()
-                .single();
+                .collectList();
     }
 
-    private Mono<SakResource> addNewRecord(String caseId, JournalpostDto journalpostDto) {
+    private Mono<Long> addNewRecord(String caseId, JournalpostDto journalpostDto) {
         return dispatchFiles(journalpostDto)
                 .map(dokumentfilResourceLinkPerFileId ->
                         journalpostMappingService.toJournalpostResource(journalpostDto, dokumentfilResourceLinkPerFileId)
@@ -107,7 +109,7 @@ public class DispatchService {
                 .doOnNext(journalpostResource -> log.debug("Creating new record: {}", journalpostResource))
                 .map(JournalpostWrapper::new)
                 .flatMap(journalpostWrapper -> fintArchiveClient.putRecord(caseId, journalpostWrapper))
-                .doOnNext(result -> log.info("Added new record on case with id={}", result.getMappeId().getIdentifikatorverdi()));
+                .doOnNext(journalpostNummer -> log.info("Added new record on case with id={} and journalpostNummer={}", caseId, journalpostNummer));
     }
 
     private Mono<Map<UUID, Link>> dispatchFiles(JournalpostDto journalpostDto) {

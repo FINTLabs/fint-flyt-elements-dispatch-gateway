@@ -1,6 +1,7 @@
 package no.fintlabs.web.archive;
 
 import lombok.extern.slf4j.Slf4j;
+import no.fint.model.resource.arkiv.noark.JournalpostResource;
 import no.fint.model.resource.arkiv.noark.SakResource;
 import no.fintlabs.model.File;
 import no.fintlabs.model.JournalpostWrapper;
@@ -17,6 +18,7 @@ import reactor.util.retry.Retry;
 
 import java.net.URI;
 import java.time.Duration;
+import java.util.Comparator;
 
 @Slf4j
 @Service
@@ -83,13 +85,18 @@ public class FintArchiveClient {
         );
     }
 
-    public Mono<SakResource> putRecord(String caseId, JournalpostWrapper journalpostWrapper) {
+    public Mono<Long> putRecord(String caseId, JournalpostWrapper journalpostWrapper) {
         return pollForCaseResult(
                 fintWebClient
                         .put()
                         .uri("/arkiv/noark/sak/mappeid/" + caseId)
                         .bodyValue(journalpostWrapper)
                         .retrieve()
+        ).map(sakResource -> sakResource.getJournalpost()
+                .stream()
+                .map(JournalpostResource::getJournalPostnummer)
+                .max(Comparator.comparingLong(a -> a))
+                .orElseThrow()
         );
     }
 
