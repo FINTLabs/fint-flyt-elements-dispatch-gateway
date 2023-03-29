@@ -3,6 +3,8 @@ package no.fintlabs.model.instance;
 import lombok.Builder;
 import lombok.extern.jackson.Jacksonized;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,10 +19,10 @@ public class SakDto {
     private final String saksansvarlig;
     private final String arkivdel;
     private final String saksstatus;
-    private final List<PartDto> part;
-    private final SkjermingDto skjerming;
-    private final List<KlasseDto> klasse;
-    private final List<JournalpostDto> journalpost;
+    private final List<@NotNull @Valid PartDto> part;
+    private final @Valid SkjermingDto skjerming;
+    private final List<@NotNull @Valid KlasseDto> klasse;
+    private final List<@NotNull @Valid JournalpostDto> journalpost;
 
     public Optional<String> getTittel() {
         return Optional.ofNullable(tittel);

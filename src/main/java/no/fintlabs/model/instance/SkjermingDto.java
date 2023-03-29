@@ -1,19 +1,15 @@
 package no.fintlabs.model.instance;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.extern.jackson.Jacksonized;
 
 import java.util.Optional;
 
 @Builder
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
+@Jacksonized
 public class SkjermingDto {
-    private String tilgangsrestriksjon;
-    private String skjermingshjemmel;
+    private final String tilgangsrestriksjon;
+    private final String skjermingshjemmel;
 
     public Optional<String> getTilgangsrestriksjon() {
         return Optional.ofNullable(tilgangsrestriksjon);

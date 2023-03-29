@@ -8,6 +8,7 @@ import no.fintlabs.model.validation.groups.CaseByIdValidationGroup;
 import no.fintlabs.model.validation.groups.CaseBySearchValidationGroup;
 import no.fintlabs.model.validation.groups.NewCaseValidationGroup;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.List;
@@ -19,15 +20,15 @@ import java.util.List;
 public class ArchiveInstance {
 
     @NotNull
-    private CaseDispatchType type;
+    private final CaseDispatchType type;
 
     @NotNull(groups = {NewCaseValidationGroup.class, CaseBySearchValidationGroup.class})
-    private SakDto newCase;
+    private final SakDto newCase;
 
     @NotBlank(groups = CaseByIdValidationGroup.class)
-    private String caseId;
+    private final String caseId;
 
     @NotBlank(groups = CaseByIdValidationGroup.class)
-    private List<JournalpostDto> journalpost;
+    private final List<@NotNull @Valid JournalpostDto> journalpost;
 
 }

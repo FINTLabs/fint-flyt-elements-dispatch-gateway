@@ -1,20 +1,16 @@
 package no.fintlabs.model.instance;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.extern.jackson.Jacksonized;
 
 import java.util.Optional;
 
-@Data
 @Builder
-@AllArgsConstructor
-@NoArgsConstructor
+@Jacksonized
 public class KontaktinformasjonDto {
-    private String epostadresse;
-    private String mobiltelefonnummer;
-    private String telefonnummer;
+    private final String epostadresse;
+    private final String mobiltelefonnummer;
+    private final String telefonnummer;
 
     public Optional<String> getEpostadresse() {
         return Optional.ofNullable(epostadresse);

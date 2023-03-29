@@ -1,23 +1,21 @@
 package no.fintlabs.model.instance;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.extern.jackson.Jacksonized;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import java.util.Collection;
 import java.util.Optional;
 
-@Data
 @Builder
-@AllArgsConstructor
-@NoArgsConstructor
+@Jacksonized
 public class DokumentbeskrivelseDto {
-    private String tittel;
-    private String dokumentstatus;
-    private String dokumentType;
-    private String tilknyttetRegistreringSom;
-    private Collection<DokumentobjektDto> dokumentobjekt;
+    private final String tittel;
+    private final String dokumentstatus;
+    private final String dokumentType;
+    private final String tilknyttetRegistreringSom;
+    private final Collection<@NotNull @Valid DokumentobjektDto> dokumentobjekt;
 
     public Optional<String> getTittel() {
         return Optional.ofNullable(tittel);

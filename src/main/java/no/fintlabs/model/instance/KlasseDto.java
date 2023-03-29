@@ -1,22 +1,20 @@
 package no.fintlabs.model.instance;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.extern.jackson.Jacksonized;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import java.util.Optional;
 
-@Data
 @Builder
-@AllArgsConstructor
-@NoArgsConstructor
+@Jacksonized
 public class KlasseDto {
-    private Integer rekkefolge;
-    private String klassifikasjonssystem;
-    private String klasseId;
-    private String tittel;
-    private SkjermingDto skjerming;
+    private final @NotNull Integer rekkefolge;
+    private final String klassifikasjonssystem;
+    private final String klasseId;
+    private final String tittel;
+    private final @Valid SkjermingDto skjerming;
 
     public Optional<Integer> getRekkefolge() {
         return Optional.ofNullable(rekkefolge);

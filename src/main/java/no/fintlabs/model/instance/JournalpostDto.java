@@ -1,27 +1,25 @@
 package no.fintlabs.model.instance;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.extern.jackson.Jacksonized;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import java.util.Collection;
 import java.util.Optional;
 
-@Data
 @Builder
-@AllArgsConstructor
-@NoArgsConstructor
+@Jacksonized
 public class JournalpostDto {
-    private String tittel;
-    private String offentligTittel;
-    private String journalposttype;
-    private String administrativenhet;
-    private String saksbehandler;
-    private String journalstatus;
-    private SkjermingDto skjerming;
-    private Collection<KorrespondansepartDto> korrespondansepart;
-    private Collection<DokumentbeskrivelseDto> dokumentbeskrivelse;
+    private final String tittel;
+    private final String offentligTittel;
+    private final String journalposttype;
+    private final String administrativenhet;
+    private final String saksbehandler;
+    private final String journalstatus;
+    private final @Valid SkjermingDto skjerming;
+    private final Collection<@NotNull @Valid KorrespondansepartDto> korrespondansepart;
+    private final Collection<@NotNull @Valid DokumentbeskrivelseDto> dokumentbeskrivelse;
 
     public Optional<String> getTittel() {
         return Optional.ofNullable(tittel);

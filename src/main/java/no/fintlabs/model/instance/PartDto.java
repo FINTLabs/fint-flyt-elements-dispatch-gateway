@@ -3,6 +3,7 @@ package no.fintlabs.model.instance;
 import lombok.Builder;
 import lombok.extern.jackson.Jacksonized;
 
+import javax.validation.Valid;
 import java.util.Optional;
 
 @Builder
@@ -11,8 +12,8 @@ public class PartDto {
     private final String partNavn;
     private final String partRolle;
     private final String kontaktperson;
-    private final AdresseDto adresse;
-    private final KontaktinformasjonDto kontaktinformasjon;
+    private final @Valid AdresseDto adresse;
+    private final @Valid KontaktinformasjonDto kontaktinformasjon;
 
     public Optional<String> getPartNavn() {
         return Optional.ofNullable(partNavn);

@@ -1,26 +1,22 @@
 package no.fintlabs.model.instance;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.extern.jackson.Jacksonized;
 
 import javax.validation.constraints.NotNull;
 import java.util.Optional;
 import java.util.UUID;
 
-@Data
 @Builder
-@AllArgsConstructor
-@NoArgsConstructor
+@Jacksonized
 public class DokumentobjektDto {
-    private String variantformat;
-    private String filformat;
-    private String format;
+    private final String variantformat;
+    private final String filformat;
+    private final String format;
     @JsonProperty(value = "fil")
     @NotNull
-    private UUID fileId;
+    private final UUID fileId;
 
     public Optional<String> getVariantformat() {
         return Optional.ofNullable(variantformat);

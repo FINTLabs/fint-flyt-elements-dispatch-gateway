@@ -1,20 +1,16 @@
 package no.fintlabs.model.instance;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.extern.jackson.Jacksonized;
 
 import java.util.Optional;
 
-@Data
 @Builder
-@AllArgsConstructor
-@NoArgsConstructor
+@Jacksonized
 public class AdresseDto {
-    private String adresselinje;
-    private String postnummer;
-    private String poststed;
+    private final String adresselinje;
+    private final String postnummer;
+    private final String poststed;
 
     public Optional<String> getAdresselinje() {
         return Optional.ofNullable(adresselinje);

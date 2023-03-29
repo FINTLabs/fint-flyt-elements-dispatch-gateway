@@ -1,25 +1,22 @@
 package no.fintlabs.model.instance;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.extern.jackson.Jacksonized;
 
+import javax.validation.Valid;
 import java.util.Optional;
 
-@Setter
 @Builder
-@AllArgsConstructor
-@NoArgsConstructor
+@Jacksonized
 public class KorrespondansepartDto {
-    private String korrespondanseparttype;
-    private String organisasjonsnummer;
-    private String fodselsnummer;
-    private String korrespondansepartNavn;
-    private String kontaktperson;
-    private AdresseDto adresse;
-    private KontaktinformasjonDto kontaktinformasjon;
-    private SkjermingDto skjerming;
+    private final String korrespondanseparttype;
+    private final String organisasjonsnummer;
+    private final String fodselsnummer;
+    private final String korrespondansepartNavn;
+    private final String kontaktperson;
+    private final @Valid AdresseDto adresse;
+    private final @Valid KontaktinformasjonDto kontaktinformasjon;
+    private final @Valid SkjermingDto skjerming;
 
     public Optional<String> getKorrespondanseparttype() {
         return Optional.ofNullable(korrespondanseparttype);
