@@ -10,4 +10,6 @@ spring:
             authorization-grant-type: password
             provider: fint-idp
             scope: fint-client
-fint.flyt.file-service-url: 'http://fint-flyt-file-service:8080'
+fint:
+  flyt:
+    file-service-url: 'http://fint-flyt-file-service:8080'
