@@ -42,7 +42,7 @@ public class DokumentbeskrivelseTemplateService {
                                 .selectablesSources(List.of(
                                         UrlBuilder
                                                 .builder()
-                                                .urlTemplate("api/intern/kodeverk/dokumentstatus")
+                                                .urlTemplate("api/intern/arkiv/kodeverk/dokumentstatus")
                                                 .build()
                                 ))
                                 .build()
@@ -60,7 +60,7 @@ public class DokumentbeskrivelseTemplateService {
                                 .selectablesSources(List.of(
                                         UrlBuilder
                                                 .builder()
-                                                .urlTemplate("api/intern/kodeverk/dokumenttype")
+                                                .urlTemplate("api/intern/arkiv/kodeverk/dokumenttype")
                                                 .build()
                                 ))
                                 .build()
@@ -79,7 +79,7 @@ public class DokumentbeskrivelseTemplateService {
                                 .selectablesSources(List.of(
                                         UrlBuilder
                                                 .builder()
-                                                .urlTemplate("api/intern/kodeverk/tilknyttetregistreringsom")
+                                                .urlTemplate("api/intern/arkiv/kodeverk/tilknyttetregistreringsom")
                                                 .build()
                                 ))
                                 .build()
