@@ -86,7 +86,7 @@ public class SakTemplateService {
                 .addTemplate(
                         ElementConfig
                                 .builder()
-                                .key("administrativenhet")
+                                .key("administrativEnhet")
                                 .displayName("Administrativ enhet")
                                 .description("")
                                 .build(),

@@ -14,7 +14,7 @@ public class JournalpostDto {
     private final String tittel;
     private final String offentligTittel;
     private final String journalposttype;
-    private final String administrativenhet;
+    private final String administrativEnhet;
     private final String saksbehandler;
     private final String journalstatus;
     private final @Valid SkjermingDto skjerming;
@@ -41,8 +41,8 @@ public class JournalpostDto {
         return Optional.ofNullable(journalposttype);
     }
 
-    public Optional<String> getAdministrativenhet() {
-        return Optional.ofNullable(administrativenhet);
+    public Optional<String> getAdministrativEnhet() {
+        return Optional.ofNullable(administrativEnhet);
     }
 
     public Optional<SkjermingDto> getSkjerming() {

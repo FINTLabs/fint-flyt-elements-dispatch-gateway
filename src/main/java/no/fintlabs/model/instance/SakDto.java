@@ -15,7 +15,7 @@ public class SakDto {
     private final String offentligTittel;
     private final String saksmappetype;
     private final String journalenhet;
-    private final String administrativenhet;
+    private final String administrativEnhet;
     private final String saksansvarlig;
     private final String arkivdel;
     private final String saksstatus;
@@ -44,8 +44,8 @@ public class SakDto {
         return Optional.ofNullable(journalenhet);
     }
 
-    public Optional<String> getAdministrativenhet() {
-        return Optional.ofNullable(administrativenhet);
+    public Optional<String> getAdministrativEnhet() {
+        return Optional.ofNullable(administrativEnhet);
     }
 
     public Optional<String> getSaksansvarlig() {
