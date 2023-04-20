@@ -9,7 +9,7 @@ spring:
       - flyt-logging
       - fint-client
       - flyt-file-client
-logging:
-  level:
+#logging:
+#  level:
 #    reactor.netty: DEBUG
-    no.fintlabs.DispatchService: DEBUG
+#    no.fintlabs.DispatchService: DEBUG

@@ -27,6 +27,7 @@ public class FintArchiveWebClientConfiguration {
     private String baseUrl;
     private String username;
     private String password;
+    private String registrationId;
 
     @Bean
     @ConditionalOnProperty(name = "fint.dispatch-gateway.authorization.enable", havingValue = "true")
@@ -69,7 +70,7 @@ public class FintArchiveWebClientConfiguration {
         authorizedClientManager.ifPresent(presentAuthorizedClientManager -> {
             ServerOAuth2AuthorizedClientExchangeFilterFunction authorizedClientExchangeFilterFunction =
                     new ServerOAuth2AuthorizedClientExchangeFilterFunction(presentAuthorizedClientManager);
-            authorizedClientExchangeFilterFunction.setDefaultClientRegistrationId("fint");
+            authorizedClientExchangeFilterFunction.setDefaultClientRegistrationId(registrationId);
             webClientBuilder.filter(authorizedClientExchangeFilterFunction);
         });
 
