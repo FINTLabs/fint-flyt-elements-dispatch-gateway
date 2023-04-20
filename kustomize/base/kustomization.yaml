@@ -5,3 +5,4 @@ resources:
   - service.yaml
   - config-map.yaml
   - oauth2-file-client.yaml
+  - deployment.yaml
