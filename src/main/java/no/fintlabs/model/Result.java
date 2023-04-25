@@ -2,8 +2,13 @@ package no.fintlabs.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.extern.jackson.Jacksonized;
 
-@Data
+@Getter
+@EqualsAndHashCode
+@Jacksonized
 @AllArgsConstructor
 public class Result {
 
