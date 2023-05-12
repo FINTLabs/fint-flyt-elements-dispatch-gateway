@@ -16,6 +16,7 @@ public class DokumentbeskrivelseDto {
     private final String dokumentType;
     private final String tilknyttetRegistreringSom;
     private final Collection<@NotNull @Valid DokumentobjektDto> dokumentobjekt;
+    private final @Valid SkjermingDto skjerming;
 
     public Optional<String> getTittel() {
         return Optional.ofNullable(tittel);
@@ -35,6 +36,10 @@ public class DokumentbeskrivelseDto {
 
     public Optional<Collection<DokumentobjektDto>> getDokumentobjekt() {
         return Optional.ofNullable(dokumentobjekt);
+    }
+
+    public Optional<SkjermingDto> getSkjerming() {
+        return Optional.ofNullable(skjerming);
     }
 
 }

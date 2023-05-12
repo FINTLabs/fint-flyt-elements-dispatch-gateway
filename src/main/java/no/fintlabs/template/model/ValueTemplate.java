@@ -17,7 +17,7 @@ import javax.validation.constraints.NotNull;
 public class ValueTemplate {
 
     public enum Type {
-        STRING, DYNAMIC_STRING, FILE
+        STRING, DYNAMIC_STRING, FILE, BOOLEAN
     }
 
     @NotNull
