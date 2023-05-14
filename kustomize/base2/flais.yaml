@@ -28,7 +28,7 @@ spec:
       value: path
   envFrom:
     - secretRef:
-        name: fint-flyt-egrunnerverv-fint-client
+        name: fint-flyt-egrv-fint-client
   resources:
     limits:
       memory: "2048Mi"
