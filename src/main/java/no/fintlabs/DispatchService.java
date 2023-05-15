@@ -99,7 +99,13 @@ public class DispatchService {
                 archiveInstance.getNewCase(),
                 archiveInstance.getCaseSearchParameters()
         );
-        return fintArchiveClient.findCaseBySearch(caseFilter);
+        return fintArchiveClient.findCasesWithFilter(caseFilter)
+                .map(cases -> {
+                    if (cases.size() == 1) {
+                        return Optional.of(cases.get(0));
+                    }
+                    return Optional.empty();
+                });
     }
 
     private Mono<List<Long>> addNewRecords(String caseId, List<JournalpostDto> journalpostDtos) {

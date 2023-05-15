@@ -19,7 +19,7 @@ import reactor.util.retry.Retry;
 import java.net.URI;
 import java.time.Duration;
 import java.util.Comparator;
-import java.util.Optional;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -60,7 +60,7 @@ public class FintArchiveClient {
         }
     }
 
-    public Mono<Optional<SakResource>> findCaseBySearch(String caseFilter) {
+    public Mono<List<SakResource>> findCasesWithFilter(String caseFilter) {
         return fintWebClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
@@ -69,9 +69,9 @@ public class FintArchiveClient {
                         .build()
                 )
                 .retrieve()
-                .bodyToMono(SakResource.class)
-                .map(Optional::of)
-                .onErrorReturn(WebClientResponseException.NotFound.class, Optional.empty())
+                .bodyToFlux(SakResource.class)
+                .collectList()
+                .onErrorReturn(WebClientResponseException.NotFound.class, List.of())
                 .doOnError(e -> {
                     if (e instanceof WebClientResponseException) {
                         log.error(e + " body=" + ((WebClientResponseException) e).getResponseBodyAsString());
