@@ -31,6 +31,8 @@ spec:
   envFrom:
     - secretRef:
         name: fint-flyt-egrv-fint-client
+    - secretRef:
+        name: fint-flyt-file-oauth2-client
   resources:
     limits:
       memory: "2048Mi"
