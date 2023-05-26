@@ -37,7 +37,7 @@ public class FintArchiveClient {
                         .uri("/arkiv/noark/dokumentfil")
                         .contentType(getMediaType(file.getType()))
                         .bodyValue(file.getContents())
-                        .header("Content-Disposition", "attachment; filename='" + file.getName() + "'")
+                        .header("Content-Disposition", "attachment; filename=" + file.getName())
                         .retrieve()
         )
                 .doOnNext(uri -> log.info("Successfully posted file with name={} on uri={}", file.getName(), uri))
