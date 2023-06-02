@@ -14,9 +14,14 @@ import java.util.UUID;
 public class DokumentbeskrivelseMappingService {
 
     private final DokumentObjektMappingService dokumentObjektMappingService;
+    private final SkjermingMappingService skjermingMappingService;
 
-    public DokumentbeskrivelseMappingService(DokumentObjektMappingService dokumentObjektMappingService) {
+    public DokumentbeskrivelseMappingService(
+            DokumentObjektMappingService dokumentObjektMappingService,
+            SkjermingMappingService skjermingMappingService
+    ) {
         this.dokumentObjektMappingService = dokumentObjektMappingService;
+        this.skjermingMappingService = skjermingMappingService;
     }
 
     public List<DokumentbeskrivelseResource> toDokumentbeskrivelseResource(
@@ -43,6 +48,9 @@ public class DokumentbeskrivelseMappingService {
                         fileArchiveLinkPerFileId
                 ))
                 .ifPresent(dokumentbeskrivelseResource::setDokumentobjekt);
+        dokumentbeskrivelseDto.getSkjerming()
+                .map(skjermingMappingService::toSkjermingResource)
+                .ifPresent(dokumentbeskrivelseResource::setSkjerming);
         return dokumentbeskrivelseResource;
     }
 

@@ -10,13 +10,16 @@ import java.util.Map;
 @Service
 public class ArchiveTemplateService {
 
+    private final SearchParametersTemplateService searchParametersTemplateService;
     private final SakTemplateService sakTemplateService;
     private final JournalpostTemplateService journalpostTemplateService;
 
     public ArchiveTemplateService(
+            SearchParametersTemplateService searchParametersTemplateService,
             SakTemplateService sakTemplateService,
             JournalpostTemplateService journalpostTemplateService
     ) {
+        this.searchParametersTemplateService = searchParametersTemplateService;
         this.sakTemplateService = sakTemplateService;
         this.journalpostTemplateService = journalpostTemplateService;
     }
@@ -44,11 +47,11 @@ public class ArchiveTemplateService {
                                                                 .displayName("Ny")
                                                                 .value(CaseDispatchType.NEW.name())
                                                                 .build(),
-//                                        Selectable
-//                                                .builder()
-//                                                .displayName("På søk, eller ny")
-//                                                .value(CaseDispatchType.BY_SEARCH_OR_NEW.name())
-//                                                .build(),
+                                                        Selectable
+                                                                .builder()
+                                                                .displayName("På søk, eller ny")
+                                                                .value(CaseDispatchType.BY_SEARCH_OR_NEW.name())
+                                                                .build(),
                                                         Selectable
                                                                 .builder()
                                                                 .displayName("På saksnummer")
@@ -56,6 +59,29 @@ public class ArchiveTemplateService {
                                                                 .build()
                                                 ))
                                                 .build()
+                                )
+                                .addTemplate(
+                                        ElementConfig
+                                                .builder()
+                                                .key("caseSearchParameters")
+                                                .displayName("Søkeparametre")
+                                                .description("")
+                                                .showDependency(
+                                                        Dependency
+                                                                .builder()
+                                                                .hasAnyCombination(List.of(
+                                                                        List.of(ValuePredicate
+                                                                                .builder()
+                                                                                .key("type")
+                                                                                .defined(true)
+                                                                                .value(CaseDispatchType.BY_SEARCH_OR_NEW.name())
+                                                                                .build()
+                                                                        )
+                                                                ))
+                                                                .build()
+                                                )
+                                                .build(),
+                                        searchParametersTemplateService.createTemplate()
                                 )
                                 .addTemplate(
                                         ElementConfig
@@ -119,7 +145,7 @@ public class ArchiveTemplateService {
                                                                 .builder()
                                                                 .urlTemplate("api/intern/arkiv/saker/{caseId}/tittel")
                                                                 .valueRefPerPathParamKey(Map.of(
-                                                                        "caseId", "id"
+                                                                        "caseId", "caseId"
                                                                 ))
                                                                 .build()
                                                 )

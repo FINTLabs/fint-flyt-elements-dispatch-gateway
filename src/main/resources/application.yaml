@@ -1,5 +1,8 @@
 fint:
   application-id: fint-flyt-archive-dispatch-gateway
+  cache:
+    defaultCacheEntryTimeToLiveMillis: 518400000
+    defaultCacheHeapSize: 1000000
 server:
   max-http-header-size: 40KB
 spring:
@@ -9,7 +12,6 @@ spring:
       - flyt-logging
       - fint-client
       - flyt-file-client
-#logging:
-#  level:
-#    reactor.netty: DEBUG
-#    no.fintlabs.DispatchService: DEBUG
+logging:
+  level:
+    no.fintlabs.cache.ehcache.FintEhCacheEventLogger: WARN
