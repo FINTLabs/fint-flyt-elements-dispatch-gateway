@@ -65,7 +65,7 @@ public class FintArchiveClient {
                 .get()
                 .uri(uriBuilder -> uriBuilder
                         .path("/arkiv/noark/sak")
-                        .queryParam("filter", caseFilter)
+                        .queryParam("$filter", caseFilter)
                         .build()
                 )
                 .retrieve()
