@@ -49,20 +49,19 @@ public class DispatchService {
     public Mono<Result> process(InstanceFlowHeaders instanceFlowHeaders, @Valid ArchiveInstance archiveInstance) {
         return getCaseId(archiveInstance)
                 .flatMap(caseId ->
-                        archiveInstance.getType() == CaseDispatchType.NEW
+                        archiveInstance.getType() == CaseDispatchType.BY_ID
 
-                                ? archiveInstance.getNewCase().getJournalpost()
-                                .map(journalpostDtos -> addNewRecords(caseId, journalpostDtos)
-                                        .map(journalpostNummer -> caseId)
-                                )
-                                .orElse(Mono.just(caseId))
-
-                                : addNewRecords(caseId, archiveInstance.getJournalpost())
+                                ? addNewRecords(caseId, archiveInstance.getJournalpost())
                                 .map(journalpostNummers -> caseId + journalpostNummers
                                         .stream()
                                         .map(Object::toString)
                                         .collect(Collectors.joining(",", "-[", "]"))
                                 )
+                                : archiveInstance.getNewCase().getJournalpost()
+                                .map(journalpostDtos -> addNewRecords(caseId, journalpostDtos)
+                                        .map(journalpostNummer -> caseId)
+                                )
+                                .orElse(Mono.just(caseId))
                 )
                 .map(Result::accepted)
                 .onErrorResume(WebClientResponseException.class, e ->
