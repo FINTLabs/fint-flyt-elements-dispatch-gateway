@@ -1,7 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: fint-flyt-archive-dispatch-gateway
-data:
-  fint.org-id: 'vlfk.no'
-  fint.client.base-url: 'https://beta.felleskomponent.no'
