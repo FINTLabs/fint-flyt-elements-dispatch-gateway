@@ -3,6 +3,7 @@ package no.fintlabs.web.archive;
 import lombok.extern.slf4j.Slf4j;
 import no.fint.model.resource.arkiv.noark.JournalpostResource;
 import no.fint.model.resource.arkiv.noark.SakResource;
+import no.fint.model.resource.arkiv.noark.SakResources;
 import no.fintlabs.model.File;
 import no.fintlabs.model.JournalpostWrapper;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -69,8 +70,8 @@ public class FintArchiveClient {
                         .build()
                 )
                 .retrieve()
-                .bodyToFlux(SakResource.class)
-                .collectList()
+                .bodyToMono(SakResources.class)
+                .map(SakResources::getContent)
                 .onErrorReturn(WebClientResponseException.NotFound.class, List.of())
                 .doOnError(e -> {
                     if (e instanceof WebClientResponseException) {
