@@ -9,9 +9,14 @@ import java.util.List;
 public class DokumentbeskrivelseTemplateService {
 
     private final DokumentobjektTemplateService dokumentobjektTemplateService;
+    private final SkjermingTemplateService skjermingTemplateService;
 
-    public DokumentbeskrivelseTemplateService(DokumentobjektTemplateService dokumentobjektTemplateService) {
+    public DokumentbeskrivelseTemplateService(
+            DokumentobjektTemplateService dokumentobjektTemplateService,
+            SkjermingTemplateService skjermingTemplateService
+    ) {
         this.dokumentobjektTemplateService = dokumentobjektTemplateService;
+        this.skjermingTemplateService = skjermingTemplateService;
     }
 
     public ObjectTemplate createTemplate() {
@@ -96,6 +101,15 @@ public class DokumentbeskrivelseTemplateService {
                                 .builder()
                                 .elementTemplate(dokumentobjektTemplateService.createTemplate())
                                 .build()
+                )
+                .addTemplate(
+                        ElementConfig
+                                .builder()
+                                .key("skjerming")
+                                .displayName("Skjerming")
+                                .description("")
+                                .build(),
+                        skjermingTemplateService.createTemplate()
                 )
                 .build();
     }

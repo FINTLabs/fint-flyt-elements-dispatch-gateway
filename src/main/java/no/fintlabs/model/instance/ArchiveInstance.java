@@ -22,6 +22,11 @@ public class ArchiveInstance {
     @NotNull
     private final CaseDispatchType type;
 
+    @Valid
+    @NotNull(groups = CaseBySearchValidationGroup.class)
+    private final CaseSearchParametersDto caseSearchParameters;
+
+    @Valid
     @NotNull(groups = {NewCaseValidationGroup.class, CaseBySearchValidationGroup.class})
     private final SakDto newCase;
 

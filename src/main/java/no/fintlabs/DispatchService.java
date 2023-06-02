@@ -12,6 +12,7 @@ import no.fintlabs.model.CaseDispatchType;
 import no.fintlabs.model.JournalpostWrapper;
 import no.fintlabs.model.Result;
 import no.fintlabs.model.instance.*;
+import no.fintlabs.web.archive.CaseSearchParametersService;
 import no.fintlabs.web.archive.FintArchiveClient;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
@@ -29,17 +30,19 @@ public class DispatchService {
     private final FileService fileClient;
     private final SakMappingService sakMappingService;
     private final JournalpostMappingService journalpostMappingService;
+    private final CaseSearchParametersService caseSearchParametersService;
     private final FintArchiveClient fintArchiveClient;
 
     public DispatchService(
             FileService fileClient,
             SakMappingService sakMappingService,
             JournalpostMappingService journalpostMappingService,
-            FintArchiveClient fintArchiveClient
+            CaseSearchParametersService caseSearchParametersService, FintArchiveClient fintArchiveClient
     ) {
         this.fileClient = fileClient;
         this.sakMappingService = sakMappingService;
         this.journalpostMappingService = journalpostMappingService;
+        this.caseSearchParametersService = caseSearchParametersService;
         this.fintArchiveClient = fintArchiveClient;
     }
 
@@ -75,7 +78,7 @@ public class DispatchService {
                     .map(SaksmappeResource::getMappeId)
                     .map(Identifikator::getIdentifikatorverdi);
             case BY_ID -> Mono.just(archiveInstance.getCaseId());
-            case BY_SEARCH_OR_NEW -> getCaseBySearch(archiveInstance)
+            case BY_SEARCH_OR_NEW -> findCaseBySearch(archiveInstance)
                     .flatMap(optionalCase -> optionalCase
                             .map(Mono::just)
                             .orElse(createNewCase(archiveInstance.getNewCase())))
@@ -91,8 +94,18 @@ public class DispatchService {
                 .doOnNext(result -> log.info("Created new case with id={}", result.getMappeId().getIdentifikatorverdi()));
     }
 
-    private Mono<Optional<SakResource>> getCaseBySearch(ArchiveInstance archiveInstance) {
-        throw new UnsupportedOperationException();
+    private Mono<Optional<SakResource>> findCaseBySearch(ArchiveInstance archiveInstance) {
+        String caseFilter = caseSearchParametersService.createFilterQueryParamValue(
+                archiveInstance.getNewCase(),
+                archiveInstance.getCaseSearchParameters()
+        );
+        return fintArchiveClient.findCasesWithFilter(caseFilter)
+                .map(cases -> {
+                    if (cases.size() == 1) {
+                        return Optional.of(cases.get(0));
+                    }
+                    return Optional.empty();
+                });
     }
 
     private Mono<List<Long>> addNewRecords(String caseId, List<JournalpostDto> journalpostDtos) {

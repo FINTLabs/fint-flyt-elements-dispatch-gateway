@@ -16,6 +16,7 @@ import javax.validation.ValidatorFactory
 @ContextConfiguration(classes = [
         AdresseTemplateService.class,
         ArchiveTemplateService.class,
+        SearchParametersTemplateService.class,
         DokumentbeskrivelseTemplateService.class,
         DokumentobjektTemplateService.class,
         JournalpostTemplateService.class,

@@ -19,6 +19,7 @@ import reactor.util.retry.Retry;
 import java.net.URI;
 import java.time.Duration;
 import java.util.Comparator;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -59,13 +60,18 @@ public class FintArchiveClient {
         }
     }
 
-    public Mono<SakResource> getCase(String archiveCaseId) {
-        return Mono.just(fintWebClient
-                        .get()
-                        .uri("/arkiv/noark/sak/mappeid/" + archiveCaseId))
-                .map(WebClient.RequestHeadersSpec::retrieve)
-                .flatMap(responseSpec -> responseSpec.bodyToMono(SakResource.class))
-                .doOnNext(sakResource -> log.info("Successfully retrieved case with id={}", archiveCaseId))
+    public Mono<List<SakResource>> findCasesWithFilter(String caseFilter) {
+        return fintWebClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path("/arkiv/noark/sak")
+                        .queryParam("filter", caseFilter)
+                        .build()
+                )
+                .retrieve()
+                .bodyToFlux(SakResource.class)
+                .collectList()
+                .onErrorReturn(WebClientResponseException.NotFound.class, List.of())
                 .doOnError(e -> {
                     if (e instanceof WebClientResponseException) {
                         log.error(e + " body=" + ((WebClientResponseException) e).getResponseBodyAsString());
