@@ -1,10 +1,9 @@
 package no.fintlabs.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.*;
 
-@Data
-@AllArgsConstructor
+@Getter
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Result {
 
     public static Result accepted(String archiveCaseId) {

@@ -1,12 +1,17 @@
 package no.fintlabs.model;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.extern.jackson.Jacksonized;
 import no.fint.model.resource.arkiv.noark.JournalpostResource;
 
 import java.util.Collection;
 import java.util.List;
 
-@Data
+@Getter
+@EqualsAndHashCode
+@Jacksonized
 public class JournalpostWrapper {
 
     public JournalpostWrapper(JournalpostResource journalpost) {
