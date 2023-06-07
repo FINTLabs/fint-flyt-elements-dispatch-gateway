@@ -47,8 +47,8 @@ public class DispatchService {
 
     public Mono<Result> process(InstanceFlowHeaders instanceFlowHeaders, @Valid ArchiveInstance archiveInstance) {
         return (switch (archiveInstance.getType()) {
-            case BY_ID -> processNew(archiveInstance);
-            case NEW -> processById(archiveInstance);
+            case NEW -> processNew(archiveInstance);
+            case BY_ID -> processById(archiveInstance);
             case BY_SEARCH_OR_NEW -> processBySearchOrNew(archiveInstance);
         })
                 .onErrorResume(WebClientResponseException.class, e ->
