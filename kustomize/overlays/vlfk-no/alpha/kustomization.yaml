@@ -3,7 +3,7 @@ kind: Kustomization
 namespace: vlfk-no
 
 resources:
-  - ../../../base
+  - flais.yaml
 
 commonLabels:
   app.kubernetes.io/instance: fint-flyt-archive-dispatch-gateway_vlfk_no
