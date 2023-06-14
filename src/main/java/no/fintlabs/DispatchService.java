@@ -20,7 +20,6 @@ import reactor.core.publisher.Mono;
 
 import javax.validation.Valid;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -64,7 +63,7 @@ public class DispatchService {
                 .map(Identifikator::getIdentifikatorverdi)
                 .flatMap(caseId -> archiveInstance.getNewCase().getJournalpost()
                         .map(journalpostDtos -> addNewRecords(caseId, journalpostDtos)
-                                .map(journalpostNumbers -> formatCaseIdAndJournalpostIds(caseId, journalpostNumbers))
+                                .map(journalpostNumbers -> caseId)
                         )
                         .orElse(Mono.just(caseId))
                 )
@@ -73,9 +72,7 @@ public class DispatchService {
 
     private Mono<Result> processById(ArchiveInstance archiveInstance) {
         return addNewRecords(archiveInstance.getCaseId(), archiveInstance.getJournalpost())
-                .map(journalpostNumbers ->
-                        formatCaseIdAndJournalpostIds(archiveInstance.getCaseId(), journalpostNumbers)
-                )
+                .map(journalpostNumbers -> archiveInstance.getCaseId())
                 .map(Result::accepted);
     }
 
@@ -93,19 +90,12 @@ public class DispatchService {
                             .map(Identifikator::getIdentifikatorverdi)
                             .flatMap(caseId -> archiveInstance.getNewCase().getJournalpost()
                                     .map(journalpostDtos -> addNewRecords(caseId, journalpostDtos)
-                                            .map(journalpostNumbers -> formatCaseIdAndJournalpostIds(caseId, journalpostNumbers))
+                                            .map(journalpostNumbers -> caseId)
                                     )
                                     .orElse(Mono.just(caseId))
                             )
                             .map(Result::accepted);
                 });
-    }
-
-    private String formatCaseIdAndJournalpostIds(String caseId, List<Long> journalpostNumbers) {
-        return caseId + journalpostNumbers
-                .stream()
-                .map(Object::toString)
-                .collect(Collectors.joining(",", "-[", "]"));
     }
 
     private Mono<SakResource> createNewCase(SakDto sakDto) {
