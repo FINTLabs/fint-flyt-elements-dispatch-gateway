@@ -67,7 +67,7 @@ public class PartTemplateService {
                                 .builder()
                                 .key("adresse")
                                 .displayName("Adresse")
-                                .description("")
+                                .description("Postadressen til en avsender /mottaker eller part")
                                 .build(),
                         adresseTemplateService.createTemplate()
                 )
@@ -76,7 +76,7 @@ public class PartTemplateService {
                                 .builder()
                                 .key("kontaktinformasjon")
                                 .displayName("Kontaktinformasjon")
-                                .description("")
+                                .description("Den foretrukne måten for å komme i kontakt med en aktør")
                                 .build(),
                         kontaktinformasjonTemplateService.createTemplate()
                 )

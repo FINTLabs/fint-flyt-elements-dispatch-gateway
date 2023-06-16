@@ -92,7 +92,7 @@ public class ArchiveTemplateService {
                                                 .builder()
                                                 .key("newCase")
                                                 .displayName("Sak")
-                                                .description("")
+                                                .description("Generisk sak")
                                                 .showDependency(
                                                         Dependency
                                                                 .builder()
@@ -160,7 +160,7 @@ public class ArchiveTemplateService {
                                                 .builder()
                                                 .key("journalpost")
                                                 .displayName("Journalposter")
-                                                .description("")
+                                                .description("Journalposter knyttet til saksmappe")
                                                 .showDependency(
                                                         Dependency
                                                                 .builder()

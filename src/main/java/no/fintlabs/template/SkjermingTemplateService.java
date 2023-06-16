@@ -35,7 +35,8 @@ public class SkjermingTemplateService {
                                 .builder()
                                 .key("skjermingshjemmel")
                                 .displayName("Skjermingshjemmel")
-                                .description("")
+                                .description("Henvisning til hjemmel (paragraf) i offentlighetsloven, sikkerhetsloven" +
+                                        "eller beskyttelsesinstruksen")
                                 .build(),
                         SelectableValueTemplate
                                 .builder()
