@@ -27,7 +27,7 @@ public class PartTemplateService {
                                 .builder()
                                 .key("partNavn")
                                 .displayName("Navn")
-                                .description("")
+                                .description("Navn på virksomhet eller person som er part")
                                 .build(),
                         ValueTemplate
                                 .builder()
@@ -39,7 +39,7 @@ public class PartTemplateService {
                                 .builder()
                                 .key("partRolle")
                                 .displayName("Rolle")
-                                .description("")
+                                .description("Angivelse av rollen til parten")
                                 .build(),
                         SelectableValueTemplate
                                 .builder()
@@ -54,7 +54,8 @@ public class PartTemplateService {
                                 .builder()
                                 .key("kontaktperson")
                                 .displayName("Kontaktperson")
-                                .description("")
+                                .description("Kontaktperson hos en organisasjon som er avsender eller mottaker, eller" +
+                                        "part")
                                 .build(),
                         ValueTemplate
                                 .builder()

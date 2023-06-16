@@ -31,7 +31,7 @@ public class JournalpostTemplateService {
                                 .builder()
                                 .key("tittel")
                                 .displayName("Tittel")
-                                .description("")
+                                .description("Tittel eller navn på arkivenheten")
                                 .build(),
                         ValueTemplate
                                 .builder()
@@ -43,7 +43,8 @@ public class JournalpostTemplateService {
                                 .builder()
                                 .key("offentligTittel")
                                 .displayName("Offentlig tittel")
-                                .description("")
+                                .description("Offentlig tittel på arkivenheten, ord som skal skjermes er fjernet fra " +
+                                        "innholdet i tittelen (erstattet med ******)")
                                 .build(),
                         ValueTemplate
                                 .builder()
@@ -55,7 +56,7 @@ public class JournalpostTemplateService {
                                 .builder()
                                 .key("journalposttype")
                                 .displayName("Journalposttype")
-                                .description("")
+                                .description("Navn på type journalpost. Tilsvarer \"Noark dokumenttype\" i Noark 4")
                                 .build(),
                         SelectableValueTemplate
                                 .builder()
@@ -70,7 +71,8 @@ public class JournalpostTemplateService {
                                 .builder()
                                 .key("administrativEnhet")
                                 .displayName("Administrativ enhet")
-                                .description("")
+                                .description("Navn på avdeling, kontor eller annen administrativ enhet som har" +
+                                        "ansvaret for saksbehandlingen")
                                 .build(),
                         SelectableValueTemplate
                                 .builder()
@@ -85,7 +87,7 @@ public class JournalpostTemplateService {
                                 .builder()
                                 .key("saksbehandler")
                                 .displayName("Saksbehandler")
-                                .description("")
+                                .description("Navn på person som er saksbehandler")
                                 .build(),
                         SelectableValueTemplate
                                 .builder()
@@ -100,7 +102,8 @@ public class JournalpostTemplateService {
                                 .builder()
                                 .key("journalstatus")
                                 .displayName("Journalstatus")
-                                .description("")
+                                .description("Status til journalposten, dvs. om dokumentet er registrert, under" +
+                                        "behandling eller endelig arkivert.")
                                 .build(),
                         SelectableValueTemplate
                                 .builder()
@@ -115,7 +118,7 @@ public class JournalpostTemplateService {
                                 .builder()
                                 .key("skjerming")
                                 .displayName("Skjerming")
-                                .description("")
+                                .description("Skjerming av registrering")
                                 .build(),
                         skjermingTemplateService.createTemplate()
                 )
@@ -124,7 +127,7 @@ public class JournalpostTemplateService {
                                 .builder()
                                 .key("korrespondansepart")
                                 .displayName("Korrespondanseparter")
-                                .description("")
+                                .description("Mottaker eller sender av arkivdokumenter.")
                                 .build(),
                         ObjectCollectionTemplate
                                 .builder()
@@ -136,7 +139,7 @@ public class JournalpostTemplateService {
                                 .builder()
                                 .key("dokumentbeskrivelse")
                                 .displayName("Dokumentbeskrivelser")
-                                .description("")
+                                .description("Dokumentbeskrivelsene til en registrering")
                                 .build(),
                         ObjectCollectionTemplate
                                 .builder()

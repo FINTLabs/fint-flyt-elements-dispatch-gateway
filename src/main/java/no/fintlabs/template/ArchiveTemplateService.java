@@ -36,7 +36,11 @@ public class ArchiveTemplateService {
                                                 .builder()
                                                 .key("type")
                                                 .displayName("Sakslogikk")
-                                                .description("")
+                                                .description("Beskriver avlevering til arkiv. På ny sak vil det alltid " +
+                                                        "opprettes ny sak i arkivet. 'På søk, eller ny' gir muligheten " +
+                                                        "til å gjenfinne ekisterende sak på valgte kriterier, eller " +
+                                                        "opprette ny sak dersom det ikke fins treff. 'På saksnummer' " +
+                                                        "betyr at man oppgir det saksnummer som skal benyttes")
                                                 .build(),
                                         SelectableValueTemplate
                                                 .builder()
@@ -65,7 +69,7 @@ public class ArchiveTemplateService {
                                                 .builder()
                                                 .key("caseSearchParameters")
                                                 .displayName("Søkeparametre")
-                                                .description("")
+                                                .description("Her velges hvilke kriterier som skal legges til grunn for å gjenfinne en sak i arkivet")
                                                 .showDependency(
                                                         Dependency
                                                                 .builder()
@@ -120,7 +124,7 @@ public class ArchiveTemplateService {
                                                 .builder()
                                                 .key("caseId")
                                                 .displayName("Saksnummer")
-                                                .description("")
+                                                .description("Entydig identifikasjon av mappen innenfor det arkivet mappen tilhører")
                                                 .showDependency(
                                                         Dependency
                                                                 .builder()

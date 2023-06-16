@@ -30,7 +30,7 @@ public class KorrespondansepartTemplateService {
                                 .builder()
                                 .key("korrespondanseparttype")
                                 .displayName("Korrespondanseparttype")
-                                .description("")
+                                .description("Type korrespondansepart")
                                 .build(),
                         SelectableValueTemplate
                                 .builder()
@@ -45,7 +45,7 @@ public class KorrespondansepartTemplateService {
                                 .builder()
                                 .key("organisasjonsnummer")
                                 .displayName("Organisasjonsnummer")
-                                .description("")
+                                .description("Organisasjonsnummer til Korrespondansepart")
                                 .build(),
                         ValueTemplate
                                 .builder()
@@ -57,7 +57,7 @@ public class KorrespondansepartTemplateService {
                                 .builder()
                                 .key("fodselsnummer")
                                 .displayName("Fødselsnummer")
-                                .description("")
+                                .description("Fødselsnummer til Korrespondansepart")
                                 .build(),
                         ValueTemplate
                                 .builder()
@@ -69,7 +69,7 @@ public class KorrespondansepartTemplateService {
                                 .builder()
                                 .key("korrespondansepartNavn")
                                 .displayName("Navn")
-                                .description("")
+                                .description("Navn på person eller organisasjon som er avsender eller mottaker av dokumentet")
                                 .build(),
                         ValueTemplate
                                 .builder()
@@ -81,7 +81,7 @@ public class KorrespondansepartTemplateService {
                                 .builder()
                                 .key("kontaktperson")
                                 .displayName("Kontaktperson")
-                                .description("")
+                                .description("Kontaktperson hos en organisasjon som er avsender eller mottaker, eller sakspart")
                                 .build(),
                         ValueTemplate
                                 .builder()
@@ -93,7 +93,7 @@ public class KorrespondansepartTemplateService {
                                 .builder()
                                 .key("adresse")
                                 .displayName("Adresse")
-                                .description("")
+                                .description("Adressen til korrespondanseparten")
                                 .build(),
                         adresseTemplateService.createTemplate()
                 )
@@ -102,7 +102,7 @@ public class KorrespondansepartTemplateService {
                                 .builder()
                                 .key("kontaktinformasjon")
                                 .displayName("Kontaktinformasjon")
-                                .description("")
+                                .description("Kontaktinformasjon til korrespondansepart")
                                 .build(),
                         kontaktinformasjonTemplateService.createTemplate()
                 )
@@ -111,7 +111,7 @@ public class KorrespondansepartTemplateService {
                                 .builder()
                                 .key("skjerming")
                                 .displayName("Skjerming")
-                                .description("")
+                                .description("Skjerming av korrespodansepart")
                                 .build(),
                         skjermingTemplateService.createTemplate()
                 )

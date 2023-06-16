@@ -16,7 +16,7 @@ public class AdresseTemplateService {
                                 .builder()
                                 .key("adresselinje")
                                 .displayName("Adresselinje")
-                                .description("")
+                                .description("Postadressen til en avsender/mottaker eller part")
                                 .build(),
                         ValueTemplate
                                 .builder()
@@ -28,7 +28,7 @@ public class AdresseTemplateService {
                                 .builder()
                                 .key("postnummer")
                                 .displayName("Postnummer")
-                                .description("")
+                                .description("Postnummeret til en avsender /mottaker eller part")
                                 .build(),
                         ValueTemplate
                                 .builder()
@@ -40,7 +40,7 @@ public class AdresseTemplateService {
                                 .builder()
                                 .key("poststed")
                                 .displayName("Poststed")
-                                .description("")
+                                .description("Poststedet til en avsender /mottaker eller part")
                                 .build(),
                         ValueTemplate
                                 .builder()
