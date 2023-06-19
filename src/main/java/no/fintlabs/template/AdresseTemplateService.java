@@ -28,7 +28,7 @@ public class AdresseTemplateService {
                                 .builder()
                                 .key("postnummer")
                                 .displayName("Postnummer")
-                                .description("Postnummeret til en avsender /mottaker eller part")
+                                .description("Postnummer")
                                 .build(),
                         ValueTemplate
                                 .builder()
