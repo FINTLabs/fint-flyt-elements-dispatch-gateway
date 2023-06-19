@@ -137,7 +137,7 @@ public class SakTemplateService {
                                 .builder()
                                 .key("saksstatus")
                                 .displayName("Saksstatus")
-                                .description("Status til saksmappen, dvs. hvor langt saksbehandlingen har kommet.")
+                                .description("Status til saksmappen. Det vil si hvor langt saksbehandlingen har kommet. Registreres automatisk gjennom forskjellig saksbehandlingsfunksjonalitet, eller overstyres manuelt.")
                                 .build(),
                         SelectableValueTemplate
                                 .builder()
