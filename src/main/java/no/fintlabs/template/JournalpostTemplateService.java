@@ -101,8 +101,7 @@ public class JournalpostTemplateService {
                                 .builder()
                                 .key("journalstatus")
                                 .displayName("Journalstatus")
-                                .description("Status til journalposten, dvs. om dokumentet er registrert, under" +
-                                        "behandling eller endelig arkivert.")
+                                .description("Status for journalposten")
                                 .build(),
                         SelectableValueTemplate
                                 .builder()
