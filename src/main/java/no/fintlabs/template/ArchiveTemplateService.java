@@ -36,11 +36,15 @@ public class ArchiveTemplateService {
                                                 .builder()
                                                 .key("type")
                                                 .displayName("Sakslogikk")
-                                                .description("Beskriver avlevering til arkiv. På ny sak vil det alltid " +
-                                                        "opprettes ny sak i arkivet. 'På søk, eller ny' gir muligheten " +
-                                                        "til å gjenfinne ekisterende sak på valgte kriterier, eller " +
-                                                        "opprette ny sak dersom det ikke fins treff. 'På saksnummer' " +
-                                                        "betyr at man oppgir det saksnummer som skal benyttes")
+                                                .description("Logikk for oppretting eller gjenfinning av sak." +
+                                                        " Ved \"Ny sak\" opprettes det ny sak i arkivet." +
+                                                        " Ved \"På saksnummer\" brukes eksisterende sak med innfyllt saksnummer." +
+                                                        " Ved \"På søk, eller ny\" gjøres det først et forsøk på å finne saker" +
+                                                        " som passer med valgte søkekriterier. Søket har tre utfall: " +
+                                                        " (1) Ingen funn: Ny sak opprettes." +
+                                                        " (2) Én sak funnet: Journalposter legges på funnet sak." +
+                                                        " (3) To eller flere saker funnet: Instansprosessen feiler."
+                                                )
                                                 .build(),
                                         SelectableValueTemplate
                                                 .builder()
@@ -69,7 +73,7 @@ public class ArchiveTemplateService {
                                                 .builder()
                                                 .key("caseSearchParameters")
                                                 .displayName("Søkeparametre")
-                                                .description("Her velges hvilke kriterier som skal legges til grunn for å gjenfinne en sak i arkivet")
+                                                .description("Parametre for søk på sak. Huk av for de feltene som skal være med i søket. Verdiene for de avhukede feltene hentes fra oppsett for ny sak, så husk å fylle ut disse.")
                                                 .showDependency(
                                                         Dependency
                                                                 .builder()

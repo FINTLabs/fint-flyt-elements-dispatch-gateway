@@ -23,7 +23,7 @@ public class KlasseringTemplateService {
                                 .builder()
                                 .key("rekkefolge")
                                 .displayName("Rekkefølge")
-                                .description("Rekkefølge for klassifiseringer")
+                                .description("Rekkefølge for klassifiseringer. Ved bruk av primær, sekundær og tertiærklasseringer, bruk følgende verdier: 1 for primær, 2 for sekundær, og 3 for tertiær.")
                                 .build(),
                         ValueTemplate
                                 .builder()
@@ -83,7 +83,7 @@ public class KlasseringTemplateService {
                                 .builder()
                                 .key("skjerming")
                                 .displayName("Skjerming")
-                                .description("Skjerming av klassene")
+                                .description("Skjerming av klasse")
                                 .build(),
                         skjermingTemplateService.createTemplate()
                 )

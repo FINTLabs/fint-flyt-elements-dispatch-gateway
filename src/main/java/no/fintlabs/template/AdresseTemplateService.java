@@ -40,7 +40,7 @@ public class AdresseTemplateService {
                                 .builder()
                                 .key("poststed")
                                 .displayName("Poststed")
-                                .description("Poststedet til en avsender /mottaker eller part")
+                                .description("Poststed")
                                 .build(),
                         ValueTemplate
                                 .builder()

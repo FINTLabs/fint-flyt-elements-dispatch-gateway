@@ -34,7 +34,7 @@ public class SakTemplateService {
                                 .builder()
                                 .key("tittel")
                                 .displayName("Tittel")
-                                .description("Tittel eller navn på arkivenheten")
+                                .description("Tittel")
                                 .build(),
                         ValueTemplate
                                 .builder()
@@ -46,8 +46,7 @@ public class SakTemplateService {
                                 .builder()
                                 .key("offentligTittel")
                                 .displayName("Offentlig tittel")
-                                .description("Offentlig tittel på arkivenheten, ord som skal skjermes er fjernet " +
-                                        "fra innholdet i tittelen (erstattet med ******)")
+                                .description("Offentlig tittel. Husk å legge til eventuell skjerming.")
                                 .build(),
                         ValueTemplate
                                 .builder()
@@ -59,7 +58,7 @@ public class SakTemplateService {
                                 .builder()
                                 .key("saksmappetype")
                                 .displayName("Saksmappetype")
-                                .description("Saksmappetyper brukes for å differensiere innhold og etter hvilke rutiner saker skal behandles.")
+                                .description("Type saksmappe")
                                 .build(),
                         SelectableValueTemplate
                                 .builder()
@@ -74,9 +73,7 @@ public class SakTemplateService {
                                 .builder()
                                 .key("journalenhet")
                                 .displayName("Journalenhet")
-                                .description("Navn på enhet som har det arkivmessige ansvaret for kvalitetssikring av" +
-                                        "arkivdanningen, og eventuelt registrering (journalføring) og arkivering" +
-                                        "av fysiske dokumenter")
+                                .description("OBS: Ikke i bruk")
                                 .build(),
                         SelectableValueTemplate
                                 .builder()
@@ -91,7 +88,7 @@ public class SakTemplateService {
                                 .builder()
                                 .key("administrativEnhet")
                                 .displayName("Administrativ enhet")
-                                .description("Navn på avdeling, kontor eller annen administrativ enhet som har" +
+                                .description("Avdeling, kontor eller annen administrativ enhet som har" +
                                         "ansvaret for saksbehandlingen.")
                                 .build(),
                         SelectableValueTemplate
@@ -107,7 +104,7 @@ public class SakTemplateService {
                                 .builder()
                                 .key("saksansvarlig")
                                 .displayName("Saksansvarlig")
-                                .description("Navn på person som er saksansvarlig")
+                                .description("Person som er saksansvarlig")
                                 .build(),
                         SelectableValueTemplate
                                 .builder()
@@ -152,7 +149,7 @@ public class SakTemplateService {
                                 .builder()
                                 .key("part")
                                 .displayName("Parter")
-                                .description("Part til Mappe, Registrering eller Dokumentbeskrivelse.")
+                                .description("Parter")
                                 .build(),
                         ObjectCollectionTemplate
                                 .builder()

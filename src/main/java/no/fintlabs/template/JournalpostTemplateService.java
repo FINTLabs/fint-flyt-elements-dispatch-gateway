@@ -31,7 +31,7 @@ public class JournalpostTemplateService {
                                 .builder()
                                 .key("tittel")
                                 .displayName("Tittel")
-                                .description("Tittel eller navn på arkivenheten")
+                                .description("Tittel")
                                 .build(),
                         ValueTemplate
                                 .builder()
@@ -43,8 +43,7 @@ public class JournalpostTemplateService {
                                 .builder()
                                 .key("offentligTittel")
                                 .displayName("Offentlig tittel")
-                                .description("Offentlig tittel på arkivenheten, ord som skal skjermes er fjernet fra " +
-                                        "innholdet i tittelen (erstattet med ******)")
+                                .description("Offentlig tittel. Husk å legge til eventuell skjerming.")
                                 .build(),
                         ValueTemplate
                                 .builder()
