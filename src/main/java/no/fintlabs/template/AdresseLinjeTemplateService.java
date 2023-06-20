@@ -16,7 +16,7 @@ public class AdresseLinjeTemplateService {
                                 .builder()
                                 .key("adresselinje")
                                 .displayName("Adresselinje")
-                                .description("Postadressen til en avsender/mottaker eller part")
+                                .description("Adresseinformasjon")
                                 .build(),
                         ValueTemplate
                                 .builder()
