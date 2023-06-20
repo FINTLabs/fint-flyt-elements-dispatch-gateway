@@ -1,12 +1,18 @@
 package no.fintlabs.template;
 
 import no.fintlabs.template.model.ElementConfig;
+import no.fintlabs.template.model.ObjectCollectionTemplate;
 import no.fintlabs.template.model.ObjectTemplate;
 import no.fintlabs.template.model.ValueTemplate;
 import org.springframework.stereotype.Service;
 
 @Service
 public class AdresseTemplateService {
+    private final AdresseLinjeTemplateService adresseLinjeTemplateService;
+
+    public AdresseTemplateService(AdresseLinjeTemplateService adresseLinjeTemplateService) {
+        this.adresseLinjeTemplateService = adresseLinjeTemplateService;
+    }
 
     public ObjectTemplate createTemplate() {
         return ObjectTemplate
@@ -16,11 +22,11 @@ public class AdresseTemplateService {
                                 .builder()
                                 .key("adresselinje")
                                 .displayName("Adresselinje")
-                                .description("Postadressen til en avsender/mottaker eller part")
+                                .description("Adresselinje")
                                 .build(),
-                        ValueTemplate
+                        ObjectCollectionTemplate
                                 .builder()
-                                .type(ValueTemplate.Type.DYNAMIC_STRING)
+                                .elementTemplate(adresseLinjeTemplateService.createTemplate())
                                 .build()
                 )
                 .addTemplate(
