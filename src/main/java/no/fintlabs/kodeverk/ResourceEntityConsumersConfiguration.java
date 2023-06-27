@@ -3,6 +3,7 @@ package no.fintlabs.kodeverk;
 import no.fint.model.resource.FintLinks;
 import no.fint.model.resource.arkiv.kodeverk.SaksmappetypeResource;
 import no.fint.model.resource.arkiv.kodeverk.TilgangsrestriksjonResource;
+import no.fint.model.resource.arkiv.noark.AdministrativEnhetResource;
 import no.fint.model.resource.arkiv.noark.ArkivdelResource;
 import no.fint.model.resource.arkiv.noark.KlassifikasjonssystemResource;
 import no.fintlabs.cache.FintCache;
@@ -62,6 +63,17 @@ public class ResourceEntityConsumersConfiguration {
                 "arkiv.noark.arkivdel",
                 ArkivdelResource.class,
                 arkivdelResourceCache
+        );
+    }
+
+    @Bean
+    ConcurrentMessageListenerContainer<String, AdministrativEnhetResource> administrativEnhetResourceEntityConsumer(
+            FintCache<String, AdministrativEnhetResource> administrativEnhetResourceCache
+    ) {
+        return createCacheConsumer(
+                "arkiv.noark.administrativenhet",
+                AdministrativEnhetResource.class,
+                administrativEnhetResourceCache
         );
     }
 

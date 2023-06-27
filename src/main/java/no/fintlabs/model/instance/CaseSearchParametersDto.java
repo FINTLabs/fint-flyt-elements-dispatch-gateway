@@ -11,6 +11,7 @@ import java.util.Optional;
 @Jacksonized
 public class CaseSearchParametersDto {
     private final boolean arkivdel;
+    private final boolean administrativEnhet;
     private final boolean tilgangsrestriksjon;
     private final boolean saksmappetype;
     private final boolean tittel;

@@ -26,6 +26,18 @@ public class SearchParametersTemplateService {
                 .addTemplate(
                         ElementConfig
                                 .builder()
+                                .key("administrativEnhet")
+                                .displayName("Administrativ enhet")
+                                .description("")
+                                .build(),
+                        ValueTemplate
+                                .builder()
+                                .type(ValueTemplate.Type.BOOLEAN)
+                                .build()
+                )
+                .addTemplate(
+                        ElementConfig
+                                .builder()
                                 .key("tilgangsrestriksjon")
                                 .displayName("Tilgangsrestriksjon")
                                 .description("")
