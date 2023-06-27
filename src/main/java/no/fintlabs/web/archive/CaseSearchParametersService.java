@@ -4,6 +4,7 @@ import no.fint.model.felles.basisklasser.Begrep;
 import no.fint.model.felles.kompleksedatatyper.Identifikator;
 import no.fint.model.resource.arkiv.kodeverk.SaksmappetypeResource;
 import no.fint.model.resource.arkiv.kodeverk.TilgangsrestriksjonResource;
+import no.fint.model.resource.arkiv.noark.AdministrativEnhetResource;
 import no.fint.model.resource.arkiv.noark.ArkivdelResource;
 import no.fint.model.resource.arkiv.noark.KlassifikasjonssystemResource;
 import no.fintlabs.cache.FintCache;
@@ -20,17 +21,20 @@ import java.util.StringJoiner;
 public class CaseSearchParametersService {
 
     private final FintCache<String, ArkivdelResource> arkivdelResourceCache;
+    private final FintCache<String, AdministrativEnhetResource> administrativEnhetResourceCache;
     private final FintCache<String, TilgangsrestriksjonResource> tilgangsrestriksjonResourceCache;
     private final FintCache<String, SaksmappetypeResource> saksmappetypeResourceCache;
     private final FintCache<String, KlassifikasjonssystemResource> klassifikasjonssystemResourceCache;
 
     public CaseSearchParametersService(
             FintCache<String, ArkivdelResource> arkivdelResourceCache,
+            FintCache<String, AdministrativEnhetResource> administrativEnhetResourceCache,
             FintCache<String, TilgangsrestriksjonResource> tilgangsrestriksjonResourceCache,
             FintCache<String, SaksmappetypeResource> saksmappetypeResourceCache,
             FintCache<String, KlassifikasjonssystemResource> klassifikasjonssystemResourceCache
     ) {
         this.arkivdelResourceCache = arkivdelResourceCache;
+        this.administrativEnhetResourceCache = administrativEnhetResourceCache;
         this.tilgangsrestriksjonResourceCache = tilgangsrestriksjonResourceCache;
         this.saksmappetypeResourceCache = saksmappetypeResourceCache;
         this.klassifikasjonssystemResourceCache = klassifikasjonssystemResourceCache;
@@ -45,6 +49,14 @@ public class CaseSearchParametersService {
                     .map(ArkivdelResource::getSystemId)
                     .map(Identifikator::getIdentifikatorverdi)
                     .map(value -> createFilterLine("arkivdel", value))
+                    .ifPresent(filterJoiner::add);
+        }
+        if (caseSearchParametersDto.isAdministrativEnhet()) {
+            sakDto.getAdministrativEnhet()
+                    .map(administrativEnhetResourceCache::get)
+                    .map(AdministrativEnhetResource::getSystemId)
+                    .map(Identifikator::getIdentifikatorverdi)
+                    .map(value -> createFilterLine("administrativenhet", value))
                     .ifPresent(filterJoiner::add);
         }
         if (caseSearchParametersDto.isTilgangsrestriksjon()) {
@@ -109,9 +121,9 @@ public class CaseSearchParametersService {
 
     private String createKlasseringPrefix(int rekkefolge) {
         String klassifikasjonName = switch (rekkefolge) {
-            case 0 -> "primar";
-            case 1 -> "sekundar";
-            case 2 -> "tertiar";
+            case 1 -> "primar";
+            case 2 -> "sekundar";
+            case 3 -> "tertiar";
             default -> throw new IllegalArgumentException("Rekkefolge must be 0, 1 or 2");
         };
         return "klassifikasjon/" + klassifikasjonName + "/";
