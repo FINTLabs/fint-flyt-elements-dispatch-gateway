@@ -120,29 +120,23 @@ public class JournalpostTemplateService {
                                 .build(),
                         skjermingTemplateService.createTemplate()
                 )
-                .addTemplate(
+                .addCollectionTemplate(
                         ElementConfig
                                 .builder()
                                 .key("korrespondansepart")
                                 .displayName("Korrespondanseparter")
                                 .description("Mottaker eller sender av arkivdokumenter.")
                                 .build(),
-                        ObjectCollectionTemplate
-                                .builder()
-                                .elementTemplate(korrespondansepartTemplateService.createTemplate())
-                                .build()
+                        korrespondansepartTemplateService.createTemplate()
                 )
-                .addTemplate(
+                .addCollectionTemplate(
                         ElementConfig
                                 .builder()
                                 .key("dokumentbeskrivelse")
                                 .displayName("Dokumentbeskrivelser")
                                 .description("Dokumentbeskrivelsene til en registrering")
                                 .build(),
-                        ObjectCollectionTemplate
-                                .builder()
-                                .elementTemplate(dokumentbeskrivelseTemplateService.createTemplate())
-                                .build()
+                        dokumentbeskrivelseTemplateService.createTemplate()
                 )
                 .build();
     }

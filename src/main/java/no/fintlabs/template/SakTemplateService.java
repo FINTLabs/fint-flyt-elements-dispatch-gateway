@@ -144,17 +144,14 @@ public class SakTemplateService {
                                 ))
                                 .build()
                 )
-                .addTemplate(
+                .addCollectionTemplate(
                         ElementConfig
                                 .builder()
                                 .key("part")
                                 .displayName("Parter")
                                 .description("Parter")
                                 .build(),
-                        ObjectCollectionTemplate
-                                .builder()
-                                .elementTemplate(partTemplateService.createTemplate())
-                                .build()
+                        partTemplateService.createTemplate()
                 )
                 .addTemplate(
                         ElementConfig
@@ -167,19 +164,16 @@ public class SakTemplateService {
                                 .build(),
                         skjermingTemplateService.createTemplate()
                 )
-                .addTemplate(
+                .addCollectionTemplate(
                         ElementConfig
                                 .builder()
                                 .key("klasse")
                                 .displayName("Klassering")
                                 .description("Klassifisering av mappe")
                                 .build(),
-                        ObjectCollectionTemplate
-                                .builder()
-                                .elementTemplate(klasseringTemplateService.createTemplate())
-                                .build()
+                        klasseringTemplateService.createTemplate()
                 )
-                .addTemplate(
+                .addCollectionTemplate(
                         ElementConfig
                                 .builder()
                                 .key("journalpost")
@@ -189,10 +183,7 @@ public class SakTemplateService {
                                         "(dvs. korrespondansedokumenter) brukt i saksbehandlingen, og eventuelt også " +
                                         "interne dokumenter.")
                                 .build(),
-                        ObjectCollectionTemplate
-                                .builder()
-                                .elementTemplate(journalpostTemplateService.createTemplate())
-                                .build()
+                        journalpostTemplateService.createTemplate()
                 )
                 .build();
     }

@@ -159,7 +159,7 @@ public class ArchiveTemplateService {
                                                 )
                                                 .build()
                                 )
-                                .addTemplate(
+                                .addCollectionTemplate(
                                         ElementConfig
                                                 .builder()
                                                 .key("journalpost")
@@ -181,10 +181,7 @@ public class ArchiveTemplateService {
                                                                 .build()
                                                 )
                                                 .build(),
-                                        ObjectCollectionTemplate
-                                                .builder()
-                                                .elementTemplate(journalpostTemplateService.createTemplate())
-                                                .build()
+                                        journalpostTemplateService.createTemplate()
                                 )
                                 .build()
                 )

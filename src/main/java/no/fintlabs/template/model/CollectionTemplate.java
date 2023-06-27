@@ -14,10 +14,10 @@ import javax.validation.constraints.NotNull;
 @EqualsAndHashCode
 @Jacksonized
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class ObjectCollectionTemplate {
+public class CollectionTemplate<T> {
 
     @NotNull
     @Valid
-    private final ObjectTemplate elementTemplate;
+    private final T elementTemplate;
 
 }

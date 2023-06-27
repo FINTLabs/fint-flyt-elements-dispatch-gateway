@@ -90,17 +90,14 @@ public class DokumentbeskrivelseTemplateService {
                                 .build()
 
                 )
-                .addTemplate(
+                .addCollectionTemplate(
                         ElementConfig
                                 .builder()
                                 .key("dokumentobjekt")
                                 .displayName("Dokumentobjekter")
                                 .description("Dokumentobjekt tilhørende dokumentbeskrivelsen")
                                 .build(),
-                        ObjectCollectionTemplate
-                                .builder()
-                                .elementTemplate(dokumentobjektTemplateService.createTemplate())
-                                .build()
+                        dokumentobjektTemplateService.createTemplate()
                 )
                 .addTemplate(
                         ElementConfig
