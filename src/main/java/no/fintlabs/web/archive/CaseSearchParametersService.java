@@ -87,7 +87,7 @@ public class CaseSearchParametersService {
                     .ifPresent(rekkefolge -> {
 
                         Optional<KlasseDto> klasseDto = sakDto.getKlasse()
-                                .map(klasseDtos -> klasseDtos.get(rekkefolge));
+                                .map(klasseDtos -> klasseDtos.get(rekkefolge - 1));
 
                         if (caseSearchParametersDto.getKlasseringKlassifikasjonssystem()) {
                             klasseDto
@@ -124,7 +124,7 @@ public class CaseSearchParametersService {
             case 1 -> "primar";
             case 2 -> "sekundar";
             case 3 -> "tertiar";
-            default -> throw new IllegalArgumentException("Rekkefolge must be 0, 1 or 2");
+            default -> throw new IllegalArgumentException("Rekkefolge must be 1, 2 or 3");
         };
         return "klassifikasjon/" + klassifikasjonName + "/";
     }
