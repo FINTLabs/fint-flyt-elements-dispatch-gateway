@@ -28,9 +28,11 @@ spec:
       value: path
     - name: fint.dispatch-gateway.authorization.enable
       value: 'true'
+  onePassword:
+    itemPath: "vaults/aks-beta-vault/items/fint-flyt-archive-fint-client-vlfk-no"
   envFrom:
     - secretRef:
-        name: fint-flyt-archive-fint-client
+        name: fint-resource-gateway-op
     - secretRef:
         name: fint-flyt-file-oauth2-client
   resources:
