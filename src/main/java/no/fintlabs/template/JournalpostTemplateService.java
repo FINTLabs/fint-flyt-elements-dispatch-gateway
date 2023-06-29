@@ -31,7 +31,7 @@ public class JournalpostTemplateService {
                                 .builder()
                                 .key("tittel")
                                 .displayName("Tittel")
-                                .description("")
+                                .description("Tittel")
                                 .build(),
                         ValueTemplate
                                 .builder()
@@ -43,7 +43,7 @@ public class JournalpostTemplateService {
                                 .builder()
                                 .key("offentligTittel")
                                 .displayName("Offentlig tittel")
-                                .description("")
+                                .description("Offentlig tittel. Husk å legge til eventuell skjerming.")
                                 .build(),
                         ValueTemplate
                                 .builder()
@@ -55,7 +55,7 @@ public class JournalpostTemplateService {
                                 .builder()
                                 .key("journalposttype")
                                 .displayName("Journalposttype")
-                                .description("")
+                                .description("Navn på type journalpost. Tilsvarer \"Noark dokumenttype\" i Noark 4")
                                 .build(),
                         SelectableValueTemplate
                                 .builder()
@@ -70,7 +70,8 @@ public class JournalpostTemplateService {
                                 .builder()
                                 .key("administrativEnhet")
                                 .displayName("Administrativ enhet")
-                                .description("")
+                                .description("Navn på avdeling, kontor eller annen administrativ enhet som har " +
+                                        "ansvaret for saksbehandlingen")
                                 .build(),
                         SelectableValueTemplate
                                 .builder()
@@ -85,7 +86,7 @@ public class JournalpostTemplateService {
                                 .builder()
                                 .key("saksbehandler")
                                 .displayName("Saksbehandler")
-                                .description("")
+                                .description("Navn på person som er saksbehandler")
                                 .build(),
                         SelectableValueTemplate
                                 .builder()
@@ -100,7 +101,7 @@ public class JournalpostTemplateService {
                                 .builder()
                                 .key("journalstatus")
                                 .displayName("Journalstatus")
-                                .description("")
+                                .description("Status for journalposten")
                                 .build(),
                         SelectableValueTemplate
                                 .builder()
@@ -115,33 +116,27 @@ public class JournalpostTemplateService {
                                 .builder()
                                 .key("skjerming")
                                 .displayName("Skjerming")
-                                .description("")
+                                .description("Skjerming av registrering")
                                 .build(),
                         skjermingTemplateService.createTemplate()
                 )
-                .addTemplate(
+                .addCollectionTemplate(
                         ElementConfig
                                 .builder()
                                 .key("korrespondansepart")
                                 .displayName("Korrespondanseparter")
-                                .description("")
+                                .description("Mottaker eller sender av arkivdokumenter.")
                                 .build(),
-                        ObjectCollectionTemplate
-                                .builder()
-                                .elementTemplate(korrespondansepartTemplateService.createTemplate())
-                                .build()
+                        korrespondansepartTemplateService.createTemplate()
                 )
-                .addTemplate(
+                .addCollectionTemplate(
                         ElementConfig
                                 .builder()
                                 .key("dokumentbeskrivelse")
                                 .displayName("Dokumentbeskrivelser")
-                                .description("")
+                                .description("Dokumentbeskrivelsene til en registrering")
                                 .build(),
-                        ObjectCollectionTemplate
-                                .builder()
-                                .elementTemplate(dokumentbeskrivelseTemplateService.createTemplate())
-                                .build()
+                        dokumentbeskrivelseTemplateService.createTemplate()
                 )
                 .build();
     }

@@ -3,16 +3,18 @@ package no.fintlabs.model.instance;
 import lombok.Builder;
 import lombok.extern.jackson.Jacksonized;
 
+import javax.validation.constraints.NotNull;
+import java.util.Collection;
 import java.util.Optional;
 
 @Builder
 @Jacksonized
 public class AdresseDto {
-    private final String adresselinje;
+    private final Collection<@NotNull String> adresselinje;
     private final String postnummer;
     private final String poststed;
 
-    public Optional<String> getAdresselinje() {
+    public Optional<Collection<String>> getAdresselinje() {
         return Optional.ofNullable(adresselinje);
     }
 

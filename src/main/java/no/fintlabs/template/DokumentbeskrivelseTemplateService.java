@@ -27,7 +27,7 @@ public class DokumentbeskrivelseTemplateService {
                                 .builder()
                                 .key("tittel")
                                 .displayName("Tittel")
-                                .description("")
+                                .description("Tittel eller navn på arkivenheten")
                                 .build(),
                         ValueTemplate
                                 .builder()
@@ -39,7 +39,7 @@ public class DokumentbeskrivelseTemplateService {
                                 .builder()
                                 .key("dokumentstatus")
                                 .displayName("Dokumentstatus")
-                                .description("")
+                                .description("Status til dokumentet")
                                 .build(),
                         SelectableValueTemplate
                                 .builder()
@@ -57,7 +57,7 @@ public class DokumentbeskrivelseTemplateService {
                                 .builder()
                                 .key("dokumentType")
                                 .displayName("Dokumenttype")
-                                .description("")
+                                .description("Navn på type dokument")
                                 .build(),
                         SelectableValueTemplate
                                 .builder()
@@ -76,7 +76,7 @@ public class DokumentbeskrivelseTemplateService {
                                 .builder()
                                 .key("tilknyttetRegistreringSom")
                                 .displayName("Tilknyttet registrering som")
-                                .description("")
+                                .description("Angivelse av hvilken \"rolle\" dokumentet har i forhold til registreringen")
                                 .build(),
                         SelectableValueTemplate
                                 .builder()
@@ -90,24 +90,21 @@ public class DokumentbeskrivelseTemplateService {
                                 .build()
 
                 )
-                .addTemplate(
+                .addCollectionTemplate(
                         ElementConfig
                                 .builder()
                                 .key("dokumentobjekt")
                                 .displayName("Dokumentobjekter")
-                                .description("")
+                                .description("Dokumentobjekt tilhørende dokumentbeskrivelsen")
                                 .build(),
-                        ObjectCollectionTemplate
-                                .builder()
-                                .elementTemplate(dokumentobjektTemplateService.createTemplate())
-                                .build()
+                        dokumentobjektTemplateService.createTemplate()
                 )
                 .addTemplate(
                         ElementConfig
                                 .builder()
                                 .key("skjerming")
                                 .displayName("Skjerming")
-                                .description("")
+                                .description("Skjerming av dokument")
                                 .build(),
                         skjermingTemplateService.createTemplate()
                 )

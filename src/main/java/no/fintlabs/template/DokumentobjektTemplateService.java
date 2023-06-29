@@ -16,7 +16,7 @@ public class DokumentobjektTemplateService {
                                 .builder()
                                 .key("variantformat")
                                 .displayName("Variantformat")
-                                .description("")
+                                .description("Angivelse av hvilken variant et dokument forekommer i")
                                 .build(),
                         SelectableValueTemplate
                                 .builder()
@@ -34,7 +34,7 @@ public class DokumentobjektTemplateService {
                                 .builder()
                                 .key("filformat")
                                 .displayName("Filformat")
-                                .description("")
+                                .description("Dokumentets format")
                                 .build(),
                         SelectableValueTemplate
                                 .builder()
@@ -52,7 +52,7 @@ public class DokumentobjektTemplateService {
                                 .builder()
                                 .key("fil")
                                 .displayName("Fil")
-                                .description("")
+                                .description("Referanse til filen som inneholder det elektroniske dokumentet som dokumentobjektet beskriver")
                                 .build(),
                         ValueTemplate
                                 .builder()

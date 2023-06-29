@@ -11,12 +11,14 @@ public class AdresseTemplateService {
     public ObjectTemplate createTemplate() {
         return ObjectTemplate
                 .builder()
-                .addTemplate(
+                .addCollectionTemplate(
                         ElementConfig
                                 .builder()
                                 .key("adresselinje")
-                                .displayName("Adresselinje")
-                                .description("")
+                                .displayName("Adresselinjer")
+                                .description("Adresseinformasjon. Linjer representeres hver for seg, fra øverst til " +
+                                        "nederst. Dette kan være: Gateadresse, Postboksadresse, Bolignummer, " +
+                                        "C/O adresse, Attn, Mottak på vegne av andre.")
                                 .build(),
                         ValueTemplate
                                 .builder()
@@ -28,7 +30,7 @@ public class AdresseTemplateService {
                                 .builder()
                                 .key("postnummer")
                                 .displayName("Postnummer")
-                                .description("")
+                                .description("Postnummer")
                                 .build(),
                         ValueTemplate
                                 .builder()
@@ -40,7 +42,7 @@ public class AdresseTemplateService {
                                 .builder()
                                 .key("poststed")
                                 .displayName("Poststed")
-                                .description("")
+                                .description("Poststed")
                                 .build(),
                         ValueTemplate
                                 .builder()

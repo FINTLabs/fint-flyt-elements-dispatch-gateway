@@ -34,7 +34,7 @@ public class SakTemplateService {
                                 .builder()
                                 .key("tittel")
                                 .displayName("Tittel")
-                                .description("")
+                                .description("Tittel")
                                 .build(),
                         ValueTemplate
                                 .builder()
@@ -46,7 +46,7 @@ public class SakTemplateService {
                                 .builder()
                                 .key("offentligTittel")
                                 .displayName("Offentlig tittel")
-                                .description("")
+                                .description("Offentlig tittel. Husk å legge til eventuell skjerming.")
                                 .build(),
                         ValueTemplate
                                 .builder()
@@ -58,7 +58,7 @@ public class SakTemplateService {
                                 .builder()
                                 .key("saksmappetype")
                                 .displayName("Saksmappetype")
-                                .description("")
+                                .description("Type saksmappe")
                                 .build(),
                         SelectableValueTemplate
                                 .builder()
@@ -73,7 +73,7 @@ public class SakTemplateService {
                                 .builder()
                                 .key("journalenhet")
                                 .displayName("Journalenhet")
-                                .description("")
+                                .description("OBS: Ikke i bruk")
                                 .build(),
                         SelectableValueTemplate
                                 .builder()
@@ -88,7 +88,8 @@ public class SakTemplateService {
                                 .builder()
                                 .key("administrativEnhet")
                                 .displayName("Administrativ enhet")
-                                .description("")
+                                .description("Avdeling, kontor eller annen administrativ enhet som har " +
+                                        "ansvaret for saksbehandlingen.")
                                 .build(),
                         SelectableValueTemplate
                                 .builder()
@@ -103,7 +104,7 @@ public class SakTemplateService {
                                 .builder()
                                 .key("saksansvarlig")
                                 .displayName("Saksansvarlig")
-                                .description("")
+                                .description("Person som er saksansvarlig")
                                 .build(),
                         SelectableValueTemplate
                                 .builder()
@@ -118,7 +119,7 @@ public class SakTemplateService {
                                 .builder()
                                 .key("arkivdel")
                                 .displayName("Arkivdel")
-                                .description("")
+                                .description("Arkivdel som mappe tilhører")
                                 .build(),
                         SelectableValueTemplate
                                 .builder()
@@ -133,7 +134,7 @@ public class SakTemplateService {
                                 .builder()
                                 .key("saksstatus")
                                 .displayName("Saksstatus")
-                                .description("")
+                                .description("Status til saksmappen. Det vil si hvor langt saksbehandlingen har kommet. Registreres automatisk gjennom forskjellig saksbehandlingsfunksjonalitet, eller overstyres manuelt.")
                                 .build(),
                         SelectableValueTemplate
                                 .builder()
@@ -143,50 +144,46 @@ public class SakTemplateService {
                                 ))
                                 .build()
                 )
-                .addTemplate(
+                .addCollectionTemplate(
                         ElementConfig
                                 .builder()
                                 .key("part")
                                 .displayName("Parter")
-                                .description("")
+                                .description("Parter")
                                 .build(),
-                        ObjectCollectionTemplate
-                                .builder()
-                                .elementTemplate(partTemplateService.createTemplate())
-                                .build()
+                        partTemplateService.createTemplate()
                 )
                 .addTemplate(
                         ElementConfig
                                 .builder()
                                 .key("skjerming")
                                 .displayName("Skjerming")
-                                .description("")
+                                .description("Skjerming benyttes til å skjerme registrerte opplysninger eller " +
+                                        "enkeltdokumenter. Skjermingen trer i kraft når en tilgangskode påføres " +
+                                        "den enkelte mappe, registrering eller det enkelte dokument.")
                                 .build(),
                         skjermingTemplateService.createTemplate()
                 )
-                .addTemplate(
+                .addCollectionTemplate(
                         ElementConfig
                                 .builder()
                                 .key("klasse")
                                 .displayName("Klassering")
-                                .description("")
+                                .description("Klassifisering av mappe")
                                 .build(),
-                        ObjectCollectionTemplate
-                                .builder()
-                                .elementTemplate(klasseringTemplateService.createTemplate())
-                                .build()
+                        klasseringTemplateService.createTemplate()
                 )
-                .addTemplate(
+                .addCollectionTemplate(
                         ElementConfig
                                 .builder()
                                 .key("journalpost")
                                 .displayName("Journalposter")
-                                .description("")
+                                .description("En journalpost representer en \"innføring i journalen\"." +
+                                        "Journalen er en kronologisk fortegnelse over inn- og utgående dokumenter" +
+                                        "(dvs. korrespondansedokumenter) brukt i saksbehandlingen, og eventuelt også " +
+                                        "interne dokumenter.")
                                 .build(),
-                        ObjectCollectionTemplate
-                                .builder()
-                                .elementTemplate(journalpostTemplateService.createTemplate())
-                                .build()
+                        journalpostTemplateService.createTemplate()
                 )
                 .build();
     }

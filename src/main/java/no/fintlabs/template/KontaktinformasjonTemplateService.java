@@ -16,7 +16,7 @@ public class KontaktinformasjonTemplateService {
                                 .builder()
                                 .key("epostadresse")
                                 .displayName("E-post")
-                                .description("")
+                                .description("E-postadresse")
                                 .build(),
                         ValueTemplate
                                 .builder()
@@ -28,7 +28,7 @@ public class KontaktinformasjonTemplateService {
                                 .builder()
                                 .key("mobiltelefonnummer")
                                 .displayName("Mobiltelefonnummer")
-                                .description("")
+                                .description("Mobiltelefonnummer")
                                 .build(),
                         ValueTemplate
                                 .builder()
@@ -40,7 +40,7 @@ public class KontaktinformasjonTemplateService {
                                 .builder()
                                 .key("telefonnummer")
                                 .displayName("Telefonnummer")
-                                .description("")
+                                .description("Telefonnummer")
                                 .build(),
                         ValueTemplate
                                 .builder()

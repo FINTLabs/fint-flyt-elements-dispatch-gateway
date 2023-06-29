@@ -7,8 +7,9 @@ public class ObjectTemplateBuilder {
     private int nextOrderValue = 0;
     private final Collection<ElementTemplate<ValueTemplate>> valueTemplates = new ArrayList<>();
     private final Collection<ElementTemplate<SelectableValueTemplate>> selectableValueTemplates = new ArrayList<>();
+    private final Collection<ElementTemplate<CollectionTemplate<ValueTemplate>>> valueCollectionTemplates = new ArrayList<>();
     private final Collection<ElementTemplate<ObjectTemplate>> objectTemplates = new ArrayList<>();
-    private final Collection<ElementTemplate<ObjectCollectionTemplate>> objectCollectionTemplates = new ArrayList<>();
+    private final Collection<ElementTemplate<CollectionTemplate<ObjectTemplate>>> objectCollectionTemplates = new ArrayList<>();
 
     public ObjectTemplateBuilder addTemplate(ElementConfig elementConfig, ValueTemplate template) {
         return addTemplate(valueTemplates, elementConfig, template);
@@ -22,8 +23,26 @@ public class ObjectTemplateBuilder {
         return addTemplate(objectTemplates, elementConfig, template);
     }
 
-    public ObjectTemplateBuilder addTemplate(ElementConfig elementConfig, ObjectCollectionTemplate template) {
-        return addTemplate(objectCollectionTemplates, elementConfig, template);
+    public ObjectTemplateBuilder addCollectionTemplate(ElementConfig elementConfig, ValueTemplate elementTemplate) {
+        return addTemplate(
+                valueCollectionTemplates,
+                elementConfig,
+                CollectionTemplate
+                        .<ValueTemplate>builder()
+                        .elementTemplate(elementTemplate)
+                        .build()
+        );
+    }
+
+    public ObjectTemplateBuilder addCollectionTemplate(ElementConfig elementConfig, ObjectTemplate elementTemplate) {
+        return addTemplate(
+                objectCollectionTemplates,
+                elementConfig,
+                CollectionTemplate
+                        .<ObjectTemplate>builder()
+                        .elementTemplate(elementTemplate)
+                        .build()
+        );
     }
 
     private <T> ObjectTemplateBuilder addTemplate(
@@ -46,6 +65,7 @@ public class ObjectTemplateBuilder {
         return new ObjectTemplate(
                 valueTemplates,
                 selectableValueTemplates,
+                valueCollectionTemplates,
                 objectTemplates,
                 objectCollectionTemplates
         );

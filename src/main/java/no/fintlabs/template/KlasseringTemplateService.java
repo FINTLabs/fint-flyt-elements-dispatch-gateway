@@ -23,7 +23,7 @@ public class KlasseringTemplateService {
                                 .builder()
                                 .key("rekkefolge")
                                 .displayName("Rekkefølge")
-                                .description("")
+                                .description("Rekkefølge for klassifiseringer. Ved bruk av primær, sekundær og tertiærklasseringer, bruk følgende verdier: 1 for primær, 2 for sekundær, og 3 for tertiær.")
                                 .build(),
                         ValueTemplate
                                 .builder()
@@ -35,7 +35,7 @@ public class KlasseringTemplateService {
                                 .builder()
                                 .key("klassifikasjonssystem")
                                 .displayName("Klassifikasjonssystem")
-                                .description("")
+                                .description("Beskriver den overordnede strukturen for mappene i en eller flere arkivdeler")
                                 .build(),
                         SelectableValueTemplate
                                 .builder()
@@ -50,7 +50,7 @@ public class KlasseringTemplateService {
                                 .builder()
                                 .key("klasseId")
                                 .displayName("KlasseID")
-                                .description("")
+                                .description("Entydig identifikasjon av klassen innenfor klassifikasjonssystemet")
                                 .build(),
                         SelectableValueTemplate
                                 .builder()
@@ -71,7 +71,7 @@ public class KlasseringTemplateService {
                                 .builder()
                                 .key("tittel")
                                 .displayName("Tittel")
-                                .description("")
+                                .description("Tittel eller navn på arkivenheten")
                                 .build(),
                         ValueTemplate
                                 .builder()
@@ -83,7 +83,7 @@ public class KlasseringTemplateService {
                                 .builder()
                                 .key("skjerming")
                                 .displayName("Skjerming")
-                                .description("")
+                                .description("Skjerming av klasse")
                                 .build(),
                         skjermingTemplateService.createTemplate()
                 )

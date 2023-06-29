@@ -36,7 +36,15 @@ public class ArchiveTemplateService {
                                                 .builder()
                                                 .key("type")
                                                 .displayName("Sakslogikk")
-                                                .description("")
+                                                .description("Logikk for oppretting eller gjenfinning av sak." +
+                                                        " Ved \"Ny sak\" opprettes det ny sak i arkivet." +
+                                                        " Ved \"På saksnummer\" brukes eksisterende sak med innfyllt saksnummer." +
+                                                        " Ved \"På søk, eller ny\" gjøres det først et forsøk på å finne saker" +
+                                                        " som passer med valgte søkekriterier. Søket har tre utfall: " +
+                                                        " (1) Ingen funn: Ny sak opprettes." +
+                                                        " (2) Én sak funnet: Journalposter legges på funnet sak." +
+                                                        " (3) To eller flere saker funnet: Instansprosessen feiler."
+                                                )
                                                 .build(),
                                         SelectableValueTemplate
                                                 .builder()
@@ -65,7 +73,7 @@ public class ArchiveTemplateService {
                                                 .builder()
                                                 .key("caseSearchParameters")
                                                 .displayName("Søkeparametre")
-                                                .description("")
+                                                .description("Parametre for søk på sak. Huk av for de feltene som skal være med i søket. Verdiene for de avhukede feltene hentes fra oppsett for ny sak, så husk å fylle ut disse.")
                                                 .showDependency(
                                                         Dependency
                                                                 .builder()
@@ -88,7 +96,7 @@ public class ArchiveTemplateService {
                                                 .builder()
                                                 .key("newCase")
                                                 .displayName("Sak")
-                                                .description("")
+                                                .description("Generisk sak")
                                                 .showDependency(
                                                         Dependency
                                                                 .builder()
@@ -120,7 +128,7 @@ public class ArchiveTemplateService {
                                                 .builder()
                                                 .key("caseId")
                                                 .displayName("Saksnummer")
-                                                .description("")
+                                                .description("Entydig identifikasjon av mappen innenfor det arkivet mappen tilhører")
                                                 .showDependency(
                                                         Dependency
                                                                 .builder()
@@ -151,12 +159,12 @@ public class ArchiveTemplateService {
                                                 )
                                                 .build()
                                 )
-                                .addTemplate(
+                                .addCollectionTemplate(
                                         ElementConfig
                                                 .builder()
                                                 .key("journalpost")
                                                 .displayName("Journalposter")
-                                                .description("")
+                                                .description("Journalposter knyttet til saksmappe")
                                                 .showDependency(
                                                         Dependency
                                                                 .builder()
@@ -173,10 +181,7 @@ public class ArchiveTemplateService {
                                                                 .build()
                                                 )
                                                 .build(),
-                                        ObjectCollectionTemplate
-                                                .builder()
-                                                .elementTemplate(journalpostTemplateService.createTemplate())
-                                                .build()
+                                        journalpostTemplateService.createTemplate()
                                 )
                                 .build()
                 )

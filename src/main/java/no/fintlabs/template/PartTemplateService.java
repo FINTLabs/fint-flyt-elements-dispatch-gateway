@@ -27,7 +27,7 @@ public class PartTemplateService {
                                 .builder()
                                 .key("partNavn")
                                 .displayName("Navn")
-                                .description("")
+                                .description("Navn på virksomhet eller person")
                                 .build(),
                         ValueTemplate
                                 .builder()
@@ -39,7 +39,7 @@ public class PartTemplateService {
                                 .builder()
                                 .key("partRolle")
                                 .displayName("Rolle")
-                                .description("")
+                                .description("Partens rolle")
                                 .build(),
                         SelectableValueTemplate
                                 .builder()
@@ -54,7 +54,7 @@ public class PartTemplateService {
                                 .builder()
                                 .key("kontaktperson")
                                 .displayName("Kontaktperson")
-                                .description("")
+                                .description("Kontaktperson hos en organisasjon")
                                 .build(),
                         ValueTemplate
                                 .builder()
@@ -66,7 +66,7 @@ public class PartTemplateService {
                                 .builder()
                                 .key("adresse")
                                 .displayName("Adresse")
-                                .description("")
+                                .description("Adresse")
                                 .build(),
                         adresseTemplateService.createTemplate()
                 )
@@ -75,7 +75,7 @@ public class PartTemplateService {
                                 .builder()
                                 .key("kontaktinformasjon")
                                 .displayName("Kontaktinformasjon")
-                                .description("")
+                                .description("Kontaktinformasjon")
                                 .build(),
                         kontaktinformasjonTemplateService.createTemplate()
                 )
