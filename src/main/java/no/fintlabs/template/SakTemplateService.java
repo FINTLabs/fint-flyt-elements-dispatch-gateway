@@ -88,7 +88,7 @@ public class SakTemplateService {
                                 .builder()
                                 .key("administrativEnhet")
                                 .displayName("Administrativ enhet")
-                                .description("Avdeling, kontor eller annen administrativ enhet som har" +
+                                .description("Avdeling, kontor eller annen administrativ enhet som har " +
                                         "ansvaret for saksbehandlingen.")
                                 .build(),
                         SelectableValueTemplate

@@ -70,7 +70,7 @@ public class JournalpostTemplateService {
                                 .builder()
                                 .key("administrativEnhet")
                                 .displayName("Administrativ enhet")
-                                .description("Navn på avdeling, kontor eller annen administrativ enhet som har" +
+                                .description("Navn på avdeling, kontor eller annen administrativ enhet som har " +
                                         "ansvaret for saksbehandlingen")
                                 .build(),
                         SelectableValueTemplate
