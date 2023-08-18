@@ -29,9 +29,9 @@ class DokumentObjektMappingServiceTest {
         UUID fileId = UUID.randomUUID();
         DokumentobjektDto dto = DokumentobjektDto
                 .builder()
-                .variantformat("variant-format")
-                .filformat("file-format")
-                .format("format")
+                .variantformat("testVariantFormat")
+                .filformat("testFilFormat")
+                .format("testFormat")
                 .fileId(fileId)
                 .build();
         Link fileLink = new Link("mockedLinkValue");
@@ -44,7 +44,7 @@ class DokumentObjektMappingServiceTest {
         assertNotNull(resource);
 //        assertTrue(resource.getVariantFormat().contains(fileLink));
 //        assertTrue(resource.getFilformat().contains(fileLink));
-        assertEquals("format", resource.getFormat());
+        assertEquals("testFormat", resource.getFormat());
         assertTrue(resource.getReferanseDokumentfil().contains(fileLink));
     }
 

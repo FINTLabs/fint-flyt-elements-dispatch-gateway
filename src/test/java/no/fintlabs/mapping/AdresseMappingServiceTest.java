@@ -21,22 +21,22 @@ class AdresseMappingServiceTest {
 
     @Test
     void toAdresseResource() {
-        Collection<String> addressLines = Arrays.asList("Line 1", "Line 2");
-        String postNumber = "12345";
-        String postPlace = "Post Place";
+        Collection<String> adresseLinjer = Arrays.asList("Linje 1", "Linje 2");
+        String postNummer = "12345";
+        String postSted = "testPostSted";
 
         AdresseDto adresseDto = AdresseDto.builder()
-                .adresselinje(addressLines)
-                .postnummer(postNumber)
-                .poststed(postPlace)
+                .adresselinje(adresseLinjer)
+                .postnummer(postNummer)
+                .poststed(postSted)
                 .build();
 
         AdresseResource adresseResource = adresseMappingService.toAdresseResource(adresseDto);
 
         assertThat(adresseResource).isNotNull();
-        assertThat(adresseResource.getAdresselinje()).containsExactlyElementsOf(addressLines);
-        assertThat(adresseResource.getPostnummer()).isEqualTo(postNumber);
-        assertThat(adresseResource.getPoststed()).isEqualTo(postPlace);
+        assertThat(adresseResource.getAdresselinje()).containsExactlyElementsOf(adresseLinjer);
+        assertThat(adresseResource.getPostnummer()).isEqualTo(postNummer);
+        assertThat(adresseResource.getPoststed()).isEqualTo(postSted);
     }
 
     @Test

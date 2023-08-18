@@ -6,7 +6,6 @@ import no.fintlabs.model.instance.DokumentbeskrivelseDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.util.Collections;
@@ -20,12 +19,6 @@ class DokumentbeskrivelseMappingServiceTest {
     @InjectMocks
     private DokumentbeskrivelseMappingService dokumentbeskrivelseMappingService;
 
-    @Mock
-    private DokumentObjektMappingService dokumentObjektMappingService;
-
-    @Mock
-    private SkjermingMappingService skjermingMappingService;
-
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
@@ -34,19 +27,19 @@ class DokumentbeskrivelseMappingServiceTest {
     @Test
     void toDokumentbeskrivelseResource() {
         DokumentbeskrivelseDto dto = DokumentbeskrivelseDto.builder()
-                .tittel("Test Title")
-                .dokumentstatus("Status")
-                .dokumentType("Type")
-                .tilknyttetRegistreringSom("Tilknyttet")
+                .tittel("testTittel")
+                .dokumentstatus("testDokumentstatus")
+                .dokumentType("testDokumenttype")
+                .tilknyttetRegistreringSom("testTilknyttetRegistreringSom")
                 .build();
 
         HashMap<UUID, Link> linkMap = new HashMap<>();
 
         DokumentbeskrivelseResource resource = dokumentbeskrivelseMappingService.toDokumentbeskrivelseResource(dto, linkMap);
 
-        assertEquals("Test Title", resource.getTittel());
-        assertEquals(Collections.singletonList(Link.with("Type")), resource.getDokumentType());
-        assertEquals(Collections.singletonList(Link.with("Status")), resource.getDokumentstatus());
-        assertEquals(Collections.singletonList(Link.with("Tilknyttet")), resource.getTilknyttetRegistreringSom());
+        assertEquals("testTittel", resource.getTittel());
+        assertEquals(Collections.singletonList(Link.with("testDokumenttype")), resource.getDokumentType());
+        assertEquals(Collections.singletonList(Link.with("testDokumentstatus")), resource.getDokumentstatus());
+        assertEquals(Collections.singletonList(Link.with("testTilknyttetRegistreringSom")), resource.getTilknyttetRegistreringSom());
     }
 }
