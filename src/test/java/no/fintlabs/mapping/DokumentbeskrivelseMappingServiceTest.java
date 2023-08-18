@@ -20,6 +20,7 @@ class DokumentbeskrivelseMappingServiceTest {
     @InjectMocks
     private DokumentbeskrivelseMappingService dokumentbeskrivelseMappingService;
 
+    @SuppressWarnings("unused")
     @Mock
     private SkjermingMappingService skjermingMappingService;
 
