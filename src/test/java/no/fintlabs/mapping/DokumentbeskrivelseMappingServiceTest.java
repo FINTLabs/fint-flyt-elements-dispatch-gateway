@@ -6,6 +6,7 @@ import no.fintlabs.model.instance.DokumentbeskrivelseDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.util.Collections;
@@ -18,6 +19,9 @@ class DokumentbeskrivelseMappingServiceTest {
 
     @InjectMocks
     private DokumentbeskrivelseMappingService dokumentbeskrivelseMappingService;
+
+    @Mock
+    private SkjermingMappingService skjermingMappingService;
 
     @BeforeEach
     void setUp() {
