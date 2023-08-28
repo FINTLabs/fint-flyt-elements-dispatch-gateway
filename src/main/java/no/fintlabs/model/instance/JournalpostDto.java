@@ -57,4 +57,9 @@ public class JournalpostDto {
         return Optional.ofNullable(dokumentbeskrivelse);
     }
 
+    @Override
+    public String toString() {
+        return "Sensitive data omitted";
+    }
+
 }
