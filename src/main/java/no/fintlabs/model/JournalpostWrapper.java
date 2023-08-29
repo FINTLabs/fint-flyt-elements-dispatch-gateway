@@ -1,6 +1,5 @@
 package no.fintlabs.model;
 
-import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.extern.jackson.Jacksonized;
@@ -12,7 +11,6 @@ import java.util.List;
 @Getter
 @EqualsAndHashCode
 @Jacksonized
-@Builder
 public class JournalpostWrapper {
 
     public JournalpostWrapper(JournalpostResource journalpost) {
