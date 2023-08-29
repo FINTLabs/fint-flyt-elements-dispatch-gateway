@@ -19,4 +19,9 @@ public class SkjermingDto {
         return Optional.ofNullable(skjermingshjemmel);
     }
 
+    @Override
+    public String toString() {
+        return "Sensitive data omitted";
+    }
+
 }

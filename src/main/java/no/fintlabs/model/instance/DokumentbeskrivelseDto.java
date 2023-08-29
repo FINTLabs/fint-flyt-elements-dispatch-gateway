@@ -42,4 +42,9 @@ public class DokumentbeskrivelseDto {
         return Optional.ofNullable(skjerming);
     }
 
+    @Override
+    public String toString() {
+        return "Sensitive data omitted";
+    }
+
 }

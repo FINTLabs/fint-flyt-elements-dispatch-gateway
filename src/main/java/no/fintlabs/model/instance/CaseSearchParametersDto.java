@@ -32,4 +32,9 @@ public class CaseSearchParametersDto {
         return Optional.ofNullable(klasseringKlasseId).orElse(false);
     }
 
+    @Override
+    public String toString() {
+        return "Sensitive data omitted";
+    }
+
 }

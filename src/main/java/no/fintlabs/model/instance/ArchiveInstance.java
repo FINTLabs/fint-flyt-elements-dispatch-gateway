@@ -36,4 +36,9 @@ public class ArchiveInstance {
     @NotBlank(groups = CaseByIdValidationGroup.class)
     private final List<@NotNull @Valid JournalpostDto> journalpost;
 
+    @Override
+    public String toString() {
+        return "Sensitive data omitted";
+    }
+
 }
