@@ -20,7 +20,7 @@ public class SkjermingTemplateService {
                                 .key("tilgangsrestriksjon")
                                 .displayName("Tilgangsrestriksjon")
                                 .description("Angivelse av at dokumentene som tilhører arkivenheten ikke er offentlig " +
-                                        "tilgjengelig i henhold til offentlighetsloven eller av en annen grunn")
+                                        "\ntilgjengelig i henhold til offentlighetsloven eller av en annen grunn")
                                 .build(),
                         SelectableValueTemplate
                                 .builder()
@@ -36,7 +36,7 @@ public class SkjermingTemplateService {
                                 .key("skjermingshjemmel")
                                 .displayName("Skjermingshjemmel")
                                 .description("Henvisning til hjemmel (paragraf) i offentlighetsloven, sikkerhetsloven" +
-                                        "eller beskyttelsesinstruksen")
+                                        "\neller beskyttelsesinstruksen")
                                 .build(),
                         SelectableValueTemplate
                                 .builder()
