@@ -134,7 +134,9 @@ public class SakTemplateService {
                                 .builder()
                                 .key("saksstatus")
                                 .displayName("Saksstatus")
-                                .description("Status til saksmappen. Det vil si hvor langt saksbehandlingen har kommet. Registreres automatisk gjennom forskjellig saksbehandlingsfunksjonalitet, eller overstyres manuelt.")
+                                .description("Status til saksmappen. Det vil si hvor langt saksbehandlingen har kommet. " +
+                                        "\nRegistreres automatisk gjennom forskjellig saksbehandlingsfunksjonalitet, " +
+                                        "eller overstyres manuelt.")
                                 .build(),
                         SelectableValueTemplate
                                 .builder()
@@ -159,7 +161,7 @@ public class SakTemplateService {
                                 .key("skjerming")
                                 .displayName("Skjerming")
                                 .description("Skjerming benyttes til å skjerme registrerte opplysninger eller " +
-                                        "enkeltdokumenter. Skjermingen trer i kraft når en tilgangskode påføres " +
+                                        "enkeltdokumenter. Skjermingen trer i kraft når en tilgangskode påføres" +
                                         "den enkelte mappe, registrering eller det enkelte dokument.")
                                 .build(),
                         skjermingTemplateService.createTemplate()
@@ -178,10 +180,9 @@ public class SakTemplateService {
                                 .builder()
                                 .key("journalpost")
                                 .displayName("Journalposter")
-                                .description("En journalpost representer en \"innføring i journalen\"." +
-                                        "Journalen er en kronologisk fortegnelse over inn- og utgående dokumenter" +
-                                        "(dvs. korrespondansedokumenter) brukt i saksbehandlingen, og eventuelt også " +
-                                        "interne dokumenter.")
+                                .description("En journalpost representer en \"innføring i journalen\". \nJournalen er en " +
+                                        "kronologisk fortegnelse over inn- og utgående dokumenter (dvs. korrespondansedokumenter) " +
+                                        "brukt i saksbehandlingen, og eventuelt også interne dokumenter.")
                                 .build(),
                         journalpostTemplateService.createTemplate()
                 )

@@ -17,7 +17,7 @@ public class AdresseTemplateService {
                                 .key("adresselinje")
                                 .displayName("Adresselinjer")
                                 .description("Adresseinformasjon. Linjer representeres hver for seg, fra øverst til " +
-                                        "nederst. Dette kan være: Gateadresse, Postboksadresse, Bolignummer, " +
+                                        "nederst. \nDette kan være: Gateadresse, Postboksadresse, Bolignummer, " +
                                         "C/O adresse, Attn, Mottak på vegne av andre.")
                                 .build(),
                         ValueTemplate

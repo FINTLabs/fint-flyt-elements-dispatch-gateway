@@ -52,7 +52,8 @@ public class DokumentobjektTemplateService {
                                 .builder()
                                 .key("fil")
                                 .displayName("Fil")
-                                .description("Referanse til filen som inneholder det elektroniske dokumentet som dokumentobjektet beskriver")
+                                .description("Referanse til filen som inneholder det elektroniske dokumentet " +
+                                        "som dokumentobjektet beskriver")
                                 .build(),
                         ValueTemplate
                                 .builder()
