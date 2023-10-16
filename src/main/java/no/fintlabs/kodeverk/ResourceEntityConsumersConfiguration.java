@@ -63,7 +63,11 @@ public class ResourceEntityConsumersConfiguration {
                                                 .stream()
                                                 .map(key -> new AbstractMap.SimpleEntry<>(key, value))
                                 )
-                                .collect(toMap(Map.Entry::getKey, Map.Entry::getValue))
+                                .collect(toMap(
+                                        Map.Entry::getKey,
+                                        Map.Entry::getValue,
+                                        (a, b) -> b)
+                                )
                 )
         ).createContainer(EntityTopicNameParameters.builder().resource(resourceReference).build());
     }
