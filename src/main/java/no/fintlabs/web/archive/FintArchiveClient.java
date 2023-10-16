@@ -97,6 +97,9 @@ public class FintArchiveClient {
         Identifikator identifikator = new Identifikator();
         identifikator.setIdentifikatorverdi("2023/101");
         sakResource.setMappeId(identifikator);
+
+        log.info("post case");
+
         return Mono.just(sakResource).delayElement(Duration.ofMinutes(15));
     }
 
