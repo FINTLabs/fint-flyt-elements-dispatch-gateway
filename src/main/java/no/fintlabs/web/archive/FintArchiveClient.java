@@ -1,6 +1,7 @@
 package no.fintlabs.web.archive;
 
 import lombok.extern.slf4j.Slf4j;
+import no.fint.model.felles.kompleksedatatyper.Identifikator;
 import no.fint.model.resource.arkiv.noark.JournalpostResource;
 import no.fint.model.resource.arkiv.noark.SakResource;
 import no.fint.model.resource.arkiv.noark.SakResources;
@@ -82,14 +83,21 @@ public class FintArchiveClient {
                 });
     }
 
+//    public Mono<SakResource> postCase(SakResource sakResource) {
+//        return pollForCaseResult(
+//                fintWebClient
+//                        .post()
+//                        .uri("/arkiv/noark/sak")
+//                        .bodyValue(sakResource)
+//                        .retrieve()
+//        );
+//    }
+
     public Mono<SakResource> postCase(SakResource sakResource) {
-        return pollForCaseResult(
-                fintWebClient
-                        .post()
-                        .uri("/arkiv/noark/sak")
-                        .bodyValue(sakResource)
-                        .retrieve()
-        );
+        Identifikator identifikator = new Identifikator();
+        identifikator.setIdentifikatorverdi("2023/101");
+        sakResource.setMappeId(identifikator);
+        return Mono.just(sakResource).delayElement(Duration.ofMinutes(15));
     }
 
     public Mono<Long> putRecord(String caseId, JournalpostWrapper journalpostWrapper) {
