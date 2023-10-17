@@ -7,15 +7,21 @@ import no.fint.model.resource.arkiv.noark.AdministrativEnhetResource;
 import no.fint.model.resource.arkiv.noark.ArkivdelResource;
 import no.fint.model.resource.arkiv.noark.KlassifikasjonssystemResource;
 import no.fintlabs.cache.FintCache;
+import no.fintlabs.kafka.entity.EntityConsumerConfiguration;
 import no.fintlabs.kafka.entity.EntityConsumerFactoryService;
 import no.fintlabs.kafka.entity.topic.EntityTopicNameParameters;
 import no.fintlabs.links.ResourceLinkUtil;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.listener.ConcurrentMessageListenerContainer;
 
+import java.util.AbstractMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
+
+import static java.util.stream.Collectors.toMap;
 
 @Configuration
 public class ResourceEntityConsumersConfiguration {
@@ -46,12 +52,28 @@ public class ResourceEntityConsumersConfiguration {
             FintCache<String, T> cache,
             Function<T, List<String>> cacheKeyFunction
     ) {
-        return entityConsumerFactoryService.createFactory(
+        return entityConsumerFactoryService.createBatchConsumerFactory(
                 resourceClass,
-                consumerRecord -> cache.put(
-                        cacheKeyFunction.apply(consumerRecord.value()),
-                        consumerRecord.value()
-                )
+                consumerRecords -> cache.put(
+                        consumerRecords
+                                .stream()
+                                .map(ConsumerRecord::value)
+                                .flatMap(value ->
+                                        cacheKeyFunction
+                                                .apply(value)
+                                                .stream()
+                                                .map(key -> new AbstractMap.SimpleEntry<>(key, value))
+                                )
+                                .collect(toMap(
+                                        Map.Entry::getKey,
+                                        Map.Entry::getValue,
+                                        (a, b) -> b)
+                                )
+                ),
+                EntityConsumerConfiguration
+                        .builder()
+                        .groupIdSuffix(resourceReference.replace('.', '-'))
+                        .build()
         ).createContainer(EntityTopicNameParameters.builder().resource(resourceReference).build());
     }
 
