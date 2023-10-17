@@ -7,6 +7,7 @@ import no.fint.model.resource.arkiv.noark.AdministrativEnhetResource;
 import no.fint.model.resource.arkiv.noark.ArkivdelResource;
 import no.fint.model.resource.arkiv.noark.KlassifikasjonssystemResource;
 import no.fintlabs.cache.FintCache;
+import no.fintlabs.kafka.entity.EntityConsumerConfiguration;
 import no.fintlabs.kafka.entity.EntityConsumerFactoryService;
 import no.fintlabs.kafka.entity.topic.EntityTopicNameParameters;
 import no.fintlabs.links.ResourceLinkUtil;
@@ -68,7 +69,11 @@ public class ResourceEntityConsumersConfiguration {
                                         Map.Entry::getValue,
                                         (a, b) -> b)
                                 )
-                )
+                ),
+                EntityConsumerConfiguration
+                        .builder()
+                        .groupIdSuffix(resourceReference.replace('.', '-'))
+                        .build()
         ).createContainer(EntityTopicNameParameters.builder().resource(resourceReference).build());
     }
 
