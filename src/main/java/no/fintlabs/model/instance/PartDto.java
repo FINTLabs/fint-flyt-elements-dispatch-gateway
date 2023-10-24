@@ -34,9 +34,4 @@ public class PartDto {
     public Optional<KontaktinformasjonDto> getKontaktinformasjon() {
         return Optional.ofNullable(kontaktinformasjon);
     }
-
-    @Override
-    public String toString() {
-        return "Sensitive data omitted";
-    }
 }

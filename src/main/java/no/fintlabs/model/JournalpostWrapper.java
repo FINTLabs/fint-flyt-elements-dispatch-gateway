@@ -17,9 +17,4 @@ public class JournalpostWrapper {
 
     private final Collection<JournalpostResource> journalpost;
 
-    @Override
-    public String toString() {
-        return "Sensitive data omitted";
-    }
-
 }

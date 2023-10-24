@@ -24,9 +24,4 @@ public class KontaktinformasjonDto {
         return Optional.ofNullable(mobiltelefonnummer);
     }
 
-    @Override
-    public String toString() {
-        return "Sensitive data omitted";
-    }
-
 }

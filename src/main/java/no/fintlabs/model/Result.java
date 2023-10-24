@@ -22,9 +22,4 @@ public class Result {
     private final String archiveCaseId;
     private final String errorMessage;
 
-    @Override
-    public String toString() {
-        return "Sensitive data omitted";
-    }
-
 }

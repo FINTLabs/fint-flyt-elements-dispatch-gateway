@@ -26,9 +26,4 @@ public class AdresseDto {
         return Optional.ofNullable(poststed);
     }
 
-    @Override
-    public String toString() {
-        return "Sensitive data omitted";
-    }
-
 }

@@ -34,9 +34,4 @@ public class DokumentobjektDto {
         return Optional.ofNullable(fileId);
     }
 
-    @Override
-    public String toString() {
-        return "Sensitive data omitted";
-    }
-
 }

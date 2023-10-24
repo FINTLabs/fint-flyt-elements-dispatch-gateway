@@ -50,9 +50,4 @@ public class KorrespondansepartDto {
         return Optional.ofNullable(skjerming);
     }
 
-    @Override
-    public String toString() {
-        return "Sensitive data omitted";
-    }
-
 }

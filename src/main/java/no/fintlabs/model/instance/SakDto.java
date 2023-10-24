@@ -72,9 +72,4 @@ public class SakDto {
         return Optional.ofNullable(journalpost);
     }
 
-    @Override
-    public String toString() {
-        return "Sensitive data omitted";
-    }
-
 }

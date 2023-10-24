@@ -36,9 +36,4 @@ public class KlasseDto {
         return Optional.ofNullable(tittel);
     }
 
-    @Override
-    public String toString() {
-        return "Sensitive data omitted";
-    }
-
 }
