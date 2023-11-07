@@ -3,28 +3,25 @@ package no.fintlabs.dispatch.sak.result;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import no.fintlabs.dispatch.DispatchStatus;
 
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class CaseDispatchResult {
 
-    public enum Status {
-        ACCEPTED, DECLINED, FAILED
-    }
-
     public static CaseDispatchResult accepted(String archiveCaseId) {
-        return new CaseDispatchResult(Status.ACCEPTED, archiveCaseId, null);
+        return new CaseDispatchResult(DispatchStatus.ACCEPTED, archiveCaseId, null);
     }
 
     public static CaseDispatchResult declined(String errorMessage) {
-        return new CaseDispatchResult(Status.DECLINED, null, errorMessage);
+        return new CaseDispatchResult(DispatchStatus.DECLINED, null, errorMessage);
     }
 
     public static CaseDispatchResult failed() {
-        return new CaseDispatchResult(Status.FAILED, null, null);
+        return new CaseDispatchResult(DispatchStatus.FAILED, null, null);
     }
 
-    private final Status status;
+    private final DispatchStatus status;
     private final String archiveCaseId;
     private final String errorMessage;
 

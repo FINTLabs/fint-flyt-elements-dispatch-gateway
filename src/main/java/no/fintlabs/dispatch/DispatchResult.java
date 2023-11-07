@@ -8,17 +8,12 @@ import lombok.Getter;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class DispatchResult {
 
-    public enum Status {
-        ACCEPTED, DECLINED, FAILED
-    }
-
-
     public static DispatchResult accepted(String archiveCaseId) {
-        return new DispatchResult(Status.ACCEPTED, archiveCaseId, null);
+        return new DispatchResult(DispatchStatus.ACCEPTED, archiveCaseId, null);
     }
 
     public static DispatchResult declined(String errorMessage) {
-        return new DispatchResult(Status.DECLINED, null, errorMessage);
+        return new DispatchResult(DispatchStatus.DECLINED, null, errorMessage);
     }
 
     public static DispatchResult failed() {
@@ -26,10 +21,10 @@ public class DispatchResult {
     }
 
     public static DispatchResult failed(String errorMessage) {
-        return new DispatchResult(Status.FAILED, null, errorMessage);
+        return new DispatchResult(DispatchStatus.FAILED, null, errorMessage);
     }
 
-    private final Status status;
+    private final DispatchStatus status;
     private final String archiveCaseAndRecordsIds;
     private final String errorMessage;
 

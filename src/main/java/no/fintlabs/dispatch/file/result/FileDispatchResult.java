@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import no.fint.model.resource.Link;
+import no.fintlabs.dispatch.DispatchStatus;
 
 import java.util.UUID;
 
@@ -11,31 +12,27 @@ import java.util.UUID;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class FileDispatchResult {
 
-    public enum Status {
-        ACCEPTED, DECLINED, COULD_NOT_BE_RETRIEVED, FAILED
-    }
-
     public static FileDispatchResult accepted(UUID fileId, Link archiveFileLink) {
-        return new FileDispatchResult(Status.ACCEPTED, fileId, archiveFileLink, null);
+        return new FileDispatchResult(DispatchStatus.ACCEPTED, fileId, archiveFileLink, null);
     }
 
     public static FileDispatchResult declined(UUID fileId, String errorMessage) {
-        return new FileDispatchResult(Status.DECLINED, fileId, null, errorMessage);
+        return new FileDispatchResult(DispatchStatus.DECLINED, fileId, null, errorMessage);
     }
 
     public static FileDispatchResult couldNotBeRetrieved(UUID fileId) {
-        return new FileDispatchResult(Status.COULD_NOT_BE_RETRIEVED, fileId, null, null);
+        return new FileDispatchResult(DispatchStatus.FAILED, fileId, null, "Could not retrieve file");
     }
 
     public static FileDispatchResult noFileId() {
-        return new FileDispatchResult(Status.FAILED, null, null, "No fileId");
+        return new FileDispatchResult(DispatchStatus.FAILED, null, null, "No fileId");
     }
 
     public static FileDispatchResult failed(UUID fileId) {
-        return new FileDispatchResult(Status.FAILED, fileId, null, null);
+        return new FileDispatchResult(DispatchStatus.FAILED, fileId, null, null);
     }
 
-    private final Status status;
+    private final DispatchStatus status;
     private final UUID fileId;
     private final Link archiveFileLink;
     private final String errorMessage;

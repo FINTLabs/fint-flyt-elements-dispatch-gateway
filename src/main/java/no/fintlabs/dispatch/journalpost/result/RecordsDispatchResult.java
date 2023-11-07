@@ -3,6 +3,7 @@ package no.fintlabs.dispatch.journalpost.result;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import no.fintlabs.dispatch.DispatchStatus;
 
 import java.util.List;
 
@@ -10,30 +11,27 @@ import java.util.List;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class RecordsDispatchResult {
 
-    public enum Status {
-        ACCEPTED, DECLINED, FAILED
-    }
-
-    public static RecordsDispatchResult accepted(List<RecordDispatchResult> successfulRecordDispatchResults) {
-        return new RecordsDispatchResult(Status.ACCEPTED, successfulRecordDispatchResults, null);
+    public static RecordsDispatchResult accepted(List<Long> journalpostIds) {
+        return new RecordsDispatchResult(DispatchStatus.ACCEPTED, journalpostIds, null, null);
     }
 
     public static RecordsDispatchResult declined(
-            List<RecordDispatchResult> successfulRecordDispatchResults,
-            RecordDispatchResult failedRecordDispatchResult
+            String errorMessage,
+            String functionalWarningMessage
     ) {
-        return new RecordsDispatchResult(Status.DECLINED, successfulRecordDispatchResults, failedRecordDispatchResult);
+        return new RecordsDispatchResult(DispatchStatus.DECLINED, null, errorMessage, functionalWarningMessage);
     }
 
     public static RecordsDispatchResult failed(
-            List<RecordDispatchResult> successfulRecordDispatchResults,
-            RecordDispatchResult failedRecordDispatchResult
+            String errorMessage,
+            String functionalWarningMessage
     ) {
-        return new RecordsDispatchResult(Status.FAILED, successfulRecordDispatchResults, failedRecordDispatchResult);
+        return new RecordsDispatchResult(DispatchStatus.FAILED, null, errorMessage, functionalWarningMessage);
     }
 
-    private final Status status;
-    private final List<RecordDispatchResult> successfulRecordDispatchResults;
-    private final RecordDispatchResult failedRecordDispatchResult;
+    private final DispatchStatus status;
+    private final List<Long> journalpostIds;
+    private final String errorMessage;
+    private final String functionalWarningMessage;
 
 }

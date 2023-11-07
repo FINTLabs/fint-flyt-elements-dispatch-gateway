@@ -130,7 +130,7 @@ public class DispatchService {
                     case ACCEPTED -> Mono.just(DispatchResult.accepted(
                             formatCaseIdAndJournalpostIds(
                                     archiveCaseId,
-                                    getJournalpostNumbers(recordsDispatchResult.getSuccessfulRecordDispatchResults())
+                                    getJournalpostNumbers(recordsDispatchResult)
                             )
                     ));
                     case DECLINED -> createArchiveCleanupRequiredWarningMessage(archiveCaseId, newCase, recordsDispatchResult)
@@ -162,10 +162,6 @@ public class DispatchService {
                 .stream()
                 .map(Object::toString)
                 .collect(joining(",", "-[", "]"));
-    }
-
-    private List<Long> getJournalpostNumbers(List<RecordDispatchResult> recordDispatchResults) {
-        return recordDispatchResults.stream().map(RecordDispatchResult::getJournalpostId).collect(Collectors.toList());
     }
 
     private Mono<String> createArchiveCleanupRequiredWarningMessage(
@@ -232,12 +228,5 @@ public class DispatchService {
                 !recordsDispatchResult.getFailedRecordDispatchResult().getFilesDispatchResult().getSuccessfulFileDispatches().isEmpty();
     }
 
-    public Mono<List<String>> getFileIds(Collection<Link> fileLinks) {
-        return Flux.fromIterable(fileLinks)
-                .concatMap(fintArchiveClient::getFile)
-                .map(DokumentfilResource::getSystemId)
-                .map(Identifikator::getIdentifikatorverdi)
-                .collectList();
-    }
 
 }

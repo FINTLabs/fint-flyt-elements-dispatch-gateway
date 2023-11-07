@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import no.fint.model.felles.kompleksedatatyper.Identifikator;
 import no.fint.model.resource.Link;
 import no.fint.model.resource.arkiv.noark.DokumentfilResource;
+import no.fintlabs.dispatch.DispatchStatus;
 import no.fintlabs.dispatch.file.result.FileDispatchResult;
 import no.fintlabs.dispatch.file.result.FilesDispatchResult;
 import no.fintlabs.model.instance.DokumentbeskrivelseDto;
@@ -16,9 +17,12 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+
+import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toMap;
 
 @Service
 @Slf4j
@@ -34,7 +38,7 @@ public class FileDispatchService {
 
     public Mono<FilesDispatchResult> dispatchFiles(Collection<DokumentbeskrivelseDto> dokumentbeskrivelseDtos) {
         if (dokumentbeskrivelseDtos.isEmpty()) {
-            return Mono.just(FilesDispatchResult.accepted(Collections.emptyList()));
+            return Mono.just(FilesDispatchResult.accepted(Map.of()));
         }
         return Flux.fromStream(dokumentbeskrivelseDtos
                         .stream()
@@ -43,30 +47,77 @@ public class FileDispatchService {
                         .map(Optional::get)
                         .flatMap(Collection::stream))
                 .concatMap(this::dispatchFile)
-                .takeWhile(fileDispatchResult -> fileDispatchResult.getStatus() == FileDispatchResult.Status.ACCEPTED)
+                .takeWhile(fileDispatchResult -> fileDispatchResult.getStatus() == DispatchStatus.ACCEPTED)
                 .collectList()
-                .map(fileDispatchResults -> {
+                .flatMap(fileDispatchResults -> {
 
                     FileDispatchResult lastResult = fileDispatchResults.get(fileDispatchResults.size() - 1);
-                    FileDispatchResult.Status lastStatus = lastResult.getStatus();
-                    List<FileDispatchResult> successfulFileDispatches = lastStatus == FileDispatchResult.Status.ACCEPTED
+                    DispatchStatus lastStatus = lastResult.getStatus();
+                    List<FileDispatchResult> successfulFileDispatches = lastStatus == DispatchStatus.ACCEPTED
                             ? fileDispatchResults
                             : fileDispatchResults.subList(0, fileDispatchResults.size() - 1);
 
-                    return switch (lastStatus) {
-                        case ACCEPTED -> FilesDispatchResult.accepted(
+                    if (lastStatus == DispatchStatus.ACCEPTED) {
+                        return Mono.just(FilesDispatchResult.accepted(
                                 successfulFileDispatches
-                        );
-                        case DECLINED -> FilesDispatchResult.declined(
-                                successfulFileDispatches,
-                                lastResult
-                        );
-                        case COULD_NOT_BE_RETRIEVED, FAILED -> FilesDispatchResult.failed(
-                                successfulFileDispatches,
-                                lastResult
-                        );
-                    };
+                                        .stream()
+                                        .collect(toMap(
+                                                FileDispatchResult::getFileId,
+                                                FileDispatchResult::getArchiveFileLink
+                                        ))
+                        ));
+                    }
+
+                    return createFunctionalWarningMessage(
+                            successfulFileDispatches
+                                    .stream()
+                                    .map(FileDispatchResult::getArchiveFileLink)
+                                    .toList()
+                    )
+                            .map(warningMessageOptional -> {
+                                if (lastStatus == DispatchStatus.DECLINED) {
+                                    return FilesDispatchResult.declined(
+                                            lastResult.getErrorMessage(),
+                                            warningMessageOptional.orElse(null)
+                                    );
+                                } else {
+                                    return FilesDispatchResult.failed(
+                                            lastResult.getErrorMessage(),
+                                            warningMessageOptional.orElse(null)
+                                    );
+                                }
+                            });
+
                 });
+    }
+
+    public Mono<Optional<String>> createFunctionalWarningMessage(Collection<Link> fileLinks) {
+
+        if (fileLinks.isEmpty()) {
+            return Mono.just(Optional.empty());
+        }
+
+        return getFileIds(fileLinks)
+                .map(fileIds -> createFunctionalWarningMessage(fileIds, "id"))
+                .onErrorResume(e -> {
+                    log.error("Unable to get fileIds", e);
+                    return Mono.just(createFunctionalWarningMessage(
+                            fileLinks.stream()
+                                    .map(Link::getHref)
+                                    .toList(),
+                            "link")
+                    );
+                });
+    }
+
+    private Optional<String> createFunctionalWarningMessage(List<String> fileRef, String refName) {
+        if (fileRef.isEmpty()) {
+            return Optional.empty();
+        }
+        if (fileRef.size() == 1) {
+            return Optional.of("Already dispatched dokumentobjekt with " + refName + "=" + fileRef.get(0));
+        }
+        return Optional.of("Already dispatched dokumentobjekts with " + refName + "s=" + fileRef.stream().collect(joining(", ", "[", "]")));
     }
 
     public Mono<FileDispatchResult> dispatchFile(DokumentobjektDto dokumentobjektDto) {
@@ -86,4 +137,11 @@ public class FileDispatchService {
         ).orElse(Mono.just(FileDispatchResult.noFileId()));
     }
 
+    public Mono<List<String>> getFileIds(Collection<Link> fileLinks) {
+        return Flux.fromIterable(fileLinks)
+                .concatMap(fintArchiveClient::getFile)
+                .map(DokumentfilResource::getSystemId)
+                .map(Identifikator::getIdentifikatorverdi)
+                .collectList();
+    }
 }
