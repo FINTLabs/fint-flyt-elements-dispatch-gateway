@@ -1,6 +1,5 @@
 package no.fintlabs.kafka.error;
 
-import no.fintlabs.exceptions.InstanceDispatchDeclinedException;
 import no.fintlabs.flyt.kafka.event.error.InstanceFlowErrorEventProducer;
 import no.fintlabs.flyt.kafka.event.error.InstanceFlowErrorEventProducerRecord;
 import no.fintlabs.flyt.kafka.headers.InstanceFlowHeaders;
@@ -33,9 +32,9 @@ public class InstanceDispatchingErrorProducerService {
         errorEventTopicService.ensureTopic(errorEventTopicNameParameters, 0);
     }
 
-    void publishInstanceDispatchDeclinedErrorEvent(
+    public void publishInstanceDispatchDeclinedErrorEvent(
             InstanceFlowHeaders instanceFlowHeaders,
-            InstanceDispatchDeclinedException instanceDispatchDeclinedException
+            String errorMessage
     ) {
         errorEventProducer.send(
                 InstanceFlowErrorEventProducerRecord
@@ -47,7 +46,7 @@ public class InstanceDispatchingErrorProducerService {
                                         Error
                                                 .builder()
                                                 .errorCode(INSTANCE_DISPATCH_DECLINED_ERROR.getCode())
-                                                .args(Map.of("errorMessage", instanceDispatchDeclinedException.getErrorMessage()))
+                                                .args(Map.of("errorMessage", errorMessage))
                                                 .build()
                                 )
                         )
@@ -55,7 +54,7 @@ public class InstanceDispatchingErrorProducerService {
         );
     }
 
-    void publishGeneralSystemErrorEvent(InstanceFlowHeaders instanceFlowHeaders) {
+    public void publishGeneralSystemErrorEvent(InstanceFlowHeaders instanceFlowHeaders) {
         errorEventProducer.send(
                 InstanceFlowErrorEventProducerRecord
                         .builder()

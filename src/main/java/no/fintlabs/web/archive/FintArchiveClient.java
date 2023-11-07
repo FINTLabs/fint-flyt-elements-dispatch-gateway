@@ -1,6 +1,8 @@
 package no.fintlabs.web.archive;
 
 import lombok.extern.slf4j.Slf4j;
+import no.fint.model.resource.Link;
+import no.fint.model.resource.arkiv.noark.DokumentfilResource;
 import no.fint.model.resource.arkiv.noark.JournalpostResource;
 import no.fint.model.resource.arkiv.noark.SakResource;
 import no.fint.model.resource.arkiv.noark.SakResources;
@@ -32,7 +34,15 @@ public class FintArchiveClient {
         this.fintWebClient = fintWebClient;
     }
 
-    public Mono<URI> postFile(File file) {
+    public Mono<DokumentfilResource> getFile(Link link) {
+        return fintWebClient
+                .get()
+                .uri(URI.create(link.getHref()))
+                .retrieve()
+                .bodyToMono(DokumentfilResource.class);
+    }
+
+    public Mono<Link> postFile(File file) {
         return pollForCreatedLocation(
                 fintWebClient
                         .post()
@@ -42,6 +52,8 @@ public class FintArchiveClient {
                         .header("Content-Disposition", "attachment; filename=" + file.getName())
                         .retrieve()
         )
+                .map(URI::toString)
+                .map(Link::with)
                 .doOnNext(uri -> log.info("Successfully posted file with name={} on uri={}", file.getName(), uri))
                 .doOnError(e -> {
                     if (e instanceof WebClientResponseException) {
@@ -92,7 +104,7 @@ public class FintArchiveClient {
         );
     }
 
-    public Mono<Long> putRecord(String caseId, JournalpostWrapper journalpostWrapper) {
+    public Mono<JournalpostResource> postRecord(String caseId, JournalpostWrapper journalpostWrapper) {
         return pollForCaseResult(
                 fintWebClient
                         .put()
@@ -101,8 +113,7 @@ public class FintArchiveClient {
                         .retrieve()
         ).map(sakResource -> sakResource.getJournalpost()
                 .stream()
-                .map(JournalpostResource::getJournalPostnummer)
-                .max(Comparator.comparingLong(a -> a))
+                .max(Comparator.comparing(JournalpostResource::getJournalPostnummer))
                 .orElseThrow()
         );
     }
