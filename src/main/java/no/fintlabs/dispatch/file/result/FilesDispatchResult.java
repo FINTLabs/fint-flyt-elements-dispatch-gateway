@@ -8,6 +8,7 @@ import no.fintlabs.dispatch.DispatchStatus;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 @Getter
@@ -29,15 +30,18 @@ public class FilesDispatchResult {
     }
 
     public static FilesDispatchResult failed(
-            String errorMessage,
             String functionalWarningMessage
     ) {
-        return new FilesDispatchResult(DispatchStatus.FAILED, null, errorMessage, functionalWarningMessage);
+        return new FilesDispatchResult(DispatchStatus.FAILED, null, null, functionalWarningMessage);
     }
 
     private final DispatchStatus status;
     private final Map<UUID, Link> archiveFileLinkPerFileId;
     private final String errorMessage;
     private final String functionalWarningMessage;
+
+    public Optional<String> getFunctionalWarningMessage() {
+        return Optional.ofNullable(functionalWarningMessage);
+    }
 
 }

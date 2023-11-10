@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import no.fintlabs.dispatch.DispatchStatus;
 
+import java.util.Optional;
+
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class RecordDispatchResult {
@@ -25,5 +27,9 @@ public class RecordDispatchResult {
     private final Long journalpostId;
     private final String errorMessage;
     private final String functionalWarningMessage;
+
+    public Optional<String> getFunctionalWarningMessage() {
+        return Optional.ofNullable(functionalWarningMessage);
+    }
 
 }

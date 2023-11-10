@@ -16,14 +16,11 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
+import static java.util.stream.Collectors.joining;
 import static no.fintlabs.dispatch.DispatchStatus.*;
-import static no.fintlabs.dispatch.journalpost.result.RecordDispatchResult.Status.ACCEPTED;
 
 @Slf4j
 @Service
@@ -56,37 +53,62 @@ public class RecordDispatchService {
                 .map(recordDispatchResults -> {
                             RecordDispatchResult lastResult = recordDispatchResults.get(recordDispatchResults.size() - 1);
                             DispatchStatus lastStatus = lastResult.getStatus();
-                            List<RecordDispatchResult> successfulRecordDispatches = lastStatus == ACCEPTED
-                                    ? recordDispatchResults
-                                    : recordDispatchResults.subList(0, recordDispatchResults.size() - 1);
+
+                            List<Long> idsOfsuccessfullyDispatchedRecords = (
+                                    lastStatus == ACCEPTED
+                                            ? recordDispatchResults
+                                            : recordDispatchResults.subList(0, recordDispatchResults.size() - 1)
+                            ).stream().map(RecordDispatchResult::getJournalpostId).toList();
+
                             return switch (lastStatus) {
-                                case ACCEPTED -> RecordsDispatchResult.accepted(
-                                        successfulRecordDispatches
-                                );
+                                case ACCEPTED -> RecordsDispatchResult.accepted(idsOfsuccessfullyDispatchedRecords);
                                 case DECLINED -> RecordsDispatchResult.declined(
-                                        successfulRecordDispatches,
-                                        lastResult
+                                        lastResult.getErrorMessage(),
+                                        createAndMergeFunctionalWarningMessages(
+                                                idsOfsuccessfullyDispatchedRecords,
+                                                lastResult
+                                        )
                                 );
                                 case FAILED -> RecordsDispatchResult.failed(
-                                        successfulRecordDispatches,
-                                        lastResult
+                                        lastResult.getErrorMessage(),
+                                        createAndMergeFunctionalWarningMessages(
+                                                idsOfsuccessfullyDispatchedRecords,
+                                                lastResult
+                                        )
                                 );
                             };
                         }
                 ).doOnError(e -> log.error("Instance dispatch failed", e))
                 .onErrorResume(e -> Mono.just(
-                        RecordsDispatchResult.failed(Collections.emptyList(), null))
+                        RecordsDispatchResult.failed("Journalpost dispatch failed", List.of()))
                 );
     }
 
+    private List<String> createAndMergeFunctionalWarningMessages(List<Long> idsOfsuccessfullyDispatchedRecords, RecordDispatchResult lastResult) {
+        List<String> functionalWarningMessages = new ArrayList<>();
+        createDispatchedRecordsWarningMessage(idsOfsuccessfullyDispatchedRecords)
+                .ifPresent(functionalWarningMessages::add);
+        lastResult.getFunctionalWarningMessage()
+                .ifPresent(functionalWarningMessages::add);
+        return functionalWarningMessages;
+    }
+
+    private Optional<String> createDispatchedRecordsWarningMessage(List<Long> successfullJournalpostIds) {
+        if (successfullJournalpostIds.isEmpty()) {
+            return Optional.empty();
+        }
+        if (successfullJournalpostIds.size() == 1) {
+            return Optional.of("journalpost with id=" + successfullJournalpostIds.get(0));
+        }
+        return Optional.of("journalposts with ids=" + successfullJournalpostIds.stream().map(String::valueOf).collect(joining(",", "[", "]")));
+    }
+
     private void logRecordDispatchResult(RecordDispatchResult recordDispatchResult) {
-        if (recordDispatchResult.getStatus() == RecordDispatchResult.Status.ACCEPTED) {
+        if (recordDispatchResult.getStatus() == DispatchStatus.ACCEPTED) {
             log.info("Successfully dispatched record");
-        } else if (recordDispatchResult.getStatus() == RecordDispatchResult.Status.DECLINED) {
+        } else if (recordDispatchResult.getStatus() == DispatchStatus.DECLINED) {
             log.info("Record dispatch was declined with message='{}'", recordDispatchResult.getErrorMessage());
-        } else if (recordDispatchResult.getStatus() == RecordDispatchResult.Status.FILE_DECLINED) {
-            log.info("Record dispatch was declined because file dispatch was declined");
-        } else if (recordDispatchResult.getStatus() == RecordDispatchResult.Status.FAILED) {
+        } else if (recordDispatchResult.getStatus() == DispatchStatus.FAILED) {
             log.info("Record dispatch failed");
         }
     }
@@ -96,15 +118,19 @@ public class RecordDispatchService {
                         journalpostDto.getDokumentbeskrivelse().orElse(Collections.emptyList())
                 )
                 .flatMap(filesDispatchResult -> switch (filesDispatchResult.getStatus()) {
-                    case ACCEPTED -> addNewRecord(caseId, journalpostDto, filesDispatchResult);
+                    case ACCEPTED -> addNewRecord(caseId, journalpostDto, filesDispatchResult.
+                            getArchiveFileLinkPerFileId());
                     case DECLINED -> Mono.just(
                             RecordDispatchResult.declined(
-                                    filesDispatchResult.getErrorMessage(), filesDispatchResult.getFunctionalWarningMessage()
+                                    "Dokumentobjekt declined by destination with message='" +
+                                            filesDispatchResult.getErrorMessage() + "'",
+                                    filesDispatchResult.getFunctionalWarningMessage().orElse(null)
                             )
                     );
                     case FAILED -> Mono.just(
                             RecordDispatchResult.failed(
-                                    filesDispatchResult.getErrorMessage(), filesDispatchResult.getFunctionalWarningMessage()
+                                    "Dokumentobjekt dispatch failed",
+                                    filesDispatchResult.getFunctionalWarningMessage().orElse(null)
                             )
                     );
                 });
@@ -115,6 +141,7 @@ public class RecordDispatchService {
             JournalpostDto journalpostDto,
             Map<UUID, Link> archiveFileLinkPerFileId
     ) {
+
         JournalpostWrapper journalpostWrapper = new JournalpostWrapper(
                 journalpostMappingService.toJournalpostResource(
                         journalpostDto,
@@ -145,7 +172,8 @@ public class RecordDispatchService {
                 );
     }
 
-    private List<Long> getJournalpostNumbers(List<RecordDispatchResult> recordDispatchResults) {
+    //TODO egilballestad do we still need this?
+    public List<Long> getJournalpostNumbers(List<RecordDispatchResult> recordDispatchResults) {
         return recordDispatchResults.stream().map(RecordDispatchResult::getJournalpostId).collect(Collectors.toList());
     }
 

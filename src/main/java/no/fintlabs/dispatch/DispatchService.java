@@ -60,11 +60,11 @@ public class DispatchService {
     }
 
     private void logDispatchResult(InstanceFlowHeaders instanceFlowHeaders, DispatchResult dispatchResult) {
-        if (dispatchResult.getStatus() == DispatchResult.Status.ACCEPTED) {
+        if (dispatchResult.getStatus() == DispatchStatus.ACCEPTED) {
             log.info("Successfully dispatched instance with headers=" + instanceFlowHeaders);
-        } else if (dispatchResult.getStatus() == DispatchResult.Status.DECLINED) {
+        } else if (dispatchResult.getStatus() == DispatchStatus.DECLINED) {
             log.info("Dispatch was declined for instance with headers=" + instanceFlowHeaders);
-        } else if (dispatchResult.getStatus() == DispatchResult.Status.FAILED) {
+        } else if (dispatchResult.getStatus() == DispatchStatus.FAILED) {
             log.error("Failed to dispatch instance with headers=" + instanceFlowHeaders);
         }
     }
@@ -130,17 +130,17 @@ public class DispatchService {
                     case ACCEPTED -> Mono.just(DispatchResult.accepted(
                             formatCaseIdAndJournalpostIds(
                                     archiveCaseId,
-                                    getJournalpostNumbers(recordsDispatchResult)
+                                    recordsDispatchResult.getJournalpostIds()
                             )
                     ));
                     case DECLINED -> createArchiveCleanupRequiredWarningMessage(archiveCaseId, newCase, recordsDispatchResult)
                             .map(archiveCleanupRequiredWarningMessage ->
                                     DispatchResult.declined(
-                                            switch (recordsDispatchResult.getFailedRecordDispatchResult().getStatus()) {
+                                            switch (recordsDispatchResult.getStatus()) {
                                                 case DECLINED -> "Journalpost was declined by the destination." +
                                                         archiveCleanupRequiredWarningMessage +
                                                         " Error message from destination: '" +
-                                                        recordsDispatchResult.getFailedRecordDispatchResult().getErrorMessage() +
+                                                        recordsDispatchResult.getErrorMessage() +
                                                         "'";
                                                 case FILE_DECLINED -> "File was declined by the destination. Error message from destination: '" +
                                                         archiveCleanupRequiredWarningMessage +

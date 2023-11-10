@@ -82,7 +82,6 @@ public class FileDispatchService {
                                     );
                                 } else {
                                     return FilesDispatchResult.failed(
-                                            lastResult.getErrorMessage(),
                                             warningMessageOptional.orElse(null)
                                     );
                                 }
