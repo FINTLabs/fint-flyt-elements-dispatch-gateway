@@ -17,7 +17,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.util.retry.Retry;
 
 import java.net.URI;
 import java.time.Duration;
@@ -61,8 +60,7 @@ public class FintArchiveClient {
                     } else {
                         log.error(e.toString());
                     }
-                })
-                .retryWhen(Retry.backoff(5, Duration.ofSeconds(1)));
+                });
     }
 
     private MediaType getMediaType(String mediaType) {

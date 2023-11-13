@@ -17,10 +17,9 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.joining;
-import static no.fintlabs.dispatch.DispatchStatus.*;
+import static no.fintlabs.dispatch.DispatchStatus.ACCEPTED;
 
 @Slf4j
 @Service
@@ -170,11 +169,6 @@ public class RecordDispatchService {
                                     ));
                         }
                 );
-    }
-
-    //TODO egilballestad do we still need this?
-    public List<Long> getJournalpostNumbers(List<RecordDispatchResult> recordDispatchResults) {
-        return recordDispatchResults.stream().map(RecordDispatchResult::getJournalpostId).collect(Collectors.toList());
     }
 
 }

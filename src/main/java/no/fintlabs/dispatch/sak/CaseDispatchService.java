@@ -49,7 +49,6 @@ public class CaseDispatchService {
                 });
     }
 
-    // TODO eivindmorch 30/10/2023 : Move? Rename? Return result?
     public Mono<List<SakResource>> findCasesBySearch(ArchiveInstance archiveInstance) {
         String caseFilter = caseSearchParametersService.createFilterQueryParamValue(
                 archiveInstance.getNewCase(),

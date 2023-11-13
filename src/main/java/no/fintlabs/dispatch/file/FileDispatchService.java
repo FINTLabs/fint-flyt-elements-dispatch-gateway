@@ -114,9 +114,9 @@ public class FileDispatchService {
             return Optional.empty();
         }
         if (fileRef.size() == 1) {
-            return Optional.of("Already dispatched dokumentobjekt with " + refName + "=" + fileRef.get(0));
+            return Optional.of("dokumentobjekt with " + refName + "=" + fileRef.get(0));
         }
-        return Optional.of("Already dispatched dokumentobjekts with " + refName + "s=" + fileRef.stream().collect(joining(", ", "[", "]")));
+        return Optional.of("dokumentobjekts with " + refName + "s=" + fileRef.stream().collect(joining(", ", "[", "]")));
     }
 
     public Mono<FileDispatchResult> dispatchFile(DokumentobjektDto dokumentobjektDto) {

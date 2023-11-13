@@ -1,31 +1,19 @@
 package no.fintlabs.dispatch;
 
 import lombok.extern.slf4j.Slf4j;
-import no.fint.model.felles.kompleksedatatyper.Identifikator;
-import no.fint.model.resource.Link;
-import no.fint.model.resource.arkiv.noark.DokumentfilResource;
-import no.fintlabs.dispatch.file.result.FileDispatchResult;
 import no.fintlabs.dispatch.journalpost.RecordDispatchService;
-import no.fintlabs.dispatch.journalpost.result.RecordDispatchResult;
-import no.fintlabs.dispatch.journalpost.result.RecordsDispatchResult;
 import no.fintlabs.dispatch.sak.CaseDispatchService;
 import no.fintlabs.dispatch.sak.result.CaseDispatchResult;
 import no.fintlabs.flyt.kafka.headers.InstanceFlowHeaders;
 import no.fintlabs.model.instance.ArchiveInstance;
 import no.fintlabs.model.instance.JournalpostDto;
-import no.fintlabs.web.archive.FintArchiveClient;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.util.retry.Retry;
 
 import javax.validation.Valid;
-import java.time.Duration;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.StringJoiner;
-import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.joining;
 
@@ -35,16 +23,13 @@ public class DispatchService {
 
     private final CaseDispatchService caseDispatchService;
     private final RecordDispatchService recordDispatchService;
-    private final FintArchiveClient fintArchiveClient;
-
 
     public DispatchService(
             CaseDispatchService caseDispatchService,
-            RecordDispatchService recordDispatchService,
-            FintArchiveClient fintArchiveClient) {
+            RecordDispatchService recordDispatchService
+    ) {
         this.caseDispatchService = caseDispatchService;
         this.recordDispatchService = recordDispatchService;
-        this.fintArchiveClient = fintArchiveClient;
     }
 
     public Mono<DispatchResult> process(InstanceFlowHeaders instanceFlowHeaders, @Valid ArchiveInstance archiveInstance) {
@@ -87,8 +72,6 @@ public class DispatchService {
                 );
     }
 
-    // TODO eivindmorch 03/11/2023 : Fjerne retries?
-
     private Mono<DispatchResult> processById(ArchiveInstance archiveInstance) {
         return processRecords(archiveInstance.getCaseId(), false, archiveInstance.getJournalpost());
     }
@@ -125,34 +108,31 @@ public class DispatchService {
         return recordDispatchService.dispatch(
                 archiveCaseId,
                 journalpostDtos
-        ).flatMap(recordsDispatchResult ->
+        ).map(recordsDispatchResult ->
                 switch (recordsDispatchResult.getStatus()) {
-                    case ACCEPTED -> Mono.just(DispatchResult.accepted(
+                    case ACCEPTED -> DispatchResult.accepted(
                             formatCaseIdAndJournalpostIds(
                                     archiveCaseId,
                                     recordsDispatchResult.getJournalpostIds()
                             )
-                    ));
-                    case DECLINED -> createArchiveCleanupRequiredWarningMessage(archiveCaseId, newCase, recordsDispatchResult)
-                            .map(archiveCleanupRequiredWarningMessage ->
-                                    DispatchResult.declined(
-                                            switch (recordsDispatchResult.getStatus()) {
-                                                case DECLINED -> "Journalpost was declined by the destination." +
-                                                        archiveCleanupRequiredWarningMessage +
-                                                        " Error message from destination: '" +
-                                                        recordsDispatchResult.getErrorMessage() +
-                                                        "'";
-                                                case FILE_DECLINED -> "File was declined by the destination. Error message from destination: '" +
-                                                        archiveCleanupRequiredWarningMessage +
-                                                        recordsDispatchResult.getFailedRecordDispatchResult().getFilesDispatchResult().getFailedFileDispatch().getErrorMessage() +
-                                                        "'";
-                                                default -> throw new IllegalStateException(); // TODO eivindmorch 31/10/2023 : Fix?
-                                            }
-                                    )
-                            );
-                    case FAILED -> Mono.just(DispatchResult.failed("Journalpost dispatch failed." +
-                            createArchiveCleanupRequiredWarningMessage(archiveCaseId, newCase, recordsDispatchResult)
-                    ));
+                    );
+                    case DECLINED -> DispatchResult.declined(
+                            "Journalpost was declined by the destination." +
+                                    combineFunctionalWarningMessages(
+                                            archiveCaseId,
+                                            newCase,
+                                            recordsDispatchResult.getFunctionalWarningMessages()
+                                    ) +
+                                    " Error message from destination: '" +
+                                    recordsDispatchResult.getErrorMessage() +
+                                    "'");
+                    case FAILED -> DispatchResult.failed("Journalpost dispatch failed." +
+                            combineFunctionalWarningMessages(
+                                    archiveCaseId,
+                                    newCase,
+                                    recordsDispatchResult.getFunctionalWarningMessages()
+                            )
+                    );
                 }
         );
     }
@@ -164,69 +144,18 @@ public class DispatchService {
                 .collect(joining(",", "-[", "]"));
     }
 
-    private Mono<String> createArchiveCleanupRequiredWarningMessage(
+    private String combineFunctionalWarningMessages(
             String archiveCaseId,
             boolean newCase,
-            RecordsDispatchResult recordsDispatchResult
+            List<String> functionalWarningMessages
     ) {
-        if (!hasDispatchedElementsToArchiveThatNeedToBeCleanedUp(newCase, recordsDispatchResult)) {
-            return Mono.just("");
+        StringJoiner stringJoiner = new StringJoiner(", ", " !!!Already successfully dispatched ", "!!!");
+        if (newCase) {
+            stringJoiner.add("sak with id=" + archiveCaseId);
         }
-        List<FileDispatchResult> successfulFileDispatchesForFailedRecord = recordsDispatchResult.getFailedRecordDispatchResult().getFilesDispatchResult().getSuccessfulFileDispatches();
-        List<Long> successfullJournalpostIds = recordsDispatchResult.getSuccessfulRecordDispatchResults()
-                .stream()
-                .map(RecordDispatchResult::getJournalpostId)
-                .toList();
+        functionalWarningMessages.forEach(stringJoiner::add);
 
-        return (
-                successfulFileDispatchesForFailedRecord.isEmpty() ? Mono.just(List.<String>of()) :
-                        getFileIds(
-                                successfulFileDispatchesForFailedRecord
-                                        .stream()
-                                        .map(FileDispatchResult::getArchiveFileLink)
-                                        .toList()
-                        ).retryWhen(Retry.backoff(5, Duration.ofSeconds(3)))
-                                .doOnError(
-                                        e -> log.error("Could not get file ids for files with links=" +
-                                                successfulFileDispatchesForFailedRecord
-                                                        .stream()
-                                                        .map(FileDispatchResult::getArchiveFileLink)
-                                                        .map(Link::getHref)
-                                                        .collect(joining(",", "[", "]"))
-                                        ))
-                                .onErrorResume(e -> Mono.just(successfulFileDispatchesForFailedRecord
-                                        .stream()
-                                        .map(FileDispatchResult::getArchiveFileLink)
-                                        .map(Link::getHref)
-                                        .toList())
-                                )
-        ).map(fileIds -> {
-            StringJoiner stringJoiner = new StringJoiner(", ", " !!!Already successfully dispatched ", "!!!");
-            if (newCase) {
-                stringJoiner.add("sak with id=" + archiveCaseId);
-            }
-            if (successfullJournalpostIds.size() == 1) {
-                stringJoiner.add("journalpost with id=" + successfullJournalpostIds.get(0));
-            } else if (!successfullJournalpostIds.isEmpty()) {
-                stringJoiner.add("journalposts with ids=" + successfullJournalpostIds.stream().map(String::valueOf).collect(joining(",", "[", "]")));
-            }
-            if (fileIds.size() == 1) {
-                stringJoiner.add("dokumentobjekt with id=" + fileIds.get(0));
-            } else if (!fileIds.isEmpty()) {
-                stringJoiner.add("dokumentobjekts with ids=" + fileIds.stream().collect(joining(",", "[", "]")));
-            }
-            return stringJoiner.toString();
-        });
+        return stringJoiner.toString();
     }
-
-    private boolean hasDispatchedElementsToArchiveThatNeedToBeCleanedUp(
-            boolean newCase,
-            RecordsDispatchResult recordsDispatchResult
-    ) {
-        return newCase ||
-                !recordsDispatchResult.getSuccessfulRecordDispatchResults().isEmpty() ||
-                !recordsDispatchResult.getFailedRecordDispatchResult().getFilesDispatchResult().getSuccessfulFileDispatches().isEmpty();
-    }
-
 
 }
