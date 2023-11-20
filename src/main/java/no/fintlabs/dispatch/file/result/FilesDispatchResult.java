@@ -1,13 +1,9 @@
 package no.fintlabs.dispatch.file.result;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
+import lombok.*;
 import no.fint.model.resource.Link;
 import no.fintlabs.dispatch.DispatchStatus;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -15,6 +11,7 @@ import java.util.UUID;
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @EqualsAndHashCode
+@ToString
 public class FilesDispatchResult {
 
 

@@ -47,7 +47,7 @@ public class FileDispatchService {
                         .map(Optional::get)
                         .flatMap(Collection::stream))
                 .concatMap(this::dispatchFile)
-                .takeWhile(fileDispatchResult -> fileDispatchResult.getStatus() == DispatchStatus.ACCEPTED)
+                .takeUntil(fileDispatchResult -> fileDispatchResult.getStatus() != DispatchStatus.ACCEPTED)
                 .collectList()
                 .flatMap(fileDispatchResults -> {
 
@@ -114,12 +114,12 @@ public class FileDispatchService {
             return Optional.empty();
         }
         if (fileRef.size() == 1) {
-            return Optional.of("dokumentobjekt with " + refName + "=" + fileRef.get(0));
+            return Optional.of("dokumentobjekt with " + refName + "='" + fileRef.get(0) + "'");
         }
-        return Optional.of("dokumentobjekts with " + refName + "s=" + fileRef.stream().collect(joining(", ", "[", "]")));
+        return Optional.of("dokumentobjekts with " + refName + "s=" + fileRef.stream().collect(joining("', '", "['", "']")));
     }
 
-    public Mono<FileDispatchResult> dispatchFile(DokumentobjektDto dokumentobjektDto) {
+    private Mono<FileDispatchResult> dispatchFile(DokumentobjektDto dokumentobjektDto) {
         return dokumentobjektDto.getFileId().map(fileId ->
                 fileClient.getFile(fileId)
                         .flatMap(file -> fintArchiveClient.postFile(file)
@@ -136,7 +136,7 @@ public class FileDispatchService {
         ).orElse(Mono.just(FileDispatchResult.noFileId()));
     }
 
-    public Mono<List<String>> getFileIds(Collection<Link> fileLinks) {
+    private Mono<List<String>> getFileIds(Collection<Link> fileLinks) {
         return Flux.fromIterable(fileLinks)
                 .concatMap(fintArchiveClient::getFile)
                 .map(DokumentfilResource::getSystemId)

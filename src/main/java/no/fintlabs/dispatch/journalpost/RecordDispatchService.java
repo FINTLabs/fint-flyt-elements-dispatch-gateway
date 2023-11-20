@@ -47,7 +47,7 @@ public class RecordDispatchService {
                 .doOnNext(journalpostDto -> log.info("Dispatching record"))
                 .concatMap(journalpostDto -> addFilesAndNewRecord(caseId, journalpostDto))
                 .doOnNext(this::logRecordDispatchResult)
-                .takeWhile(recordDispatchResult -> recordDispatchResult.getStatus() == ACCEPTED)
+                .takeUntil(recordDispatchResult -> recordDispatchResult.getStatus() != ACCEPTED)
                 .collectList()
                 .map(recordDispatchResults -> {
                             RecordDispatchResult lastResult = recordDispatchResults.get(recordDispatchResults.size() - 1);
