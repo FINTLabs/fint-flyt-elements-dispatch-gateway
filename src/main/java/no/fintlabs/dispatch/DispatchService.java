@@ -1,7 +1,6 @@
 package no.fintlabs.dispatch;
 
 import lombok.extern.slf4j.Slf4j;
-import no.fintlabs.dispatch.journalpost.RecordDispatchService;
 import no.fintlabs.dispatch.journalpost.RecordsDispatchService;
 import no.fintlabs.dispatch.sak.CaseDispatchService;
 import no.fintlabs.dispatch.sak.result.CaseDispatchResult;
