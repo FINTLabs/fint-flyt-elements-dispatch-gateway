@@ -3,11 +3,13 @@ package no.fintlabs.dispatch.journalpost.result;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.ToString;
 import no.fintlabs.dispatch.DispatchStatus;
 
 import java.util.List;
 
 @Getter
+@ToString
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class RecordsDispatchResult {
 

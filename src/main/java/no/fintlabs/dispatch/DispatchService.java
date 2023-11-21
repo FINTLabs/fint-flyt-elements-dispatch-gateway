@@ -2,6 +2,7 @@ package no.fintlabs.dispatch;
 
 import lombok.extern.slf4j.Slf4j;
 import no.fintlabs.dispatch.journalpost.RecordDispatchService;
+import no.fintlabs.dispatch.journalpost.RecordsDispatchService;
 import no.fintlabs.dispatch.sak.CaseDispatchService;
 import no.fintlabs.dispatch.sak.result.CaseDispatchResult;
 import no.fintlabs.flyt.kafka.headers.InstanceFlowHeaders;
@@ -22,14 +23,14 @@ import static java.util.stream.Collectors.joining;
 public class DispatchService {
 
     private final CaseDispatchService caseDispatchService;
-    private final RecordDispatchService recordDispatchService;
+    private final RecordsDispatchService recordsDispatchService;
 
     public DispatchService(
             CaseDispatchService caseDispatchService,
-            RecordDispatchService recordDispatchService
+            RecordsDispatchService recordsDispatchService
     ) {
         this.caseDispatchService = caseDispatchService;
-        this.recordDispatchService = recordDispatchService;
+        this.recordsDispatchService = recordsDispatchService;
     }
 
     public Mono<DispatchResult> process(InstanceFlowHeaders instanceFlowHeaders, @Valid ArchiveInstance archiveInstance) {
@@ -105,7 +106,7 @@ public class DispatchService {
     }
 
     private Mono<DispatchResult> processRecords(String archiveCaseId, boolean newCase, List<JournalpostDto> journalpostDtos) {
-        return recordDispatchService.dispatch(
+        return recordsDispatchService.dispatch(
                 archiveCaseId,
                 journalpostDtos
         ).map(recordsDispatchResult ->

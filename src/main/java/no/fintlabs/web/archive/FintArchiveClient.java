@@ -42,6 +42,7 @@ public class FintArchiveClient {
     }
 
     public Mono<Link> postFile(File file) {
+        log.info("Posting file");
         return pollForCreatedLocation(
                 fintWebClient
                         .post()

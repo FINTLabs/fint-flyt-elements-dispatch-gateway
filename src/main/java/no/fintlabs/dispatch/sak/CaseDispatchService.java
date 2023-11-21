@@ -32,8 +32,8 @@ public class CaseDispatchService {
     }
 
     public Mono<CaseDispatchResult> dispatch(SakDto sakDto) {
+        log.info("Dispatching case");
         SakResource sakResource = sakMappingService.toSakResource(sakDto);
-        log.info("Posting case");
         return fintArchiveClient.postCase(sakResource)
                 .map(sr -> CaseDispatchResult.accepted(sr.getMappeId().getIdentifikatorverdi()))
                 .doOnNext(caseDispatchResult -> log.info(
@@ -46,7 +46,7 @@ public class CaseDispatchService {
                 ).onErrorResume(e -> {
                     log.error("Failed to post case", e);
                     return Mono.just(CaseDispatchResult.failed());
-                });
+                }).doOnNext(result -> log.info("Dispatch result: " + result.toString()));
     }
 
     public Mono<List<SakResource>> findCasesBySearch(ArchiveInstance archiveInstance) {
