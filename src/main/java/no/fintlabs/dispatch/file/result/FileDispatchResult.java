@@ -1,17 +1,15 @@
 package no.fintlabs.dispatch.file.result;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.ToString;
+import lombok.*;
 import no.fint.model.resource.Link;
 import no.fintlabs.dispatch.DispatchStatus;
 
 import java.util.UUID;
 
 @Getter
-@ToString
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
+@EqualsAndHashCode
+@ToString
 public class FileDispatchResult {
 
     public static FileDispatchResult accepted(UUID fileId, Link archiveFileLink) {

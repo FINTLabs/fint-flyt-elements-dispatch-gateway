@@ -4,18 +4,19 @@ import lombok.extern.slf4j.Slf4j;
 import no.fint.model.resource.Link;
 import no.fint.model.resource.arkiv.noark.JournalpostResource;
 import no.fintlabs.dispatch.file.FilesDispatchService;
+import no.fintlabs.dispatch.file.FilesWarningMessageService;
 import no.fintlabs.dispatch.journalpost.result.RecordDispatchResult;
 import no.fintlabs.mapping.JournalpostMappingService;
 import no.fintlabs.model.JournalpostWrapper;
+import no.fintlabs.model.instance.DokumentbeskrivelseDto;
+import no.fintlabs.model.instance.DokumentobjektDto;
 import no.fintlabs.model.instance.JournalpostDto;
 import no.fintlabs.web.archive.FintArchiveClient;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
 
-import java.util.Collections;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -23,23 +24,29 @@ public class RecordDispatchService {
 
     private final JournalpostMappingService journalpostMappingService;
     private final FilesDispatchService filesDispatchService;
+
+    private final FilesWarningMessageService filesWarningMessageService;
     private final FintArchiveClient fintArchiveClient;
 
     public RecordDispatchService(
             JournalpostMappingService journalpostMappingService,
             FilesDispatchService filesDispatchService,
+            FilesWarningMessageService filesWarningMessageService,
             FintArchiveClient fintArchiveClient
     ) {
         this.journalpostMappingService = journalpostMappingService;
         this.filesDispatchService = filesDispatchService;
+        this.filesWarningMessageService = filesWarningMessageService;
         this.fintArchiveClient = fintArchiveClient;
     }
 
     public Mono<RecordDispatchResult> dispatch(String caseId, JournalpostDto journalpostDto) {
         log.info("Dispatching record");
-        return filesDispatchService.dispatch(
-                        journalpostDto.getDokumentbeskrivelse().orElse(Collections.emptyList())
-                )
+        List<DokumentobjektDto> dokumentobjektDtos = journalpostDto.getDokumentbeskrivelse()
+                .map(this::getDokumentObjektDtos)
+                .orElse(List.of());
+
+        return filesDispatchService.dispatch(dokumentobjektDtos)
                 .flatMap(filesDispatchResult -> switch (filesDispatchResult.getStatus()) {
                     case ACCEPTED ->
                             dispatch(caseId, journalpostDto, filesDispatchResult.getArchiveFileLinkPerFileId());
@@ -59,6 +66,16 @@ public class RecordDispatchService {
                 }).doOnNext(result -> log.info("Dispatch result=" + result.toString()));
     }
 
+    private List<DokumentobjektDto> getDokumentObjektDtos(Collection<DokumentbeskrivelseDto> dokumentbeskrivelseDtos) {
+        return dokumentbeskrivelseDtos
+                .stream()
+                .map(DokumentbeskrivelseDto::getDokumentobjekt)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .flatMap(Collection::stream)
+                .toList();
+    }
+
     private Mono<RecordDispatchResult> dispatch(
             String caseId,
             JournalpostDto journalpostDto,
@@ -76,7 +93,7 @@ public class RecordDispatchService {
                 .map(RecordDispatchResult::accepted)
                 .onErrorResume(
                         WebClientResponseException.class,
-                        e -> filesDispatchService.createFunctionalWarningMessage(archiveFileLinkPerFileId.values())
+                        e -> filesWarningMessageService.createFunctionalWarningMessage(archiveFileLinkPerFileId.values())
                                 .map(filesFunctionalWarningOptional -> RecordDispatchResult.declined(
                                         e.getResponseBodyAsString(),
                                         filesFunctionalWarningOptional.orElse(null)
@@ -86,7 +103,7 @@ public class RecordDispatchService {
                 .onErrorResume(
                         e -> {
                             log.error("Failed to post record", e);
-                            return filesDispatchService.createFunctionalWarningMessage(archiveFileLinkPerFileId.values())
+                            return filesWarningMessageService.createFunctionalWarningMessage(archiveFileLinkPerFileId.values())
                                     .map(filesFunctionalWarningOptional -> RecordDispatchResult.failed(
                                             null,
                                             filesFunctionalWarningOptional.orElse(null)

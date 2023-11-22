@@ -33,6 +33,7 @@ public class RecordsDispatchService {
     }
 
     public Mono<RecordsDispatchResult> dispatch(String caseId, List<JournalpostDto> journalpostDtos) {
+        log.info("Dispatching records");
         if (journalpostDtos.isEmpty()) {
             return Mono.just(RecordsDispatchResult.accepted(Collections.emptyList()));
         }

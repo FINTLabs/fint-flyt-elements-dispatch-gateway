@@ -1,12 +1,10 @@
 package no.fintlabs.dispatch.file;
 
 import lombok.extern.slf4j.Slf4j;
-import no.fint.model.resource.Link;
-import no.fintlabs.dispatch.DispatchMessageFormattingService;
 import no.fintlabs.dispatch.DispatchStatus;
 import no.fintlabs.dispatch.file.result.FileDispatchResult;
 import no.fintlabs.dispatch.file.result.FilesDispatchResult;
-import no.fintlabs.model.instance.DokumentbeskrivelseDto;
+import no.fintlabs.model.instance.DokumentobjektDto;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -24,26 +22,22 @@ public class FilesDispatchService {
 
     private final FileDispatchService fileDispatchService;
 
-    private final DispatchMessageFormattingService dispatchMessageFormattingService;
+    private final FilesWarningMessageService filesWarningMessageService;
 
     public FilesDispatchService(
             FileDispatchService fileDispatchService,
-            DispatchMessageFormattingService dispatchMessageFormattingService
+            FilesWarningMessageService filesWarningMessageService
     ) {
         this.fileDispatchService = fileDispatchService;
-        this.dispatchMessageFormattingService = dispatchMessageFormattingService;
+        this.filesWarningMessageService = filesWarningMessageService;
     }
 
-    public Mono<FilesDispatchResult> dispatch(Collection<DokumentbeskrivelseDto> dokumentbeskrivelseDtos) {
-        if (dokumentbeskrivelseDtos.isEmpty()) {
+    public Mono<FilesDispatchResult> dispatch(Collection<DokumentobjektDto> dokumentobjektDtos) {
+        log.info("Dispatching files");
+        if (dokumentobjektDtos.isEmpty()) {
             return Mono.just(FilesDispatchResult.accepted(Map.of()));
         }
-        return Flux.fromStream(dokumentbeskrivelseDtos
-                        .stream()
-                        .map(DokumentbeskrivelseDto::getDokumentobjekt)
-                        .filter(Optional::isPresent)
-                        .map(Optional::get)
-                        .flatMap(Collection::stream))
+        return Flux.fromStream(dokumentobjektDtos.stream())
                 .concatMap(fileDispatchService::dispatch)
                 .takeUntil(fileDispatchResult -> fileDispatchResult.getStatus() != DispatchStatus.ACCEPTED)
                 .collectList()
@@ -66,55 +60,27 @@ public class FilesDispatchService {
                         ));
                     }
 
-                    return createFunctionalWarningMessage(
+                    return (successfulFileDispatches.isEmpty()
+                            ? Mono.just(Optional.<String>empty())
+                            : filesWarningMessageService.createFunctionalWarningMessage(
                             successfulFileDispatches
                                     .stream()
                                     .map(FileDispatchResult::getArchiveFileLink)
-                                    .toList()
-                    )
-                            .map(warningMessageOptional -> {
-                                if (lastStatus == DispatchStatus.DECLINED) {
-                                    return FilesDispatchResult.declined(
-                                            lastResult.getErrorMessage(),
-                                            warningMessageOptional.orElse(null)
-                                    );
-                                } else {
-                                    return FilesDispatchResult.failed(
-                                            warningMessageOptional.orElse(null)
-                                    );
-                                }
-                            });
+                                    .toList())
+                    ).map(warningMessageOptional -> {
+                        if (lastStatus == DispatchStatus.DECLINED) {
+                            return FilesDispatchResult.declined(
+                                    lastResult.getErrorMessage(),
+                                    warningMessageOptional.orElse(null)
+                            );
+                        } else {
+                            return FilesDispatchResult.failed(
+                                    warningMessageOptional.orElse(null)
+                            );
+                        }
+                    });
 
-                });
-    }
-
-    public Mono<Optional<String>> createFunctionalWarningMessage(Collection<Link> fileLinks) {
-        if (fileLinks.isEmpty()) {
-            return Mono.just(Optional.empty());
-        }
-        return getFileIds(fileLinks)
-                .map(fileIds -> dispatchMessageFormattingService.createFunctionalWarningMessage(
-                        "dokumentobjekt",
-                        "id",
-                        fileIds
-                ))
-                .onErrorResume(e -> {
-                    log.error("Unable to get fileIds", e);
-                    return Mono.just(dispatchMessageFormattingService.createFunctionalWarningMessage(
-                            "dokumentobjekt",
-                            "link",
-                            fileLinks.stream()
-                                    .map(Link::getHref)
-                                    .toList()
-                    ));
-                })
-                .doOnNext(result -> log.info("Dispatch result=" + result.toString()));
-    }
-
-    private Mono<List<String>> getFileIds(Collection<Link> fileLinks) {
-        return Flux.fromIterable(fileLinks)
-                .concatMap(fileDispatchService::getFileId)
-                .collectList();
+                }).doOnNext(result -> log.info("Dispatch result=" + result.toString()));
     }
 
 }

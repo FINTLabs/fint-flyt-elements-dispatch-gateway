@@ -1,9 +1,6 @@
 package no.fintlabs.dispatch.file;
 
 import lombok.extern.slf4j.Slf4j;
-import no.fint.model.felles.kompleksedatatyper.Identifikator;
-import no.fint.model.resource.Link;
-import no.fint.model.resource.arkiv.noark.DokumentfilResource;
 import no.fintlabs.dispatch.file.result.FileDispatchResult;
 import no.fintlabs.model.instance.DokumentobjektDto;
 import no.fintlabs.web.archive.FintArchiveClient;
@@ -40,12 +37,6 @@ public class FileDispatchService {
                         ))
                 ).orElse(Mono.just(FileDispatchResult.noFileId()))
                 .doOnNext(result -> log.info("Dispatch result=" + result.toString()));
-    }
-
-    public Mono<String> getFileId(Link fileLink) {
-        return fintArchiveClient.getFile(fileLink)
-                .map(DokumentfilResource::getSystemId)
-                .map(Identifikator::getIdentifikatorverdi);
     }
 
 }
