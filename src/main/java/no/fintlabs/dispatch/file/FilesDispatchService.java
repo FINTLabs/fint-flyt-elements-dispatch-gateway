@@ -33,10 +33,11 @@ public class FilesDispatchService {
     }
 
     public Mono<FilesDispatchResult> dispatch(Collection<DokumentobjektDto> dokumentobjektDtos) {
-        log.info("Dispatching files");
         if (dokumentobjektDtos.isEmpty()) {
+            log.info("No files to dispatch");
             return Mono.just(FilesDispatchResult.accepted(Map.of()));
         }
+        log.info("Dispatching files");
         return Flux.fromStream(dokumentobjektDtos.stream())
                 .concatMap(fileDispatchService::dispatch)
                 .takeUntil(fileDispatchResult -> fileDispatchResult.getStatus() != DispatchStatus.ACCEPTED)

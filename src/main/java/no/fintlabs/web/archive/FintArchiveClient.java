@@ -103,12 +103,12 @@ public class FintArchiveClient {
         );
     }
 
-    public Mono<JournalpostResource> postRecord(String caseId, JournalpostWrapper journalpostWrapper) {
+    public Mono<JournalpostResource> postRecord(String caseId, JournalpostResource journalpostResource) {
         return pollForCaseResult(
                 fintWebClient
                         .put()
                         .uri("/arkiv/noark/sak/mappeid/" + caseId)
-                        .bodyValue(journalpostWrapper)
+                        .bodyValue(new JournalpostWrapper(journalpostResource))
                         .retrieve()
         ).map(sakResource -> sakResource.getJournalpost()
                 .stream()

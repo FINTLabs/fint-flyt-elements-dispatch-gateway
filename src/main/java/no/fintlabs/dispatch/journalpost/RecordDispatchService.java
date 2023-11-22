@@ -7,7 +7,6 @@ import no.fintlabs.dispatch.file.FilesDispatchService;
 import no.fintlabs.dispatch.file.FilesWarningMessageService;
 import no.fintlabs.dispatch.journalpost.result.RecordDispatchResult;
 import no.fintlabs.mapping.JournalpostMappingService;
-import no.fintlabs.model.JournalpostWrapper;
 import no.fintlabs.model.instance.DokumentbeskrivelseDto;
 import no.fintlabs.model.instance.DokumentobjektDto;
 import no.fintlabs.model.instance.JournalpostDto;
@@ -45,7 +44,9 @@ public class RecordDispatchService {
         List<DokumentobjektDto> dokumentobjektDtos = journalpostDto.getDokumentbeskrivelse()
                 .map(this::getDokumentObjektDtos)
                 .orElse(List.of());
-
+        if (dokumentobjektDtos.isEmpty()) {
+            return dispatch(caseId, journalpostDto, Map.of());
+        }
         return filesDispatchService.dispatch(dokumentobjektDtos)
                 .flatMap(filesDispatchResult -> switch (filesDispatchResult.getStatus()) {
                     case ACCEPTED ->
@@ -81,14 +82,11 @@ public class RecordDispatchService {
             JournalpostDto journalpostDto,
             Map<UUID, Link> archiveFileLinkPerFileId
     ) {
-
-        JournalpostWrapper journalpostWrapper = new JournalpostWrapper(
-                journalpostMappingService.toJournalpostResource(
-                        journalpostDto,
-                        archiveFileLinkPerFileId
-                )
+        JournalpostResource journalpostResource = journalpostMappingService.toJournalpostResource(
+                journalpostDto,
+                archiveFileLinkPerFileId
         );
-        return fintArchiveClient.postRecord(caseId, journalpostWrapper)
+        return fintArchiveClient.postRecord(caseId, journalpostResource)
                 .map(JournalpostResource::getJournalPostnummer)
                 .map(RecordDispatchResult::accepted)
                 .onErrorResume(

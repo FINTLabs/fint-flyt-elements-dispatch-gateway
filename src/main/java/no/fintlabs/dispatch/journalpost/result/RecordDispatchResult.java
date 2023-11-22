@@ -1,15 +1,13 @@
 package no.fintlabs.dispatch.journalpost.result;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.ToString;
+import lombok.*;
 import no.fintlabs.dispatch.DispatchStatus;
 
 import java.util.Optional;
 
 @Getter
 @ToString
+@EqualsAndHashCode
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class RecordDispatchResult {
 
