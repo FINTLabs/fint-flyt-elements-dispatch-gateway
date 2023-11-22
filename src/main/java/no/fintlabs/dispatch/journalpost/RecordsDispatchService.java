@@ -79,7 +79,9 @@ public class RecordsDispatchService {
     private List<String> createAndMergeFunctionalWarningMessages(List<Long> idsOfsuccessfullyDispatchedRecords, RecordDispatchResult lastResult) {
         List<String> functionalWarningMessages = new ArrayList<>();
         dispatchMessageFormattingService.createFunctionalWarningMessage(
-                "journalpost", "id", idsOfsuccessfullyDispatchedRecords, String::valueOf
+                "journalpost",
+                "id",
+                idsOfsuccessfullyDispatchedRecords.stream().map(String::valueOf).toList()
         ).ifPresent(functionalWarningMessages::add);
         lastResult.getFunctionalWarningMessage()
                 .ifPresent(functionalWarningMessages::add);

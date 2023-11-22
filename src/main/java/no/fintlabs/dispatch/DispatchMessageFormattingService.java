@@ -4,25 +4,11 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Function;
 
 import static java.util.stream.Collectors.joining;
 
 @Service
 public class DispatchMessageFormattingService {
-
-    public <T> Optional<String> createFunctionalWarningMessage(
-            String objectDisplayName,
-            String refDisplayName,
-            List<T> objectRefs,
-            Function<T, String> objectRefToDisplayName
-    ) {
-        return createFunctionalWarningMessage(
-                objectDisplayName,
-                refDisplayName,
-                objectRefs.stream().map(objectRefToDisplayName).toList()
-        );
-    }
 
     public Optional<String> createFunctionalWarningMessage(
             String objectDisplayName,
