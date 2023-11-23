@@ -69,9 +69,13 @@ public class RecordsDispatchService {
                                 );
                             };
                         }
-                ).doOnError(e -> log.error("Journalposts dispatch failed", e))
+                )
+                .doOnError(e -> log.error("Journalposts dispatch failed", e))
                 .onErrorResume(e -> Mono.just(
-                        RecordsDispatchResult.failed("Journalposts dispatch failed", List.of()))
+                        RecordsDispatchResult.failed(
+                                "Journalposts dispatch failed",
+                                List.of("Possible journalposts with unknown ids")) // TODO: egilballestad 23/11/2023 what do we return here as warning?
+                        )
                 ).doOnNext(result -> log.info("Dispatch result=" + result.toString()));
 
     }

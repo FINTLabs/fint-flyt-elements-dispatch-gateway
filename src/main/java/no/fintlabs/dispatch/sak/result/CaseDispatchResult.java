@@ -1,14 +1,12 @@
 package no.fintlabs.dispatch.sak.result;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.ToString;
+import lombok.*;
 import no.fintlabs.dispatch.DispatchStatus;
 
 @Getter
 @ToString
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
+@EqualsAndHashCode
 public class CaseDispatchResult {
 
     public static CaseDispatchResult accepted(String archiveCaseId) {
