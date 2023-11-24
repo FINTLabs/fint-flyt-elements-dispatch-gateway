@@ -7,8 +7,8 @@ import java.util.List;
 
 @Getter
 @ToString
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @EqualsAndHashCode
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class RecordsDispatchResult {
 
     public static RecordsDispatchResult accepted(List<Long> journalpostIds) {

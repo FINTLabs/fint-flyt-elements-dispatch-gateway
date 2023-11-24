@@ -5,8 +5,8 @@ import no.fintlabs.dispatch.DispatchStatus;
 
 @Getter
 @ToString
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @EqualsAndHashCode
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class CaseDispatchResult {
 
     public static CaseDispatchResult accepted(String archiveCaseId) {
