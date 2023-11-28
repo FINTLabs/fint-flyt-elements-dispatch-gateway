@@ -43,4 +43,56 @@ class DispatchMessageFormattingServiceTest {
         )).contains("testObjectDisplayNames with testRefDisplayNames=['ref1', 'ref2', 'ref3']");
     }
 
+    @Test
+    public void givenCaseIdWithJournalpostNumbers_whenFormattingCaseIdAndJournalpostIds_thenReturnCaseIdWithJournalpostIds() {
+        assertThat(dispatchMessageFormattingService.formatCaseIdAndJournalpostIds(
+                "testCaseId",
+                List.of(1L)
+        )).contains("testCaseId-[1]");
+    }
+
+    @Test
+    public void givenCaseIdWithNoJournalpostNumbers_whenFormattingCaseIdAndJournalpostIds_thenReturnCaseIdWithNoJournalpostIds() {
+        assertThat(dispatchMessageFormattingService.formatCaseIdAndJournalpostIds(
+                "testCaseId",
+                List.of()
+        )).contains("testCaseId");
+    }
+
+    @Test
+    public void givenCaseIdAndNewCaseTrueAndListOfFunctionalWarningMessages_whenCombiningFunctionalWarningMessages_thenReturnMessageWithCaseIdAndFunctionalWarningMessages() {
+        assertThat(dispatchMessageFormattingService.combineFunctionalWarningMessages(
+                "testCaseId",
+                true,
+                List.of("test warning message")
+        )).contains("(!) Already successfully dispatched sak with id=testCaseId, test warning message (!)");
+    }
+
+    @Test
+    public void givenCaseIdAndNewCaseFalseAndListOfFunctionalWarningMessages_whenCombiningFunctionalWarningMessages_thenReturnMessageWithCaseIdAndFunctionalWarningMessages() {
+        assertThat(dispatchMessageFormattingService.combineFunctionalWarningMessages(
+                "testCaseId",
+                false,
+                List.of("test warning message")
+        )).contains("(!) Already successfully dispatched test warning message (!)");
+    }
+
+    @Test
+    public void givenCaseIdAndNewCaseTrueAndEmptyListOfFunctionalWarningMessages_whenCombiningFunctionalWarningMessages_thenReturnMessageWithCaseIdAndFunctionalWarningMessages() {
+        assertThat(dispatchMessageFormattingService.combineFunctionalWarningMessages(
+                "testCaseId",
+                true,
+                List.of()
+        )).contains("(!) Already successfully dispatched sak with id=testCaseId (!)");
+    }
+
+    @Test
+    public void givenCaseIdAndNewCaseFalseAndEmptyListOfFunctionalWarningMessages_whenCombiningFunctionalWarningMessages_thenReturnMessageWithCaseIdAndFunctionalWarningMessages() {
+        assertThat(dispatchMessageFormattingService.combineFunctionalWarningMessages(
+                "testCaseId",
+                false,
+                List.of()
+        )).isEmpty();
+    }
+
 }

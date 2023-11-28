@@ -1,7 +1,6 @@
 package no.fintlabs.dispatch;
 
 import lombok.extern.slf4j.Slf4j;
-import no.fintlabs.dispatch.journalpost.RecordsDispatchService;
 import no.fintlabs.dispatch.sak.CaseDispatchService;
 import no.fintlabs.dispatch.sak.result.CaseDispatchResult;
 import no.fintlabs.flyt.kafka.headers.InstanceFlowHeaders;
@@ -13,23 +12,19 @@ import reactor.core.publisher.Mono;
 import javax.validation.Valid;
 import java.util.List;
 import java.util.Optional;
-import java.util.StringJoiner;
-
-import static java.util.stream.Collectors.joining;
 
 @Slf4j
 @Service
 public class DispatchService {
 
     private final CaseDispatchService caseDispatchService;
-    private final RecordsDispatchService recordsDispatchService;
+    private final RecordsProcessingService recordsProcessingService;
 
     public DispatchService(
             CaseDispatchService caseDispatchService,
-            RecordsDispatchService recordsDispatchService
-    ) {
+            RecordsProcessingService recordsProcessingService) {
         this.caseDispatchService = caseDispatchService;
-        this.recordsDispatchService = recordsDispatchService;
+        this.recordsProcessingService = recordsProcessingService;
     }
 
     public Mono<DispatchResult> process(InstanceFlowHeaders instanceFlowHeaders, @Valid ArchiveInstance archiveInstance) {
@@ -58,7 +53,7 @@ public class DispatchService {
         return caseDispatchService.dispatch(archiveInstance.getNewCase())
                 .flatMap(caseDispatchResult -> switch (caseDispatchResult.getStatus()) {
                             case ACCEPTED -> archiveInstance.getNewCase().getJournalpost()
-                                    .map(journalpostDtos -> processRecords(
+                                    .map(journalpostDtos -> recordsProcessingService.processRecords(
                                                     caseDispatchResult.getArchiveCaseId(),
                                                     true,
                                                     journalpostDtos
@@ -73,7 +68,7 @@ public class DispatchService {
     }
 
     private Mono<DispatchResult> processById(ArchiveInstance archiveInstance) {
-        return processRecords(archiveInstance.getCaseId(), false, archiveInstance.getJournalpost());
+        return recordsProcessingService.processRecords(archiveInstance.getCaseId(), false, archiveInstance.getJournalpost());
     }
 
     private Mono<DispatchResult> processBySearchOrNew(ArchiveInstance archiveInstance) {
@@ -88,14 +83,14 @@ public class DispatchService {
                                 return Mono.just(DispatchResult.declined("Found multiple cases"));
                             }
                             return cases.size() == 1
-                                    ? processRecords(
+                                    ? recordsProcessingService.processRecords(
                                     cases.get(0).getMappeId().getIdentifikatorverdi(),
                                     false,
                                     journalpostDtosOptional.get()
                             )
                                     : caseDispatchService.dispatch(archiveInstance.getNewCase())
                                     .map(CaseDispatchResult::getArchiveCaseId)
-                                    .flatMap(caseId -> processRecords(
+                                    .flatMap(caseId -> recordsProcessingService.processRecords(
                                             caseId,
                                             true,
                                             journalpostDtosOptional.get()
@@ -104,58 +99,5 @@ public class DispatchService {
                 );
     }
 
-    private Mono<DispatchResult> processRecords(String archiveCaseId, boolean newCase, List<JournalpostDto> journalpostDtos) {
-        return recordsDispatchService.dispatch(
-                archiveCaseId,
-                journalpostDtos
-        ).map(recordsDispatchResult ->
-                switch (recordsDispatchResult.getStatus()) {
-                    case ACCEPTED -> DispatchResult.accepted(
-                            formatCaseIdAndJournalpostIds(
-                                    archiveCaseId,
-                                    recordsDispatchResult.getJournalpostIds()
-                            )
-                    );
-                    case DECLINED -> DispatchResult.declined(
-                            "Journalpost was declined by the destination." +
-                                    combineFunctionalWarningMessages(
-                                            archiveCaseId,
-                                            newCase,
-                                            recordsDispatchResult.getFunctionalWarningMessages()
-                                    ) +
-                                    " Error message from destination: '" +
-                                    recordsDispatchResult.getErrorMessage() +
-                                    "'");
-                    case FAILED -> DispatchResult.failed("Journalpost dispatch failed." +
-                            combineFunctionalWarningMessages(
-                                    archiveCaseId,
-                                    newCase,
-                                    recordsDispatchResult.getFunctionalWarningMessages()
-                            )
-                    );
-                }
-        );
-    }
-
-    private String formatCaseIdAndJournalpostIds(String caseId, List<Long> journalpostNumbers) {
-        return caseId + journalpostNumbers
-                .stream()
-                .map(Object::toString)
-                .collect(joining(",", "-[", "]"));
-    }
-
-    private String combineFunctionalWarningMessages(
-            String archiveCaseId,
-            boolean newCase,
-            List<String> functionalWarningMessages
-    ) {
-        StringJoiner stringJoiner = new StringJoiner(", ", " !!!Already successfully dispatched ", "!!!");
-        if (newCase) {
-            stringJoiner.add("sak with id=" + archiveCaseId);
-        }
-        functionalWarningMessages.forEach(stringJoiner::add);
-
-        return stringJoiner.toString();
-    }
 
 }
