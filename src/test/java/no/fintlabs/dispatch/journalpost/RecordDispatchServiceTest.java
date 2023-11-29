@@ -12,6 +12,7 @@ import no.fintlabs.model.instance.DokumentobjektDto;
 import no.fintlabs.model.instance.JournalpostDto;
 import no.fintlabs.web.archive.FintArchiveClient;
 import org.hamcrest.Matchers;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -25,7 +26,6 @@ import reactor.test.StepVerifier;
 import java.util.*;
 
 import static org.hamcrest.Matchers.allOf;
-import static org.hamcrest.Matchers.iterableWithSize;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -45,6 +45,13 @@ class RecordDispatchServiceTest {
 
     @InjectMocks
     RecordDispatchService recordDispatchService;
+
+    private Random random;
+
+    @BeforeEach
+    public void setup() {
+        random = new Random(42);
+    }
 
     @Test
     public void givenJournalpostDtoWithNoDokumentbeskrivelseDtosShouldCallMappingServiceWithEmptyDokumentobjektList() {
@@ -107,9 +114,9 @@ class RecordDispatchServiceTest {
                         .build()
         ))).when(journalpostDto).getDokumentbeskrivelse();
 
-        UUID uuid1 = mock(UUID.class);
-        UUID uuid2 = mock(UUID.class);
-        UUID uuid3 = mock(UUID.class);
+        UUID uuid1 = getUuid();
+        UUID uuid2 = getUuid();
+        UUID uuid3 = getUuid();
 
         Link link1 = mock(Link.class);
         Link link2 = mock(Link.class);
@@ -189,8 +196,8 @@ class RecordDispatchServiceTest {
                 ))
         ).when(journalpostDto).getDokumentbeskrivelse();
 
-        UUID fileId1 = mock(UUID.class);
-        UUID fileId2 = mock(UUID.class);
+        UUID fileId1 = getUuid();
+        UUID fileId2 = getUuid();
         Link archiveFileLink1 = mock(Link.class);
         Link archiveFileLink2 = mock(Link.class);
         doReturn(
@@ -239,8 +246,8 @@ class RecordDispatchServiceTest {
                 ))
         ).when(journalpostDto).getDokumentbeskrivelse();
 
-        UUID fileId1 = mock(UUID.class);
-        UUID fileId2 = mock(UUID.class);
+        UUID fileId1 = getUuid();
+        UUID fileId2 = getUuid();
         Link archiveFileLink1 = mock(Link.class);
         Link archiveFileLink2 = mock(Link.class);
         doReturn(
@@ -375,6 +382,12 @@ class RecordDispatchServiceTest {
                         null
                 ))
                 .verifyComplete();
+    }
+
+    private UUID getUuid() {
+        byte[] bytes = new byte[7];
+        random.nextBytes(bytes);
+        return UUID.nameUUIDFromBytes(bytes);
     }
 
 }

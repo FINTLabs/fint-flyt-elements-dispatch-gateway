@@ -7,6 +7,7 @@ import no.fintlabs.model.File;
 import no.fintlabs.model.instance.DokumentobjektDto;
 import no.fintlabs.web.archive.FintArchiveClient;
 import no.fintlabs.web.file.FileClient;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -16,6 +17,7 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
+import java.util.Random;
 import java.util.UUID;
 
 import static org.mockito.Mockito.*;
@@ -30,6 +32,12 @@ class FileDispatchServiceTest {
     private FileClient fileClient;
     @InjectMocks
     private FileDispatchService fileDispatchService;
+    private Random random;
+
+    @BeforeEach
+    public void setup() {
+        random = new Random(42);
+    }
 
     @Test
     public void givenSuccessFromGetFileAndSuccessFromPostFileShouldReturnAcceptedResult() {
@@ -52,7 +60,7 @@ class FileDispatchServiceTest {
 
     @Test
     public void givenErrorFromGetFileShouldReturnFailedCouldNotBeRetrievedResult() {
-        UUID fileId = mock(UUID.class);
+        UUID fileId = getUuid();
 
         doReturn(Mono.error(new RuntimeException())).when(fileClient).getFile(fileId);
 
@@ -112,7 +120,8 @@ class FileDispatchServiceTest {
     }
 
     private FileMock mockFile() {
-        UUID fileId = mock(UUID.class);
+
+        UUID fileId = getUuid();
         return new FileMock(
                 fileId,
                 mock(File.class),
@@ -127,6 +136,12 @@ class FileDispatchServiceTest {
         private final File file;
         private final Link archiveLink;
         private final DokumentobjektDto dokumentobjektDto;
+    }
+
+    private UUID getUuid() {
+        byte[] bytes = new byte[7];
+        random.nextBytes(bytes);
+        return UUID.nameUUIDFromBytes(bytes);
     }
 
 }

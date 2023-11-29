@@ -5,6 +5,7 @@ import no.fint.model.resource.Link;
 import no.fintlabs.dispatch.file.result.FileDispatchResult;
 import no.fintlabs.dispatch.file.result.FilesDispatchResult;
 import no.fintlabs.model.instance.DokumentobjektDto;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -13,10 +14,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 import static org.mockito.Mockito.*;
 
@@ -25,12 +23,16 @@ class FilesDispatchServiceTest {
 
     @Mock
     private FileDispatchService fileDispatchService;
-
     @Mock
     private FilesWarningMessageService filesWarningMessageService;
-
     @InjectMocks
     private FilesDispatchService filesDispatchService;
+    private Random random;
+
+    @BeforeEach
+    public void setup() {
+        random = new Random(42);
+    }
 
     @Test
     public void givenNoDokumentBeskrivelseDtosShouldReturnAcceptedResultWithNoDispatches() {
@@ -231,7 +233,7 @@ class FilesDispatchServiceTest {
     }
 
     private DokumentobjektMock mockDokumentobjekt() {
-        UUID fileId = mock(UUID.class);
+        UUID fileId = getUuid();
         return new DokumentobjektMock(
                 fileId,
                 mock(Link.class),
@@ -245,5 +247,12 @@ class FilesDispatchServiceTest {
         private final Link archiveLink;
         private final DokumentobjektDto dokumentobjektDto;
     }
+
+    private UUID getUuid() {
+        byte[] bytes = new byte[7];
+        random.nextBytes(bytes);
+        return UUID.nameUUIDFromBytes(bytes);
+    }
+
 
 }
