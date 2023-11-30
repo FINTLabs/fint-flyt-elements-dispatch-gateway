@@ -40,7 +40,8 @@ public class InstanceReadyForDispatchEventConsumerConfiguration {
                                         dispatchResult.getErrorMessage()
                                 );
                                 case FAILED -> instanceDispatchingErrorProducerService.publishGeneralSystemErrorEvent(
-                                        instanceFlowConsumerRecord.getInstanceFlowHeaders()
+                                        instanceFlowConsumerRecord.getInstanceFlowHeaders(),
+                                        dispatchResult.getErrorMessage()
                                 );
                             }
                         }).block(),

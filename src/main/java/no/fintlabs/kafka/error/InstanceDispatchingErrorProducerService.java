@@ -54,7 +54,16 @@ public class InstanceDispatchingErrorProducerService {
         );
     }
 
-    public void publishGeneralSystemErrorEvent(InstanceFlowHeaders instanceFlowHeaders) {
+    public void publishGeneralSystemErrorEvent(
+            InstanceFlowHeaders instanceFlowHeaders
+    ) {
+        publishGeneralSystemErrorEvent(instanceFlowHeaders, "");
+    }
+
+    public void publishGeneralSystemErrorEvent(
+            InstanceFlowHeaders instanceFlowHeaders,
+            String errorMessage
+    ) {
         errorEventProducer.send(
                 InstanceFlowErrorEventProducerRecord
                         .builder()
@@ -65,6 +74,7 @@ public class InstanceDispatchingErrorProducerService {
                                         Error
                                                 .builder()
                                                 .errorCode(GENERAL_SYSTEM_ERROR.getCode())
+                                                .args(Map.of("errorMessage", errorMessage))
                                                 .build()
                                 )
                         )
