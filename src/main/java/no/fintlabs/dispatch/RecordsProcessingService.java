@@ -38,7 +38,9 @@ public class RecordsProcessingService {
                                     dispatchMessageFormattingService.combineFunctionalWarningMessages(
                                             archiveCaseId,
                                             newCase,
-                                            List.of(recordsDispatchResult.getFunctionalWarningMessage())
+                                            recordsDispatchResult.getFunctionalWarningMessage() == null
+                                                    ? List.of()
+                                                    : List.of(recordsDispatchResult.getFunctionalWarningMessage())
                                     ).map(warningmessage -> " " + warningmessage + " ").orElse("") +
                                     "Error message from destination: '" +
                                     recordsDispatchResult.getErrorMessage() +
@@ -47,7 +49,9 @@ public class RecordsProcessingService {
                             dispatchMessageFormattingService.combineFunctionalWarningMessages(
                                     archiveCaseId,
                                     newCase,
-                                    List.of(recordsDispatchResult.getFunctionalWarningMessage())
+                                    recordsDispatchResult.getFunctionalWarningMessage() == null
+                                            ? List.of()
+                                            : List.of(recordsDispatchResult.getFunctionalWarningMessage())
                             ).map(warningmessage -> " " + warningmessage).orElse("")
                     );
                 }
