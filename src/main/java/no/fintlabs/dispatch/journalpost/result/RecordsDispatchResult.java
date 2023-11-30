@@ -17,21 +17,21 @@ public class RecordsDispatchResult {
 
     public static RecordsDispatchResult declined(
             String errorMessage,
-            List<String> functionalWarningMessages
+            String functionalWarningMessage
     ) {
-        return new RecordsDispatchResult(DispatchStatus.DECLINED, null, errorMessage, functionalWarningMessages);
+        return new RecordsDispatchResult(DispatchStatus.DECLINED, null, errorMessage, functionalWarningMessage);
     }
 
     public static RecordsDispatchResult failed(
             String errorMessage,
-            List<String> functionalWarningMessages
+            String functionalWarningMessage
     ) {
-        return new RecordsDispatchResult(DispatchStatus.FAILED, null, errorMessage, functionalWarningMessages);
+        return new RecordsDispatchResult(DispatchStatus.FAILED, null, errorMessage, functionalWarningMessage);
     }
 
     private final DispatchStatus status;
     private final List<Long> journalpostIds;
     private final String errorMessage;
-    private final List<String> functionalWarningMessages;
+    private final String functionalWarningMessage;
 
 }

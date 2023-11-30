@@ -64,7 +64,7 @@ class RecordsProcessingServiceTest {
         JournalpostDto journalpostDto = mock(JournalpostDto.class);
         RecordsDispatchResult recordsDispatchResult = RecordsDispatchResult.declined(
                 "test error message",
-                List.of("test warning message")
+                "test warning message"
         );
         doReturn(Mono.just(recordsDispatchResult)).when(recordsDispatchService).dispatch(
                 "testCaseId",
@@ -98,7 +98,7 @@ class RecordsProcessingServiceTest {
         JournalpostDto journalpostDto = mock(JournalpostDto.class);
         RecordsDispatchResult recordsDispatchResult = RecordsDispatchResult.failed(
                 "test error message",
-                List.of("test warning message")
+                "test warning message"
         );
         doReturn(Mono.just(recordsDispatchResult)).when(recordsDispatchService).dispatch(
                 "testCaseId",

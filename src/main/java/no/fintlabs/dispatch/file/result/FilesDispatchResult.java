@@ -5,7 +5,6 @@ import no.fint.model.resource.Link;
 import no.fintlabs.dispatch.DispatchStatus;
 
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 
 @Getter
@@ -14,33 +13,22 @@ import java.util.UUID;
 @ToString
 public class FilesDispatchResult {
 
-
     public static FilesDispatchResult accepted(
             Map<UUID, Link> archiveFileLinkPerFileId
     ) {
-        return new FilesDispatchResult(DispatchStatus.ACCEPTED, archiveFileLinkPerFileId, null, null);
+        return new FilesDispatchResult(DispatchStatus.ACCEPTED, archiveFileLinkPerFileId, null);
     }
 
-    public static FilesDispatchResult declined(
-            String errorMessage,
-            String functionalWarningMessage
-    ) {
-        return new FilesDispatchResult(DispatchStatus.DECLINED, null, errorMessage, functionalWarningMessage);
+    public static FilesDispatchResult declined(String errorMessage) {
+        return new FilesDispatchResult(DispatchStatus.DECLINED, null, errorMessage);
     }
 
-    public static FilesDispatchResult failed(
-            String functionalWarningMessage
-    ) {
-        return new FilesDispatchResult(DispatchStatus.FAILED, null, null, functionalWarningMessage);
+    public static FilesDispatchResult failed() {
+        return new FilesDispatchResult(DispatchStatus.FAILED, null, null);
     }
 
     private final DispatchStatus status;
     private final Map<UUID, Link> archiveFileLinkPerFileId;
     private final String errorMessage;
-    private final String functionalWarningMessage;
-
-    public Optional<String> getFunctionalWarningMessage() {
-        return Optional.ofNullable(functionalWarningMessage);
-    }
 
 }

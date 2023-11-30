@@ -120,7 +120,6 @@ class FileDispatchServiceTest {
     }
 
     private FileMock mockFile() {
-
         UUID fileId = getUuid();
         return new FileMock(
                 fileId,

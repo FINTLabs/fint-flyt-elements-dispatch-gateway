@@ -60,7 +60,7 @@ class RecordsDispatchServiceTest {
     }
 
     @Test
-    public void givenAcceptedJournalpostsAndLastOneDeclinedWithoutWarningShouldReturnDeclinedResultWithErrorMessageAndWarningMessage() {
+    public void givenAcceptedJournalpostsAndLastOneDeclinedShouldReturnDeclinedResultWithErrorMessageAndWarningMessage() {
         final String caseId = "testCaseId";
         JournalpostDto journalpostDto1 = mock(JournalpostDto.class);
         JournalpostDto journalpostDto2 = mock(JournalpostDto.class);
@@ -70,7 +70,7 @@ class RecordsDispatchServiceTest {
 
         doReturn(Mono.just(RecordDispatchResult.accepted(1L))).when(recordDispatchService).dispatch(caseId, journalpostDto1);
         doReturn(Mono.just(RecordDispatchResult.accepted(2L))).when(recordDispatchService).dispatch(caseId, journalpostDto2);
-        doReturn(Mono.just(RecordDispatchResult.declined("test error message", null))).when(recordDispatchService).dispatch(caseId, journalpostDto3);
+        doReturn(Mono.just(RecordDispatchResult.declined("test error message"))).when(recordDispatchService).dispatch(caseId, journalpostDto3);
 
         StepVerifier.create(
                         recordsDispatchService.dispatch(caseId, List.of(
@@ -81,7 +81,7 @@ class RecordsDispatchServiceTest {
                 )
                 .expectNext(RecordsDispatchResult.declined(
                         "test error message",
-                        List.of("test warning message")
+                        "test warning message"
 
                 ))
                 .verifyComplete();
@@ -94,46 +94,6 @@ class RecordsDispatchServiceTest {
         verify(recordDispatchService, times(1)).dispatch(caseId, journalpostDto3);
         verifyNoMoreInteractions(recordDispatchService);
     }
-
-    @Test
-    public void givenAcceptedJournalpostsAndLastOneDeclinedWithWarningShouldReturnDeclinedResultWithErrorMessageAndMergedWarningMessage() {
-        final String caseId = "testCaseId";
-        JournalpostDto journalpostDto1 = mock(JournalpostDto.class);
-        JournalpostDto journalpostDto2 = mock(JournalpostDto.class);
-        JournalpostDto journalpostDto3 = mock(JournalpostDto.class);
-
-        doReturn(Optional.of("test records warning message")).when(dispatchMessageFormattingService).createFunctionalWarningMessage("journalpost", "id", List.of("1", "2"));
-
-        doReturn(Mono.just(RecordDispatchResult.accepted(1L))).when(recordDispatchService).dispatch(caseId, journalpostDto1);
-        doReturn(Mono.just(RecordDispatchResult.accepted(2L))).when(recordDispatchService).dispatch(caseId, journalpostDto2);
-        doReturn(Mono.just(RecordDispatchResult.declined("test error message", "test record warning message"))).when(recordDispatchService).dispatch(caseId, journalpostDto3);
-
-        StepVerifier.create(
-                        recordsDispatchService.dispatch(caseId, List.of(
-                                journalpostDto1,
-                                journalpostDto2,
-                                journalpostDto3
-                        ))
-                )
-                .expectNext(RecordsDispatchResult.declined(
-                        "test error message",
-                        List.of(
-                                "test records warning message",
-                                "test record warning message"
-                        )
-
-                ))
-                .verifyComplete();
-
-        verify(dispatchMessageFormattingService, times(1)).createFunctionalWarningMessage("journalpost", "id", List.of("1", "2"));
-        verifyNoMoreInteractions(dispatchMessageFormattingService);
-
-        verify(recordDispatchService, times(1)).dispatch(caseId, journalpostDto1);
-        verify(recordDispatchService, times(1)).dispatch(caseId, journalpostDto2);
-        verify(recordDispatchService, times(1)).dispatch(caseId, journalpostDto3);
-        verifyNoMoreInteractions(recordDispatchService);
-    }
-
 
     @Test
     public void givenAcceptedJournalpostsAndLastOneFailedWithoutWarningShouldReturnFailedResultWithErrorMessageAndWarningMessage() {
@@ -146,7 +106,7 @@ class RecordsDispatchServiceTest {
 
         doReturn(Mono.just(RecordDispatchResult.accepted(1L))).when(recordDispatchService).dispatch(caseId, journalpostDto1);
         doReturn(Mono.just(RecordDispatchResult.accepted(2L))).when(recordDispatchService).dispatch(caseId, journalpostDto2);
-        doReturn(Mono.just(RecordDispatchResult.failed("test error message", null))).when(recordDispatchService).dispatch(caseId, journalpostDto3);
+        doReturn(Mono.just(RecordDispatchResult.failed("test error message"))).when(recordDispatchService).dispatch(caseId, journalpostDto3);
 
         StepVerifier.create(
                         recordsDispatchService.dispatch(caseId, List.of(
@@ -157,47 +117,7 @@ class RecordsDispatchServiceTest {
                 )
                 .expectNext(RecordsDispatchResult.failed(
                         "test error message",
-                        List.of("test warning message")
-
-                ))
-                .verifyComplete();
-
-        verify(dispatchMessageFormattingService, times(1)).createFunctionalWarningMessage("journalpost", "id", List.of("1", "2"));
-        verifyNoMoreInteractions(dispatchMessageFormattingService);
-
-        verify(recordDispatchService, times(1)).dispatch(caseId, journalpostDto1);
-        verify(recordDispatchService, times(1)).dispatch(caseId, journalpostDto2);
-        verify(recordDispatchService, times(1)).dispatch(caseId, journalpostDto3);
-        verifyNoMoreInteractions(recordDispatchService);
-    }
-
-    @Test
-    public void givenAcceptedJournalpostsAndLastOneFailedWithWarningShouldReturnFailedResultWithErrorMessageAndMergedWarningMessage() {
-
-        final String caseId = "testCaseId";
-        JournalpostDto journalpostDto1 = mock(JournalpostDto.class);
-        JournalpostDto journalpostDto2 = mock(JournalpostDto.class);
-        JournalpostDto journalpostDto3 = mock(JournalpostDto.class);
-
-        doReturn(Optional.of("test records warning message")).when(dispatchMessageFormattingService).createFunctionalWarningMessage("journalpost", "id", List.of("1", "2"));
-
-        doReturn(Mono.just(RecordDispatchResult.accepted(1L))).when(recordDispatchService).dispatch(caseId, journalpostDto1);
-        doReturn(Mono.just(RecordDispatchResult.accepted(2L))).when(recordDispatchService).dispatch(caseId, journalpostDto2);
-        doReturn(Mono.just(RecordDispatchResult.failed("test error message", "test record warning message"))).when(recordDispatchService).dispatch(caseId, journalpostDto3);
-
-        StepVerifier.create(
-                        recordsDispatchService.dispatch(caseId, List.of(
-                                journalpostDto1,
-                                journalpostDto2,
-                                journalpostDto3
-                        ))
-                )
-                .expectNext(RecordsDispatchResult.failed(
-                        "test error message",
-                        List.of(
-                                "test records warning message",
-                                "test record warning message"
-                        )
+                        "test warning message"
 
                 ))
                 .verifyComplete();
@@ -223,7 +143,7 @@ class RecordsDispatchServiceTest {
                                 journalpostDto
                         ))
                 )
-                .expectNext(RecordsDispatchResult.failed("Journalposts dispatch failed", List.of("Possible journalposts with unknown ids")))
+                .expectNext(RecordsDispatchResult.failed("Journalposts dispatch failed", "possible journalposts with unknown ids"))
                 .verifyComplete();
 
         verify(recordDispatchService, times(1)).dispatch(caseId, journalpostDto);

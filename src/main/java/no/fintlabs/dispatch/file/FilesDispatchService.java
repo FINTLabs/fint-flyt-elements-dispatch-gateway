@@ -10,9 +10,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import static java.util.stream.Collectors.toMap;
 
@@ -22,14 +20,11 @@ public class FilesDispatchService {
 
     private final FileDispatchService fileDispatchService;
 
-    private final FilesWarningMessageService filesWarningMessageService;
 
     public FilesDispatchService(
-            FileDispatchService fileDispatchService,
-            FilesWarningMessageService filesWarningMessageService
+            FileDispatchService fileDispatchService
     ) {
         this.fileDispatchService = fileDispatchService;
-        this.filesWarningMessageService = filesWarningMessageService;
     }
 
     public Mono<FilesDispatchResult> dispatch(Collection<DokumentobjektDto> dokumentobjektDtos) {
@@ -42,44 +37,26 @@ public class FilesDispatchService {
                 .concatMap(fileDispatchService::dispatch)
                 .takeUntil(fileDispatchResult -> fileDispatchResult.getStatus() != DispatchStatus.ACCEPTED)
                 .collectList()
-                .flatMap(fileDispatchResults -> {
+                .map(fileDispatchResults -> {
 
                     FileDispatchResult lastResult = fileDispatchResults.get(fileDispatchResults.size() - 1);
                     DispatchStatus lastStatus = lastResult.getStatus();
-                    List<FileDispatchResult> successfulFileDispatches = lastStatus == DispatchStatus.ACCEPTED
-                            ? fileDispatchResults
-                            : fileDispatchResults.subList(0, fileDispatchResults.size() - 1);
 
-                    if (lastStatus == DispatchStatus.ACCEPTED) {
-                        return Mono.just(FilesDispatchResult.accepted(
-                                successfulFileDispatches
+                    return switch (lastStatus) {
+                        case ACCEPTED -> FilesDispatchResult.accepted(
+                                fileDispatchResults
                                         .stream()
                                         .collect(toMap(
                                                 FileDispatchResult::getFileId,
                                                 FileDispatchResult::getArchiveFileLink
                                         ))
-                        ));
-                    }
+                        );
+                        case DECLINED -> FilesDispatchResult.declined(
+                                lastResult.getErrorMessage()
+                        );
+                        case FAILED -> FilesDispatchResult.failed();
 
-                    return (successfulFileDispatches.isEmpty()
-                            ? Mono.just(Optional.<String>empty())
-                            : filesWarningMessageService.createFunctionalWarningMessage(
-                            successfulFileDispatches
-                                    .stream()
-                                    .map(FileDispatchResult::getArchiveFileLink)
-                                    .toList())
-                    ).map(warningMessageOptional -> {
-                        if (lastStatus == DispatchStatus.DECLINED) {
-                            return FilesDispatchResult.declined(
-                                    lastResult.getErrorMessage(),
-                                    warningMessageOptional.orElse(null)
-                            );
-                        } else {
-                            return FilesDispatchResult.failed(
-                                    warningMessageOptional.orElse(null)
-                            );
-                        }
-                    });
+                    };
 
                 }).doOnNext(result -> log.info("Dispatch result=" + result.toString()));
     }

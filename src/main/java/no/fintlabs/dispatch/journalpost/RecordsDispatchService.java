@@ -10,9 +10,9 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import static no.fintlabs.dispatch.DispatchStatus.ACCEPTED;
 
@@ -55,41 +55,32 @@ public class RecordsDispatchService {
                                 case ACCEPTED -> RecordsDispatchResult.accepted(idsOfsuccessfullyDispatchedRecords);
                                 case DECLINED -> RecordsDispatchResult.declined(
                                         lastResult.getErrorMessage(),
-                                        createAndMergeFunctionalWarningMessages(
-                                                idsOfsuccessfullyDispatchedRecords,
-                                                lastResult
-                                        )
+                                        createFunctionalWarningMessages(idsOfsuccessfullyDispatchedRecords).orElse(null)
                                 );
                                 case FAILED -> RecordsDispatchResult.failed(
                                         lastResult.getErrorMessage(),
-                                        createAndMergeFunctionalWarningMessages(
-                                                idsOfsuccessfullyDispatchedRecords,
-                                                lastResult
-                                        )
+                                        createFunctionalWarningMessages(idsOfsuccessfullyDispatchedRecords).orElse(null)
                                 );
                             };
                         }
                 )
                 .doOnError(e -> log.error("Journalposts dispatch failed", e))
                 .onErrorResume(e -> Mono.just(
-                        RecordsDispatchResult.failed(
-                                "Journalposts dispatch failed",
-                                List.of("Possible journalposts with unknown ids")) // TODO: egilballestad 23/11/2023 what do we return here as warning?
+                                RecordsDispatchResult.failed(
+                                        "Journalposts dispatch failed",
+                                        "possible journalposts with unknown ids"
+                                )
                         )
                 ).doOnNext(result -> log.info("Dispatch result=" + result.toString()));
 
     }
 
-    private List<String> createAndMergeFunctionalWarningMessages(List<Long> idsOfsuccessfullyDispatchedRecords, RecordDispatchResult lastResult) {
-        List<String> functionalWarningMessages = new ArrayList<>();
-        dispatchMessageFormattingService.createFunctionalWarningMessage(
+    private Optional<String> createFunctionalWarningMessages(List<Long> idsOfsuccessfullyDispatchedRecords) {
+        return dispatchMessageFormattingService.createFunctionalWarningMessage(
                 "journalpost",
                 "id",
                 idsOfsuccessfullyDispatchedRecords.stream().map(String::valueOf).toList()
-        ).ifPresent(functionalWarningMessages::add);
-        lastResult.getFunctionalWarningMessage()
-                .ifPresent(functionalWarningMessages::add);
-        return functionalWarningMessages;
+        );
     }
 
 }

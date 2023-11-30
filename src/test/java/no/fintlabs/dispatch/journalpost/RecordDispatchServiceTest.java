@@ -3,7 +3,6 @@ package no.fintlabs.dispatch.journalpost;
 import no.fint.model.resource.Link;
 import no.fint.model.resource.arkiv.noark.JournalpostResource;
 import no.fintlabs.dispatch.file.FilesDispatchService;
-import no.fintlabs.dispatch.file.FilesWarningMessageService;
 import no.fintlabs.dispatch.file.result.FilesDispatchResult;
 import no.fintlabs.dispatch.journalpost.result.RecordDispatchResult;
 import no.fintlabs.mapping.JournalpostMappingService;
@@ -11,13 +10,11 @@ import no.fintlabs.model.instance.DokumentbeskrivelseDto;
 import no.fintlabs.model.instance.DokumentobjektDto;
 import no.fintlabs.model.instance.JournalpostDto;
 import no.fintlabs.web.archive.FintArchiveClient;
-import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.hamcrest.MockitoHamcrest;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
@@ -25,7 +22,6 @@ import reactor.test.StepVerifier;
 
 import java.util.*;
 
-import static org.hamcrest.Matchers.allOf;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -36,9 +32,6 @@ class RecordDispatchServiceTest {
 
     @Mock
     FilesDispatchService filesDispatchService;
-
-    @Mock
-    FilesWarningMessageService filesWarningMessageService;
 
     @Mock
     FintArchiveClient fintArchiveClient;
@@ -185,27 +178,8 @@ class RecordDispatchServiceTest {
     }
 
     @Test
-    public void givenWebclientResponseExceptionFromArchiveClientPostRecordShouldReturnDeclinedResultWithErrorMessageAndWarningMessage() {
+    public void givenWebclientResponseExceptionFromArchiveClientPostRecordShouldReturnDeclinedResultWithErrorMessage() {
         JournalpostDto journalpostDto = mock(JournalpostDto.class);
-        doReturn(
-                Optional.of(List.of(
-                        DokumentbeskrivelseDto
-                                .builder()
-                                .dokumentobjekt(List.of(mock(DokumentobjektDto.class)))
-                                .build()
-                ))
-        ).when(journalpostDto).getDokumentbeskrivelse();
-
-        UUID fileId1 = getUuid();
-        UUID fileId2 = getUuid();
-        Link archiveFileLink1 = mock(Link.class);
-        Link archiveFileLink2 = mock(Link.class);
-        doReturn(
-                Mono.just(FilesDispatchResult.accepted(Map.of(
-                        fileId1, archiveFileLink1,
-                        fileId2, archiveFileLink2
-                )))
-        ).when(filesDispatchService).dispatch(any());
 
         JournalpostResource journalpostResource = mock(JournalpostResource.class);
         doReturn(journalpostResource).when(journalpostMappingService).toJournalpostResource(any(), any());
@@ -214,172 +188,75 @@ class RecordDispatchServiceTest {
         doReturn("test response body").when(webClientResponseException).getResponseBodyAsString();
         doReturn(Mono.error(webClientResponseException)).when(fintArchiveClient).postRecord(any(), any());
 
-        doReturn(Mono.just(Optional.of("test warning message")))
-                .when(filesWarningMessageService).createFunctionalWarningMessage(any());
-
         StepVerifier
                 .create(recordDispatchService.dispatch("testCaseId", journalpostDto))
                 .expectNext(RecordDispatchResult.declined(
-                        "test response body",
-                        "test warning message"
+                        "test response body"
                 ))
                 .verifyComplete();
-
-        verify(filesWarningMessageService, times(1)).createFunctionalWarningMessage(
-                MockitoHamcrest.argThat(allOf(
-                        Matchers.<Link>iterableWithSize(2),
-                        Matchers.containsInAnyOrder(archiveFileLink1, archiveFileLink2)
-                ))
-        );
-        verifyNoMoreInteractions(filesWarningMessageService);
     }
 
     @Test
-    public void givenExceptionOtherThanWebclientResponseExceptionFromArchiveClientPostRecordShouldReturnFailedResultWithErrorMessageAndWarningMessage() {
+    public void givenExceptionOtherThanWebclientResponseExceptionFromArchiveClientPostRecordShouldReturnFailedResultWithoutErrorMessage() {
         JournalpostDto journalpostDto = mock(JournalpostDto.class);
-        doReturn(
-                Optional.of(List.of(
-                        DokumentbeskrivelseDto
-                                .builder()
-                                .dokumentobjekt(List.of(mock(DokumentobjektDto.class)))
-                                .build()
-                ))
-        ).when(journalpostDto).getDokumentbeskrivelse();
-
-        UUID fileId1 = getUuid();
-        UUID fileId2 = getUuid();
-        Link archiveFileLink1 = mock(Link.class);
-        Link archiveFileLink2 = mock(Link.class);
-        doReturn(
-                Mono.just(FilesDispatchResult.accepted(Map.of(
-                        fileId1, archiveFileLink1,
-                        fileId2, archiveFileLink2
-                )))
-        ).when(filesDispatchService).dispatch(any());
 
         JournalpostResource journalpostResource = mock(JournalpostResource.class);
         doReturn(journalpostResource).when(journalpostMappingService).toJournalpostResource(any(), any());
 
         doReturn(Mono.error(new RuntimeException())).when(fintArchiveClient).postRecord(any(), any());
 
-        doReturn(Mono.just(Optional.of("test warning message")))
-                .when(filesWarningMessageService).createFunctionalWarningMessage(any());
-
         StepVerifier
                 .create(recordDispatchService.dispatch("testCaseId", journalpostDto))
                 .expectNext(RecordDispatchResult.failed(
-                        null,
-                        "test warning message"
+                        null
                 ))
                 .verifyComplete();
-
-        verify(filesWarningMessageService, times(1)).createFunctionalWarningMessage(
-                MockitoHamcrest.argThat(allOf(
-                        Matchers.<Link>iterableWithSize(2),
-                        Matchers.containsInAnyOrder(archiveFileLink1, archiveFileLink2)
-                ))
-        );
-        verifyNoMoreInteractions(filesWarningMessageService);
     }
 
     @Test
-    public void givenDeclinedFilesDispatchWithErrorMessageAndWarningMessageShouldReturnDeclinedResultWithErrorMessageAndWarningMessage() {
+    public void givenDeclinedFilesDispatchWithErrorMessageShouldReturnDeclinedResultWithErrorMessage() {
         JournalpostDto journalpostDto = mock(JournalpostDto.class);
-        DokumentobjektDto dokumentobjektDto1 = mock(DokumentobjektDto.class);
+        DokumentobjektDto dokumentobjektDto = mock(DokumentobjektDto.class);
         doReturn(Optional.of(List.of(
                 DokumentbeskrivelseDto
                         .builder()
-                        .dokumentobjekt(List.of(dokumentobjektDto1))
+                        .dokumentobjekt(List.of(dokumentobjektDto))
                         .build()
         ))).when(journalpostDto).getDokumentbeskrivelse();
 
         doReturn(
                 Mono.just(FilesDispatchResult.declined(
-                        "test error message",
-                        "test functional warning message"
+                        "test error message"
                 ))
         ).when(filesDispatchService).dispatch(any());
 
         StepVerifier
                 .create(recordDispatchService.dispatch("testCaseId", journalpostDto))
                 .expectNext(RecordDispatchResult.declined(
-                        "Dokumentobjekt declined by destination with message='test error message'",
-                        "test functional warning message"
+                        "Dokumentobjekt declined by destination with message='test error message'"
                 ))
                 .verifyComplete();
     }
 
     @Test
-    public void givenDeclinedFilesDispatchWithErrorMessageAndNoWarningMessageShouldReturnDeclinedResultWithErrorMessageAndNoWarningMessage() {
+    public void givenFailedFilesDispatchShouldReturnDeclinedResultWithErrorMessage() {
         JournalpostDto journalpostDto = mock(JournalpostDto.class);
-        DokumentobjektDto dokumentobjektDto1 = mock(DokumentobjektDto.class);
+        DokumentobjektDto dokumentobjektDto = mock(DokumentobjektDto.class);
         doReturn(Optional.of(List.of(
                 DokumentbeskrivelseDto
                         .builder()
-                        .dokumentobjekt(List.of(dokumentobjektDto1))
+                        .dokumentobjekt(List.of(dokumentobjektDto))
                         .build()
         ))).when(journalpostDto).getDokumentbeskrivelse();
 
         doReturn(
-                Mono.just(FilesDispatchResult.declined(
-                        "test error message",
-                        null
-                ))
-        ).when(filesDispatchService).dispatch(any());
-
-        StepVerifier
-                .create(recordDispatchService.dispatch("testCaseId", journalpostDto))
-                .expectNext(RecordDispatchResult.declined(
-                        "Dokumentobjekt declined by destination with message='test error message'",
-                        null
-                ))
-                .verifyComplete();
-    }
-
-    @Test
-    public void givenFailedFilesDispatchWithWarningMessageShouldReturnDeclinedResultWithErrorMessageAndWarningMessage() {
-        JournalpostDto journalpostDto = mock(JournalpostDto.class);
-        DokumentobjektDto dokumentobjektDto1 = mock(DokumentobjektDto.class);
-        doReturn(Optional.of(List.of(
-                DokumentbeskrivelseDto
-                        .builder()
-                        .dokumentobjekt(List.of(dokumentobjektDto1))
-                        .build()
-        ))).when(journalpostDto).getDokumentbeskrivelse();
-
-        doReturn(
-                Mono.just(FilesDispatchResult.failed("test functional warning message"))
+                Mono.just(FilesDispatchResult.failed())
         ).when(filesDispatchService).dispatch(any());
 
         StepVerifier
                 .create(recordDispatchService.dispatch("testCaseId", journalpostDto))
                 .expectNext(RecordDispatchResult.failed(
-                        "Dokumentobjekt dispatch failed",
-                        "test functional warning message"
-                ))
-                .verifyComplete();
-    }
-
-    @Test
-    public void givenFailedFilesDispatchWithNoWarningMessageShouldReturnDeclinedResultWithErrorMessageAndNoWarningMessage() {
-        JournalpostDto journalpostDto = mock(JournalpostDto.class);
-        DokumentobjektDto dokumentobjektDto1 = mock(DokumentobjektDto.class);
-        doReturn(Optional.of(List.of(
-                DokumentbeskrivelseDto
-                        .builder()
-                        .dokumentobjekt(List.of(dokumentobjektDto1))
-                        .build()
-        ))).when(journalpostDto).getDokumentbeskrivelse();
-
-        doReturn(
-                Mono.just(FilesDispatchResult.failed(null))
-        ).when(filesDispatchService).dispatch(any());
-
-        StepVerifier
-                .create(recordDispatchService.dispatch("testCaseId", journalpostDto))
-                .expectNext(RecordDispatchResult.failed(
-                        "Dokumentobjekt dispatch failed",
-                        null
+                        "Dokumentobjekt dispatch failed"
                 ))
                 .verifyComplete();
     }

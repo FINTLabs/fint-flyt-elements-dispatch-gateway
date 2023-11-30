@@ -14,7 +14,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.UUID;
 
 import static org.mockito.Mockito.*;
 
@@ -23,8 +26,6 @@ class FilesDispatchServiceTest {
 
     @Mock
     private FileDispatchService fileDispatchService;
-    @Mock
-    private FilesWarningMessageService filesWarningMessageService;
     @InjectMocks
     private FilesDispatchService filesDispatchService;
     private Random random;
@@ -81,11 +82,11 @@ class FilesDispatchServiceTest {
     }
 
     @Test
-    public void givenDeclinedDispatchOfSingleDokumentobjektShouldReturnDeclinedResultWithNoWarningMessage() {
+    public void givenDeclinedDispatchOfSingleDokumentobjektShouldReturnDeclinedResult() {
         DokumentobjektMock dokumentobjektMock = mockDokumentobjektWithDeclinedDispatch("test error message");
 
         StepVerifier.create(filesDispatchService.dispatch(List.of(dokumentobjektMock.dokumentobjektDto)))
-                .expectNext(FilesDispatchResult.declined("test error message", null))
+                .expectNext(FilesDispatchResult.declined("test error message"))
                 .verifyComplete();
 
         verify(fileDispatchService, times(1)).dispatch(dokumentobjektMock.dokumentobjektDto);
@@ -93,66 +94,31 @@ class FilesDispatchServiceTest {
     }
 
     @Test
-    public void givenDeclinedDispatchOfFirstOfMultipleDokumentobjektShouldReturnDeclinedResultWithNoWarningMessage() {
-        DokumentobjektMock dokumentobjektMock1 = mockDokumentobjektWithDeclinedDispatch("test error message");
-        DokumentobjektMock dokumentobjektMock2 = mockDokumentobjekt();
-        DokumentobjektMock dokumentobjektMock3 = mockDokumentobjekt();
-
-        StepVerifier.create(filesDispatchService.dispatch(List.of(
-                        dokumentobjektMock1.dokumentobjektDto,
-                        dokumentobjektMock2.dokumentobjektDto,
-                        dokumentobjektMock3.dokumentobjektDto
-                )))
-                .expectNext(FilesDispatchResult.declined("test error message", null))
-                .verifyComplete();
-
-        verify(fileDispatchService, times(1)).dispatch(dokumentobjektMock1.dokumentobjektDto);
-        verifyNoMoreInteractions(fileDispatchService);
-    }
-
-    @Test
-    public void givenDeclinedDispatchOfLastOfMultipleDokumentobjektShouldReturnDeclinedResultWithWarningMessage() {
+    public void givenDeclinedDispatchOfLastOfMultipleDokumentobjektShouldReturnDeclinedResult() {
         DokumentobjektMock dokumentobjektMock1 = mockDokumentobjektWithAcceptedDispatch();
         DokumentobjektMock dokumentobjektMock2 = mockDokumentobjektWithAcceptedDispatch();
         DokumentobjektMock dokumentobjektMock3 = mockDokumentobjektWithDeclinedDispatch("test error message");
 
-        doReturn(Mono.just(Optional.of("test warning message")))
-                .when(filesWarningMessageService).createFunctionalWarningMessage(List.of(
-                        dokumentobjektMock1.archiveLink,
-                        dokumentobjektMock2.archiveLink
-                ));
-
         StepVerifier.create(filesDispatchService.dispatch(List.of(
                         dokumentobjektMock1.dokumentobjektDto,
                         dokumentobjektMock2.dokumentobjektDto,
                         dokumentobjektMock3.dokumentobjektDto
                 )))
-                .expectNext(FilesDispatchResult.declined(
-                        "test error message",
-                        "test warning message"
-                ))
+                .expectNext(FilesDispatchResult.declined("test error message"))
                 .verifyComplete();
 
         verify(fileDispatchService, times(1)).dispatch(dokumentobjektMock1.dokumentobjektDto);
         verify(fileDispatchService, times(1)).dispatch(dokumentobjektMock2.dokumentobjektDto);
         verify(fileDispatchService, times(1)).dispatch(dokumentobjektMock3.dokumentobjektDto);
         verifyNoMoreInteractions(fileDispatchService);
-
-        verify(filesWarningMessageService, times(1)).createFunctionalWarningMessage(List.of(
-                        dokumentobjektMock1.archiveLink,
-                        dokumentobjektMock2.archiveLink
-                )
-        );
-        verifyNoMoreInteractions(filesWarningMessageService);
     }
 
-
     @Test
-    public void givenFailedDispatchOfSingleDokumentobjektShouldReturnFailedResultWithNoWarningMessage() {
+    public void givenFailedDispatchOfSingleDokumentobjektShouldReturnFailedResult() {
         DokumentobjektMock dokumentobjektMock = mockDokumentobjektWithFailedDispatch();
 
         StepVerifier.create(filesDispatchService.dispatch(List.of(dokumentobjektMock.dokumentobjektDto)))
-                .expectNext(FilesDispatchResult.failed(null))
+                .expectNext(FilesDispatchResult.failed())
                 .verifyComplete();
 
         verify(fileDispatchService, times(1)).dispatch(dokumentobjektMock.dokumentobjektDto);
@@ -160,55 +126,23 @@ class FilesDispatchServiceTest {
     }
 
     @Test
-    public void givenFailedDispatchOfFirstOfMultipleDokumentobjektShouldReturnFailedResultWithNoWarningMessage() {
-        DokumentobjektMock dokumentobjektMock1 = mockDokumentobjektWithFailedDispatch();
-        DokumentobjektMock dokumentobjektMock2 = mockDokumentobjekt();
-        DokumentobjektMock dokumentobjektMock3 = mockDokumentobjekt();
-
-        StepVerifier.create(filesDispatchService.dispatch(List.of(
-                        dokumentobjektMock1.dokumentobjektDto,
-                        dokumentobjektMock2.dokumentobjektDto,
-                        dokumentobjektMock3.dokumentobjektDto
-                )))
-                .expectNext(FilesDispatchResult.failed(null))
-                .verifyComplete();
-
-        verify(fileDispatchService, times(1)).dispatch(dokumentobjektMock1.dokumentobjektDto);
-        verifyNoMoreInteractions(fileDispatchService);
-    }
-
-    @Test
-    public void givenFailedDispatchOfLastOfMultipleDokumentobjektShouldReturnFailedResultWithWarningMessage() {
+    public void givenFailedDispatchOfLastOfMultipleDokumentobjektShouldReturnFailedResult() {
         DokumentobjektMock dokumentobjektMock1 = mockDokumentobjektWithAcceptedDispatch();
         DokumentobjektMock dokumentobjektMock2 = mockDokumentobjektWithAcceptedDispatch();
         DokumentobjektMock dokumentobjektMock3 = mockDokumentobjektWithFailedDispatch();
 
-        doReturn(Mono.just(Optional.of("formatted warning message")))
-                .when(filesWarningMessageService).createFunctionalWarningMessage(List.of(
-                        dokumentobjektMock1.archiveLink,
-                        dokumentobjektMock2.archiveLink
-                ));
-
         StepVerifier.create(filesDispatchService.dispatch(List.of(
                         dokumentobjektMock1.dokumentobjektDto,
                         dokumentobjektMock2.dokumentobjektDto,
                         dokumentobjektMock3.dokumentobjektDto
                 )))
-                .expectNext(FilesDispatchResult.failed(
-                        "formatted warning message"
-                ))
+                .expectNext(FilesDispatchResult.failed())
                 .verifyComplete();
 
         verify(fileDispatchService, times(1)).dispatch(dokumentobjektMock1.dokumentobjektDto);
         verify(fileDispatchService, times(1)).dispatch(dokumentobjektMock2.dokumentobjektDto);
         verify(fileDispatchService, times(1)).dispatch(dokumentobjektMock3.dokumentobjektDto);
         verifyNoMoreInteractions(fileDispatchService);
-
-        verify(filesWarningMessageService, times(1)).createFunctionalWarningMessage(List.of(
-                dokumentobjektMock1.archiveLink,
-                dokumentobjektMock2.archiveLink
-        ));
-        verifyNoMoreInteractions(filesWarningMessageService);
     }
 
     private DokumentobjektMock mockDokumentobjektWithAcceptedDispatch() {
