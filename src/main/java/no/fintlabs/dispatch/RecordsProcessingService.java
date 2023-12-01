@@ -42,7 +42,7 @@ public class RecordsProcessingService {
                                                     ? List.of()
                                                     : List.of(recordsDispatchResult.getFunctionalWarningMessage())
                                     ).map(warningmessage -> " " + warningmessage + " ").orElse("") +
-                                    "Error message from destination: '" +
+                                    "Error message: '" +
                                     recordsDispatchResult.getErrorMessage() +
                                     "'");
                     case FAILED -> DispatchResult.failed("Journalpost dispatch failed." +

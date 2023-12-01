@@ -29,12 +29,18 @@ public class FileDispatchService {
                                 .onErrorResume(WebClientResponseException.class, e -> Mono.just(
                                         FileDispatchResult.declined(fileId, e.getResponseBodyAsString())
                                 ))
-                                .onErrorResume(e -> Mono.just(
-                                        FileDispatchResult.failed(fileId)
-                                ))
-                        ).onErrorResume(e -> Mono.just(
-                                FileDispatchResult.couldNotBeRetrieved(fileId)
-                        ))
+                                .onErrorResume(e -> {
+                                    log.error("File dispatch failed");
+                                    return Mono.just(
+                                            FileDispatchResult.failed(fileId)
+                                    );
+                                })
+                        ).onErrorResume(e -> {
+                            log.error("File could not be retrieved");
+                            return Mono.just(
+                                    FileDispatchResult.couldNotBeRetrieved(fileId)
+                            );
+                        })
                 ).orElse(Mono.just(FileDispatchResult.noFileId()))
                 .doOnNext(result -> log.info("Dispatch result=" + result.toString()));
     }

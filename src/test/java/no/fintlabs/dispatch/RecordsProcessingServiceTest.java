@@ -88,7 +88,7 @@ class RecordsProcessingServiceTest {
                 .expectNext(DispatchResult.declined(
                         "Journalpost was declined by the destination. " +
                                 "test combined functional warning message " +
-                                "Error message from destination: 'test error message'"
+                                "Error message: 'test error message'"
                 ))
                 .verifyComplete();
     }
