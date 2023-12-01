@@ -34,7 +34,7 @@ public class RecordsProcessingService {
                             )
                     );
                     case DECLINED -> DispatchResult.declined(
-                            "Journalpost was declined by the destination." +
+                            "Journalpost was declined by the destination. " +
                                     dispatchMessageFormattingService.combineFunctionalWarningMessages(
                                             archiveCaseId,
                                             newCase,
