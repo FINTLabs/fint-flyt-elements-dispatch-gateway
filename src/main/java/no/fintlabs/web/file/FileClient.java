@@ -22,6 +22,7 @@ public class FileClient {
     }
 
     public Mono<File> getFile(UUID fileId) {
+        log.info("Getting file");
         return fileWebClient
                 .get()
                 .uri("/" + fileId)

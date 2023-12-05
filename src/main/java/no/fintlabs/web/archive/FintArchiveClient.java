@@ -1,6 +1,8 @@
 package no.fintlabs.web.archive;
 
 import lombok.extern.slf4j.Slf4j;
+import no.fint.model.resource.Link;
+import no.fint.model.resource.arkiv.noark.DokumentfilResource;
 import no.fint.model.resource.arkiv.noark.JournalpostResource;
 import no.fint.model.resource.arkiv.noark.SakResource;
 import no.fint.model.resource.arkiv.noark.SakResources;
@@ -15,7 +17,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.util.retry.Retry;
 
 import java.net.URI;
 import java.time.Duration;
@@ -32,7 +33,16 @@ public class FintArchiveClient {
         this.fintWebClient = fintWebClient;
     }
 
-    public Mono<URI> postFile(File file) {
+    public Mono<DokumentfilResource> getFile(Link link) {
+        return fintWebClient
+                .get()
+                .uri(URI.create(link.getHref()))
+                .retrieve()
+                .bodyToMono(DokumentfilResource.class);
+    }
+
+    public Mono<Link> postFile(File file) {
+        log.info("Posting file");
         return pollForCreatedLocation(
                 fintWebClient
                         .post()
@@ -42,6 +52,8 @@ public class FintArchiveClient {
                         .header("Content-Disposition", "attachment; filename=" + file.getName())
                         .retrieve()
         )
+                .map(URI::toString)
+                .map(Link::with)
                 .doOnNext(uri -> log.info("Successfully posted file with name={} on uri={}", file.getName(), uri))
                 .doOnError(e -> {
                     if (e instanceof WebClientResponseException) {
@@ -49,8 +61,7 @@ public class FintArchiveClient {
                     } else {
                         log.error(e.toString());
                     }
-                })
-                .retryWhen(Retry.backoff(5, Duration.ofSeconds(1)));
+                });
     }
 
     private MediaType getMediaType(String mediaType) {
@@ -92,17 +103,16 @@ public class FintArchiveClient {
         );
     }
 
-    public Mono<Long> putRecord(String caseId, JournalpostWrapper journalpostWrapper) {
+    public Mono<JournalpostResource> postRecord(String caseId, JournalpostResource journalpostResource) {
         return pollForCaseResult(
                 fintWebClient
                         .put()
                         .uri("/arkiv/noark/sak/mappeid/" + caseId)
-                        .bodyValue(journalpostWrapper)
+                        .bodyValue(new JournalpostWrapper(journalpostResource))
                         .retrieve()
         ).map(sakResource -> sakResource.getJournalpost()
                 .stream()
-                .map(JournalpostResource::getJournalPostnummer)
-                .max(Comparator.comparingLong(a -> a))
+                .max(Comparator.comparing(JournalpostResource::getJournalPostnummer))
                 .orElseThrow()
         );
     }

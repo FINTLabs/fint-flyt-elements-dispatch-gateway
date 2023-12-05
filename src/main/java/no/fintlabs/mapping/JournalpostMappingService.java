@@ -25,7 +25,6 @@ public class JournalpostMappingService {
         this.dokumentbeskrivelseMappingService = dokumentbeskrivelseMappingService;
     }
 
-
     public JournalpostResource toJournalpostResource(
             JournalpostDto journalpostDto,
             Map<UUID, Link> fileArchiveLinkPerFileId

@@ -1,11 +1,13 @@
 package no.fintlabs.mapping;
 
+import lombok.extern.slf4j.Slf4j;
 import no.fint.model.resource.Link;
 import no.fint.model.resource.arkiv.noark.SakResource;
 import no.fintlabs.model.instance.SakDto;
 import org.springframework.stereotype.Service;
 
 @Service
+@Slf4j
 public class SakMappingService {
 
     private final SkjermingMappingService skjermingMappingService;
@@ -23,8 +25,11 @@ public class SakMappingService {
 
     public SakResource toSakResource(SakDto sakDto) {
         if (sakDto == null) {
-            return null;
+            throw new IllegalArgumentException("sakDto cannot be null");
         }
+
+        log.info("Mapping SakDto to SakResource");
+
         SakResource sakResource = new SakResource();
         sakDto.getTittel().ifPresent(sakResource::setTittel);
         sakDto.getOffentligTittel().ifPresent(sakResource::setOffentligTittel);
@@ -48,6 +53,7 @@ public class SakMappingService {
                 .map(klasseMappingService::toKlasse)
                 .ifPresent(sakResource::setKlasse);
 
+        log.info("Successfully mapped SakDto to SakResource");
         return sakResource;
     }
 

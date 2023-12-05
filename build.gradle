@@ -52,7 +52,7 @@ dependencies {
     implementation 'org.glassfish:javax.el:3.0.0'
 
     implementation 'no.fint:fint-model-resource:0.4.1'
-    implementation 'no.fint:fint-arkiv-resource-model-java:3.11.0'
+    implementation "no.fint:fint-arkiv-resource-model-java:${apiVersion}"
 
     compileOnly 'org.projectlombok:lombok'
     runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
@@ -62,6 +62,8 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'io.projectreactor:reactor-test'
     testImplementation 'cglib:cglib-nodep:3.3.0'
+    testCompileOnly 'org.projectlombok:lombok'
+    testAnnotationProcessor 'org.projectlombok:lombok'
 }
 
 test {

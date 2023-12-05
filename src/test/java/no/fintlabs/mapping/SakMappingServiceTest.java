@@ -4,15 +4,17 @@ import no.fint.model.resource.Link;
 import no.fint.model.resource.arkiv.noark.PartResource;
 import no.fint.model.resource.arkiv.noark.SakResource;
 import no.fint.model.resource.arkiv.noark.SkjermingResource;
-import no.fintlabs.model.instance.*;
+import no.fintlabs.model.instance.PartDto;
+import no.fintlabs.model.instance.SakDto;
+import no.fintlabs.model.instance.SkjermingDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 class SakMappingServiceTest {
@@ -64,7 +66,6 @@ class SakMappingServiceTest {
         SakResource sakResource = sakMappingService.toSakResource(nySakDto);
 
 
-
         assertEquals("testTittel", sakResource.getTittel());
         assertEquals("testOffentligTittel", sakResource.getOffentligTittel());
 
@@ -80,8 +81,12 @@ class SakMappingServiceTest {
 
     @Test
     void testToSakResourceWithNullDtoReturnsNull() {
-        SakResource sakResource = sakMappingService.toSakResource(null);
-        assertNull(sakResource);
+        IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> sakMappingService.toSakResource(null)
+        );
+
+        assertEquals("sakDto cannot be null", exception.getMessage());
     }
 
 
