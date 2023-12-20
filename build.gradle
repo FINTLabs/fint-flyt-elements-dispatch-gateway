@@ -49,7 +49,7 @@ dependencies {
     implementation 'javax.validation:validation-api'
     implementation 'org.hibernate.validator:hibernate-validator'
     implementation 'javax.el:javax.el-api:3.0.0'
-    implementation 'org.glassfish:javax.el:3.0.0'
+    implementation 'org.glassfish:jakarta.el:3.0.4'
 
     implementation 'no.fint:fint-model-resource:0.4.1'
     implementation "no.fint:fint-arkiv-resource-model-java:${apiVersion}"
