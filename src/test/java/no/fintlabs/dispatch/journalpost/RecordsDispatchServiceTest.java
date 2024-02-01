@@ -1,9 +1,11 @@
 package no.fintlabs.dispatch.journalpost;
 
-import no.fintlabs.dispatch.DispatchMessageFormattingService;
-import no.fintlabs.dispatch.journalpost.result.RecordDispatchResult;
-import no.fintlabs.dispatch.journalpost.result.RecordsDispatchResult;
-import no.fintlabs.model.instance.JournalpostDto;
+import no.fintlabs.flyt.gateway.application.archive.dispatch.DispatchMessageFormattingService;
+import no.fintlabs.flyt.gateway.application.archive.dispatch.journalpost.RecordDispatchService;
+import no.fintlabs.flyt.gateway.application.archive.dispatch.journalpost.RecordsDispatchService;
+import no.fintlabs.flyt.gateway.application.archive.dispatch.journalpost.result.RecordDispatchResult;
+import no.fintlabs.flyt.gateway.application.archive.dispatch.journalpost.result.RecordsDispatchResult;
+import no.fintlabs.flyt.gateway.application.archive.dispatch.model.instance.JournalpostDto;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

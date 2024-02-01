@@ -1,5 +1,6 @@
 package no.fintlabs.dispatch;
 
+import no.fintlabs.flyt.gateway.application.archive.dispatch.DispatchMessageFormattingService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

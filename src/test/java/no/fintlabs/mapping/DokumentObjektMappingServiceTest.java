@@ -2,7 +2,8 @@ package no.fintlabs.mapping;
 
 import no.fint.model.resource.Link;
 import no.fint.model.resource.arkiv.noark.DokumentobjektResource;
-import no.fintlabs.model.instance.DokumentobjektDto;
+import no.fintlabs.flyt.gateway.application.archive.dispatch.mapping.DokumentObjektMappingService;
+import no.fintlabs.flyt.gateway.application.archive.dispatch.model.instance.DokumentobjektDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;

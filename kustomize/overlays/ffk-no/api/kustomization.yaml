@@ -6,11 +6,13 @@ resources:
   - ../../../base
 
 commonLabels:
-  app.kubernetes.io/instance: fint-flyt-archive-dispatch-gateway_ffk_no
   fintlabs.no/org-id: ffk.no
 
 patches:
   - patch: |-
+      - op: replace
+        path: "/metadata/labels/app.kubernetes.io~1instance"
+        value: "fint-archive-gateway_ffk_no"
       - op: replace
         path: "/spec/kafka/acls/0/topic"
         value: "ffk-no.flyt.*"
@@ -22,4 +24,15 @@ patches:
         value: "https://api.felleskomponent.no"
     target:
       kind: Application
-      name: fint-flyt-archive-dispatch-gateway
+      name: fint-archive-gateway
+
+  - patch: |-
+      - op: replace
+        path: "/metadata/labels/app.kubernetes.io~1instance"
+        value: "fint-flyt-archive-fint-client_ffk_no"
+      - op: replace
+        path: "/spec/orgId"
+        value: "ffk.no"
+    target:
+      kind: FintClient
+      name: fint-flyt-archive-fint-client

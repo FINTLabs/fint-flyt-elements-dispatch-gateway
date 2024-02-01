@@ -2,13 +2,15 @@ package no.fintlabs.dispatch.sak;
 
 import no.fint.model.felles.kompleksedatatyper.Identifikator;
 import no.fint.model.resource.arkiv.noark.SakResource;
-import no.fintlabs.dispatch.sak.result.CaseDispatchResult;
-import no.fintlabs.mapping.SakMappingService;
-import no.fintlabs.model.instance.ArchiveInstance;
-import no.fintlabs.model.instance.CaseSearchParametersDto;
-import no.fintlabs.model.instance.SakDto;
-import no.fintlabs.web.archive.CaseSearchParametersService;
-import no.fintlabs.web.archive.FintArchiveClient;
+import no.fintlabs.flyt.gateway.application.archive.dispatch.sak.CaseDispatchService;
+import no.fintlabs.flyt.gateway.application.archive.dispatch.sak.result.CaseDispatchResult;
+import no.fintlabs.flyt.gateway.application.archive.dispatch.mapping.SakMappingService;
+import no.fintlabs.flyt.gateway.application.archive.dispatch.model.instance.ArchiveInstance;
+import no.fintlabs.flyt.gateway.application.archive.dispatch.model.instance.CaseSearchParametersDto;
+import no.fintlabs.flyt.gateway.application.archive.dispatch.model.instance.SakDto;
+import no.fintlabs.flyt.gateway.application.archive.resource.web.CaseSearchParametersService;
+import no.fintlabs.flyt.gateway.application.archive.dispatch.web.FintArchiveDispatchClient;
+import no.fintlabs.flyt.gateway.application.archive.resource.web.FintArchiveResourceClient;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -30,7 +32,9 @@ class CaseDispatchServiceTest {
     @Mock
     private CaseSearchParametersService caseSearchParametersService;
     @Mock
-    private FintArchiveClient fintArchiveClient;
+    private FintArchiveDispatchClient fintArchiveDispatchClient;
+    @Mock
+    private FintArchiveResourceClient fintArchiveResourceClient;
     @InjectMocks
     private CaseDispatchService caseDispatchService;
 
@@ -44,7 +48,7 @@ class CaseDispatchServiceTest {
         Identifikator identifikator = mock(Identifikator.class);
         doReturn(identifikator).when(sakResourceResult).getMappeId();
         doReturn("testArchiveCaseId").when(identifikator).getIdentifikatorverdi();
-        doReturn(Mono.just(sakResourceResult)).when(fintArchiveClient).postCase(sakResource);
+        doReturn(Mono.just(sakResourceResult)).when(fintArchiveDispatchClient).postCase(sakResource);
 
         StepVerifier.create(
                         caseDispatchService.dispatch(sakDto)
@@ -55,8 +59,8 @@ class CaseDispatchServiceTest {
         verify(sakMappingService, times(1)).toSakResource(sakDto);
         verifyNoMoreInteractions(sakMappingService);
 
-        verify(fintArchiveClient, times(1)).postCase(sakResource);
-        verifyNoMoreInteractions(fintArchiveClient);
+        verify(fintArchiveDispatchClient, times(1)).postCase(sakResource);
+        verifyNoMoreInteractions(fintArchiveDispatchClient);
     }
 
     @Test
@@ -67,7 +71,7 @@ class CaseDispatchServiceTest {
 
         WebClientResponseException webClientResponseException = mock(WebClientResponseException.class);
         doReturn("test response body").when(webClientResponseException).getResponseBodyAsString();
-        doReturn(Mono.error(webClientResponseException)).when(fintArchiveClient).postCase(sakResource);
+        doReturn(Mono.error(webClientResponseException)).when(fintArchiveDispatchClient).postCase(sakResource);
 
         StepVerifier.create(
                         caseDispatchService.dispatch(sakDto)
@@ -78,8 +82,8 @@ class CaseDispatchServiceTest {
         verify(sakMappingService, times(1)).toSakResource(sakDto);
         verifyNoMoreInteractions(sakMappingService);
 
-        verify(fintArchiveClient, times(1)).postCase(sakResource);
-        verifyNoMoreInteractions(fintArchiveClient);
+        verify(fintArchiveDispatchClient, times(1)).postCase(sakResource);
+        verifyNoMoreInteractions(fintArchiveDispatchClient);
     }
 
     @Test
@@ -87,7 +91,7 @@ class CaseDispatchServiceTest {
         SakDto sakDto = mock(SakDto.class);
         SakResource sakResource = mock(SakResource.class);
         doReturn(sakResource).when(sakMappingService).toSakResource(sakDto);
-        doReturn(Mono.error(new RuntimeException())).when(fintArchiveClient).postCase(sakResource);
+        doReturn(Mono.error(new RuntimeException())).when(fintArchiveDispatchClient).postCase(sakResource);
 
         StepVerifier.create(
                         caseDispatchService.dispatch(sakDto)
@@ -98,8 +102,8 @@ class CaseDispatchServiceTest {
         verify(sakMappingService, times(1)).toSakResource(sakDto);
         verifyNoMoreInteractions(sakMappingService);
 
-        verify(fintArchiveClient, times(1)).postCase(sakResource);
-        verifyNoMoreInteractions(fintArchiveClient);
+        verify(fintArchiveDispatchClient, times(1)).postCase(sakResource);
+        verifyNoMoreInteractions(fintArchiveDispatchClient);
     }
 
     @Test
@@ -118,7 +122,7 @@ class CaseDispatchServiceTest {
         );
 
         SakResource sakResource = mock(SakResource.class);
-        doReturn(Mono.just(List.of(sakResource))).when(fintArchiveClient).findCasesWithFilter("test case filter");
+        doReturn(Mono.just(List.of(sakResource))).when(fintArchiveResourceClient).findCasesWithFilter("test case filter");
 
         StepVerifier.create(
                         caseDispatchService.findCasesBySearch(archiveInstance)
@@ -129,8 +133,8 @@ class CaseDispatchServiceTest {
         verify(caseSearchParametersService,times(1)).createFilterQueryParamValue(sakDto, caseSearchParametersDto);
         verifyNoMoreInteractions(caseSearchParametersService);
 
-        verify(fintArchiveClient,times(1)).findCasesWithFilter("test case filter");
-        verifyNoMoreInteractions(fintArchiveClient);
+        verify(fintArchiveResourceClient,times(1)).findCasesWithFilter("test case filter");
+        verifyNoMoreInteractions(fintArchiveResourceClient);
     }
 
 }

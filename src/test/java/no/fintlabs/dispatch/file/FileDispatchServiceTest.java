@@ -2,11 +2,12 @@ package no.fintlabs.dispatch.file;
 
 import lombok.AllArgsConstructor;
 import no.fint.model.resource.Link;
-import no.fintlabs.dispatch.file.result.FileDispatchResult;
-import no.fintlabs.model.File;
-import no.fintlabs.model.instance.DokumentobjektDto;
-import no.fintlabs.web.archive.FintArchiveClient;
-import no.fintlabs.web.file.FileClient;
+import no.fintlabs.flyt.gateway.application.archive.dispatch.file.FileDispatchService;
+import no.fintlabs.flyt.gateway.application.archive.dispatch.file.result.FileDispatchResult;
+import no.fintlabs.flyt.gateway.application.archive.dispatch.model.File;
+import no.fintlabs.flyt.gateway.application.archive.dispatch.model.instance.DokumentobjektDto;
+import no.fintlabs.flyt.gateway.application.archive.dispatch.web.FintArchiveDispatchClient;
+import no.fintlabs.flyt.gateway.application.archive.dispatch.web.file.FileClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -27,7 +28,7 @@ import static org.mockito.Mockito.*;
 class FileDispatchServiceTest {
 
     @Mock
-    private FintArchiveClient fintArchiveClient;
+    private FintArchiveDispatchClient fintArchiveDispatchClient;
     @Mock
     private FileClient fileClient;
     @InjectMocks
@@ -44,7 +45,7 @@ class FileDispatchServiceTest {
         FileMock fileMock = mockFile();
 
         doReturn(Mono.just(fileMock.file)).when(fileClient).getFile(fileMock.fileId);
-        doReturn(Mono.just(fileMock.archiveLink)).when(fintArchiveClient).postFile(fileMock.file);
+        doReturn(Mono.just(fileMock.archiveLink)).when(fintArchiveDispatchClient).postFile(fileMock.file);
 
         StepVerifier
                 .create(fileDispatchService.dispatch(fileMock.dokumentobjektDto))
@@ -54,8 +55,8 @@ class FileDispatchServiceTest {
         verify(fileClient, times(1)).getFile(fileMock.fileId);
         verifyNoMoreInteractions(fileClient);
 
-        verify(fintArchiveClient, times(1)).postFile(fileMock.file);
-        verifyNoMoreInteractions(fintArchiveClient);
+        verify(fintArchiveDispatchClient, times(1)).postFile(fileMock.file);
+        verifyNoMoreInteractions(fintArchiveDispatchClient);
     }
 
     @Test
@@ -86,7 +87,7 @@ class FileDispatchServiceTest {
 
         WebClientResponseException webClientResponseException = mock(WebClientResponseException.class);
         doReturn("test response body").when(webClientResponseException).getResponseBodyAsString();
-        doReturn(Mono.error(webClientResponseException)).when(fintArchiveClient).postFile(fileMock.file);
+        doReturn(Mono.error(webClientResponseException)).when(fintArchiveDispatchClient).postFile(fileMock.file);
 
         StepVerifier
                 .create(fileDispatchService.dispatch(fileMock.dokumentobjektDto))
@@ -96,8 +97,8 @@ class FileDispatchServiceTest {
         verify(fileClient, times(1)).getFile(fileMock.fileId);
         verifyNoMoreInteractions(fileClient);
 
-        verify(fintArchiveClient, times(1)).postFile(fileMock.file);
-        verifyNoMoreInteractions(fintArchiveClient);
+        verify(fintArchiveDispatchClient, times(1)).postFile(fileMock.file);
+        verifyNoMoreInteractions(fintArchiveDispatchClient);
     }
 
     @Test
@@ -105,7 +106,7 @@ class FileDispatchServiceTest {
         FileMock fileMock = mockFile();
 
         doReturn(Mono.just(fileMock.file)).when(fileClient).getFile(fileMock.fileId);
-        doReturn(Mono.error(new RuntimeException())).when(fintArchiveClient).postFile(fileMock.file);
+        doReturn(Mono.error(new RuntimeException())).when(fintArchiveDispatchClient).postFile(fileMock.file);
 
         StepVerifier
                 .create(fileDispatchService.dispatch(fileMock.dokumentobjektDto))
@@ -115,8 +116,8 @@ class FileDispatchServiceTest {
         verify(fileClient, times(1)).getFile(fileMock.fileId);
         verifyNoMoreInteractions(fileClient);
 
-        verify(fintArchiveClient, times(1)).postFile(fileMock.file);
-        verifyNoMoreInteractions(fintArchiveClient);
+        verify(fintArchiveDispatchClient, times(1)).postFile(fileMock.file);
+        verifyNoMoreInteractions(fintArchiveDispatchClient);
     }
 
     private FileMock mockFile() {

@@ -2,14 +2,15 @@ package no.fintlabs.dispatch.journalpost;
 
 import no.fint.model.resource.Link;
 import no.fint.model.resource.arkiv.noark.JournalpostResource;
-import no.fintlabs.dispatch.file.FilesDispatchService;
-import no.fintlabs.dispatch.file.result.FilesDispatchResult;
-import no.fintlabs.dispatch.journalpost.result.RecordDispatchResult;
-import no.fintlabs.mapping.JournalpostMappingService;
-import no.fintlabs.model.instance.DokumentbeskrivelseDto;
-import no.fintlabs.model.instance.DokumentobjektDto;
-import no.fintlabs.model.instance.JournalpostDto;
-import no.fintlabs.web.archive.FintArchiveClient;
+import no.fintlabs.flyt.gateway.application.archive.dispatch.file.FilesDispatchService;
+import no.fintlabs.flyt.gateway.application.archive.dispatch.file.result.FilesDispatchResult;
+import no.fintlabs.flyt.gateway.application.archive.dispatch.journalpost.RecordDispatchService;
+import no.fintlabs.flyt.gateway.application.archive.dispatch.journalpost.result.RecordDispatchResult;
+import no.fintlabs.flyt.gateway.application.archive.dispatch.mapping.JournalpostMappingService;
+import no.fintlabs.flyt.gateway.application.archive.dispatch.model.instance.DokumentbeskrivelseDto;
+import no.fintlabs.flyt.gateway.application.archive.dispatch.model.instance.DokumentobjektDto;
+import no.fintlabs.flyt.gateway.application.archive.dispatch.model.instance.JournalpostDto;
+import no.fintlabs.flyt.gateway.application.archive.dispatch.web.FintArchiveDispatchClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -34,7 +35,7 @@ class RecordDispatchServiceTest {
     FilesDispatchService filesDispatchService;
 
     @Mock
-    FintArchiveClient fintArchiveClient;
+    FintArchiveDispatchClient fintArchiveDispatchClient;
 
     @InjectMocks
     RecordDispatchService recordDispatchService;
@@ -51,7 +52,7 @@ class RecordDispatchServiceTest {
         JournalpostDto journalpostDto = mock(JournalpostDto.class);
         doReturn(Optional.empty()).when(journalpostDto).getDokumentbeskrivelse();
 
-        doReturn(Mono.empty()).when(fintArchiveClient).postRecord(any(), any());
+        doReturn(Mono.empty()).when(fintArchiveDispatchClient).postRecord(any(), any());
 
         StepVerifier
                 .create(recordDispatchService.dispatch("testCaseId", journalpostDto))
@@ -123,7 +124,7 @@ class RecordDispatchServiceTest {
                 )))
         ).when(filesDispatchService).dispatch(any());
 
-        doReturn(Mono.empty()).when(fintArchiveClient).postRecord(any(), any());
+        doReturn(Mono.empty()).when(fintArchiveDispatchClient).postRecord(any(), any());
 
         StepVerifier
                 .create(recordDispatchService.dispatch("testCaseId", journalpostDto))
@@ -148,15 +149,15 @@ class RecordDispatchServiceTest {
         JournalpostResource journalpostResource = mock(JournalpostResource.class);
         doReturn(journalpostResource).when(journalpostMappingService).toJournalpostResource(any(), any());
 
-        doReturn(Mono.empty()).when(fintArchiveClient).postRecord(any(), any());
+        doReturn(Mono.empty()).when(fintArchiveDispatchClient).postRecord(any(), any());
 
         StepVerifier
                 .create(recordDispatchService.dispatch("testCaseId", journalpostDto))
                 .verifyComplete();
 
-        verify(fintArchiveClient, times(1))
+        verify(fintArchiveDispatchClient, times(1))
                 .postRecord(caseId, journalpostResource);
-        verifyNoMoreInteractions(fintArchiveClient);
+        verifyNoMoreInteractions(fintArchiveDispatchClient);
     }
 
     @Test
@@ -169,7 +170,7 @@ class RecordDispatchServiceTest {
 
         JournalpostResource journalpostResourcePostResult = mock(JournalpostResource.class);
         doReturn(123L).when(journalpostResourcePostResult).getJournalPostnummer();
-        doReturn(Mono.just(journalpostResourcePostResult)).when(fintArchiveClient).postRecord(any(), any());
+        doReturn(Mono.just(journalpostResourcePostResult)).when(fintArchiveDispatchClient).postRecord(any(), any());
 
         StepVerifier
                 .create(recordDispatchService.dispatch("testCaseId", journalpostDto))
@@ -186,7 +187,7 @@ class RecordDispatchServiceTest {
 
         WebClientResponseException webClientResponseException = mock(WebClientResponseException.class);
         doReturn("test response body").when(webClientResponseException).getResponseBodyAsString();
-        doReturn(Mono.error(webClientResponseException)).when(fintArchiveClient).postRecord(any(), any());
+        doReturn(Mono.error(webClientResponseException)).when(fintArchiveDispatchClient).postRecord(any(), any());
 
         StepVerifier
                 .create(recordDispatchService.dispatch("testCaseId", journalpostDto))
@@ -203,7 +204,7 @@ class RecordDispatchServiceTest {
         JournalpostResource journalpostResource = mock(JournalpostResource.class);
         doReturn(journalpostResource).when(journalpostMappingService).toJournalpostResource(any(), any());
 
-        doReturn(Mono.error(new RuntimeException())).when(fintArchiveClient).postRecord(any(), any());
+        doReturn(Mono.error(new RuntimeException())).when(fintArchiveDispatchClient).postRecord(any(), any());
 
         StepVerifier
                 .create(recordDispatchService.dispatch("testCaseId", journalpostDto))

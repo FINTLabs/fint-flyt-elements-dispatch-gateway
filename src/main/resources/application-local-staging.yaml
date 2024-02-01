@@ -1,12 +1,17 @@
 fint:
   org-id: fintlabs.no
   flyt:
-    file-service-url: http://localhost:8091
-  dispatch-gateway:
-    authorization:
-      enable: true
-  client:
-    base-url: https://beta.felleskomponent.no
+    gateway:
+      application:
+        archive:
+          client:
+            fint-flyt-file:
+              base-url: http://localhost:8091
+            fint-archive:
+              base-url: https://beta.felleskomponent.no
+              authorization:
+                enable: true
+
   kafka:
     default-replicas: 1
 spring:

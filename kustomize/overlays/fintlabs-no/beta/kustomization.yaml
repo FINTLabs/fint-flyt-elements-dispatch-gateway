@@ -6,11 +6,13 @@ resources:
   - flais.yaml
 
 commonLabels:
-  app.kubernetes.io/instance: fint-flyt-archive-dispatch-gateway_fintlabs_no
   fintlabs.no/org-id: fintlabs.no
 
 patches:
   - patch: |-
+      - op: replace
+        path: "/metadata/labels/app.kubernetes.io~1instance"
+        value: "fint-archive-gateway_fintlabs_no"
       - op: replace
         path: "/spec/kafka/acls/0/topic"
         value: "fintlabs-no.flyt.*"
@@ -22,4 +24,4 @@ patches:
         value: "https://beta.felleskomponent.no"
     target:
       kind: Application
-      name: fint-flyt-archive-dispatch-gateway
+      name: fint-archive-gateway

@@ -2,9 +2,11 @@ package no.fintlabs.dispatch.file;
 
 import lombok.AllArgsConstructor;
 import no.fint.model.resource.Link;
-import no.fintlabs.dispatch.file.result.FileDispatchResult;
-import no.fintlabs.dispatch.file.result.FilesDispatchResult;
-import no.fintlabs.model.instance.DokumentobjektDto;
+import no.fintlabs.flyt.gateway.application.archive.dispatch.file.FileDispatchService;
+import no.fintlabs.flyt.gateway.application.archive.dispatch.file.FilesDispatchService;
+import no.fintlabs.flyt.gateway.application.archive.dispatch.file.result.FileDispatchResult;
+import no.fintlabs.flyt.gateway.application.archive.dispatch.file.result.FilesDispatchResult;
+import no.fintlabs.flyt.gateway.application.archive.dispatch.model.instance.DokumentobjektDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
