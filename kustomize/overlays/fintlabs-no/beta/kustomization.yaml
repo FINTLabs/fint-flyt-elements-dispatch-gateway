@@ -24,4 +24,4 @@ patches:
         value: "https://beta.felleskomponent.no"
     target:
       kind: Application
-      name: fint-archive-gateway
+      name: fint-flyt-archive-gateway

@@ -4,8 +4,8 @@ metadata:
   name: fint-flyt-archive-gateway
   namespace: fintlabs-no
   labels:
-    app.kubernetes.io/instance: fint-flyt-archive-gateway_fintlabs_no
     app.kubernetes.io/name: fint-flyt-archive-gateway
+    app.kubernetes.io/instance: fint-flyt-archive-gateway_fintlabs_no
     app.kubernetes.io/version: latest
     app.kubernetes.io/component: backend
     app.kubernetes.io/part-of: fint-flyt
