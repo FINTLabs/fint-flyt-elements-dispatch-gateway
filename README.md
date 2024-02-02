@@ -1,1 +1,1 @@
-# FINT Flyt Archive Dispatch Gateway
+# FINT Flyt Archive Gateway
