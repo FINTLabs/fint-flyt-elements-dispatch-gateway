@@ -1,10 +1,14 @@
 package no.fintlabs.mapping;
 
 import no.fint.model.resource.arkiv.noark.KorrespondansepartResource;
-import no.fintlabs.model.instance.AdresseDto;
-import no.fintlabs.model.instance.KontaktinformasjonDto;
-import no.fintlabs.model.instance.KorrespondansepartDto;
-import no.fintlabs.model.instance.SkjermingDto;
+import no.fintlabs.flyt.gateway.application.archive.dispatch.mapping.AdresseMappingService;
+import no.fintlabs.flyt.gateway.application.archive.dispatch.mapping.KontaktinformasjonMappingService;
+import no.fintlabs.flyt.gateway.application.archive.dispatch.mapping.KorrespondansepartMappingService;
+import no.fintlabs.flyt.gateway.application.archive.dispatch.mapping.SkjermingMappingService;
+import no.fintlabs.flyt.gateway.application.archive.dispatch.model.instance.AdresseDto;
+import no.fintlabs.flyt.gateway.application.archive.dispatch.model.instance.KontaktinformasjonDto;
+import no.fintlabs.flyt.gateway.application.archive.dispatch.model.instance.KorrespondansepartDto;
+import no.fintlabs.flyt.gateway.application.archive.dispatch.model.instance.SkjermingDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

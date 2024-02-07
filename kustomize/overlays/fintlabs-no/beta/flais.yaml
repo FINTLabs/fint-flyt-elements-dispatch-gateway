@@ -1,11 +1,11 @@
 apiVersion: fintlabs.no/v1alpha1
 kind: Application
 metadata:
-  name: fint-flyt-archive-dispatch-gateway
+  name: fint-flyt-archive-gateway
   namespace: fintlabs-no
   labels:
-    app.kubernetes.io/instance: fint-flyt-archive-dispatch-gateway_fintlabs_no
-    app.kubernetes.io/name: fint-flyt-archive-dispatch-gateway
+    app.kubernetes.io/name: fint-flyt-archive-gateway
+    app.kubernetes.io/instance: fint-archive-gateway_fintlabs_no
     app.kubernetes.io/version: latest
     app.kubernetes.io/component: backend
     app.kubernetes.io/part-of: fint-flyt
@@ -15,7 +15,7 @@ spec:
   port: 8080
   imagePullPolicy: Always
   orgId: fintlabs.no
-  image: ghcr.io/fintlabs/fint-flyt-archive-dispatch-gateway:sha-0000000
+  image: ghcr.io/fintlabs/fint-archive-gateway:sha-0000000
   kafka:
     enabled: true
     acls:
@@ -26,21 +26,19 @@ spec:
       value: '-XX:+ExitOnOutOfMemoryError -Xmx1840M'
     - name: fint.client.base-url
       value: path
-    - name: fint.dispatch-gateway.authorization.enable
+    - name: fint-flyt-archive-gateway.authorization.enable
       value: 'true'
   onePassword:
     itemPath: "vaults/aks-beta-vault/items/fint-flyt-archive-fint-client-vlfk-no"
   envFrom:
     - secretRef:
-        name: fint-resource-gateway-op
-    - secretRef:
-        name: fint-flyt-file-oauth2-client
+        name: fint-flyt-archive-gateway-op
   resources:
     limits:
-      memory: "2048Mi"
+      memory: "4Gi"
       cpu: "1"
     requests:
-      memory: "512Mi"
+      memory: "4Gi"
       cpu: "100m"
   restartPolicy: Always
   replicas: 1

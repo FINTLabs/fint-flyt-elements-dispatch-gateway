@@ -1,7 +1,8 @@
 package no.fintlabs.mapping;
 
 import no.fint.model.felles.kompleksedatatyper.Kontaktinformasjon;
-import no.fintlabs.model.instance.KontaktinformasjonDto;
+import no.fintlabs.flyt.gateway.application.archive.dispatch.mapping.KontaktinformasjonMappingService;
+import no.fintlabs.flyt.gateway.application.archive.dispatch.model.instance.KontaktinformasjonDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

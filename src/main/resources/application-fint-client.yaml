@@ -1,15 +1,17 @@
 fint:
-  client:
-    registration-id: fint
-    username: ${fint.core.oauth2.username}
-    password: ${fint.core.oauth2.password}
+  flyt:
+    gateway:
+      application:
+        archive:
+          client:
+            fint-archive:
+              registration-id: fint
+              username: ${fint.core.oauth2.username}
+              password: ${fint.core.oauth2.password}
 spring:
   security:
     oauth2:
       client:
-        provider:
-          fint-idp:
-            token-uri: https://idp.felleskomponent.no/nidp/oauth/nam/token?resourceServer=fint-api
         registration:
           fint:
             authorization-grant-type: password

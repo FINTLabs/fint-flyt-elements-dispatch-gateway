@@ -1,8 +1,8 @@
 package no.fintlabs.configuration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import no.fintlabs.template.*;
-import no.fintlabs.template.model.MappingTemplate;
+import no.fintlabs.flyt.gateway.application.archive.template.*;
+import no.fintlabs.flyt.gateway.application.archive.template.model.MappingTemplate;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -12,7 +12,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 
 import javax.validation.ConstraintViolation;
-import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import java.util.Set;
