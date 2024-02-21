@@ -1,10 +1,13 @@
 package no.fintlabs.flyt.gateway.application.archive.resource;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import no.fintlabs.cache.FintCache;
+import no.fintlabs.cache.FintCacheManager;
 import no.fintlabs.flyt.gateway.application.archive.resource.configuration.EntityPipeline;
 import no.fintlabs.flyt.gateway.application.archive.resource.configuration.EntityPipelineConfiguration;
-import no.fintlabs.flyt.gateway.application.archive.resource.configuration.ResourcesConfiguration;
 import no.fintlabs.flyt.gateway.application.archive.resource.configuration.EntityPipelineFactory;
+import no.fintlabs.flyt.gateway.application.archive.resource.configuration.ResourcesConfiguration;
 import no.fintlabs.flyt.gateway.application.archive.resource.web.FintArchiveResourceClient;
 import no.fintlabs.kafka.entity.EntityProducer;
 import no.fintlabs.kafka.entity.EntityProducerFactory;
@@ -14,10 +17,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClientException;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -28,13 +28,16 @@ public class FintResourcePublishingComponent {
     private final EntityProducer<Object> entityProducer;
     private final FintArchiveResourceClient fintArchiveResourceClient;
     private final List<EntityPipeline> entityPipelines;
+    private final FintCacheManager fintCacheManager;
+
 
     public FintResourcePublishingComponent(
             EntityTopicService entityTopicService,
             ResourcesConfiguration resourcesConfiguration,
             EntityPipelineFactory entityPipelineFactory,
             EntityProducerFactory entityProducerFactory,
-            FintArchiveResourceClient fintArchiveResourceClient
+            FintArchiveResourceClient fintArchiveResourceClient,
+            FintCacheManager fintCacheManager
     ) {
         this.entityTopicService = entityTopicService;
         this.entityProducer = entityProducerFactory.createProducer(Object.class);
@@ -43,6 +46,7 @@ public class FintResourcePublishingComponent {
                 entityPipelineFactory,
                 resourcesConfiguration.getEntityPipelines()
         );
+        this.fintCacheManager = fintCacheManager;
         this.ensureTopics(entityPipelines, resourcesConfiguration.getRefresh().getTopicRetentionTimeMs());
     }
 
@@ -89,39 +93,60 @@ public class FintResourcePublishingComponent {
 
     private void pullUpdatedEntityResources(EntityPipeline entityPipeline) {
         List<HashMap<String, Object>> resources = getUpdatedResources(entityPipeline.getFintEndpoint());
+
+        ObjectMapper objectMapper = new ObjectMapper();
+
         for (HashMap<String, Object> resource : resources) {
-            String key = getKey(resource, entityPipeline.getSelfLinkKeyFilter());
 
-            entityPipeline.getSubEntityPipeline().ifPresent(
-                    subEntityPipeline -> {
+            String fullClassName = entityPipeline.getFullClassName();
 
-                        List<HashMap<String, Object>> subResources = (List<HashMap<String, Object>>) resource.get(subEntityPipeline.getSubEntityName());
+            try {
+                Class<?> clazz = Class.forName(fullClassName);
+                Object resourceObject = objectMapper.convertValue(resource, clazz);
 
-                        if (subResources != null) {
+                @SuppressWarnings("unchecked")
+                FintCache<String, Object> cache = (FintCache<String, Object>) fintCacheManager.getCache(
+                        fullClassName.toLowerCase(Locale.ROOT),
+                        String.class,
+                        clazz
+                );
 
-                            for (HashMap<String, Object> subResource : subResources) {
-                                entityProducer.send(
-                                        EntityProducerRecord.builder()
-                                                .topicNameParameters(subEntityPipeline.getTopicNameParameters())
-                                                .key(key + "-" + subResource.get(subEntityPipeline.getKeySuffixFilter()))
-                                                .value(subResource)
-                                                .build()
-                                );
+                String key = getKey(resource, entityPipeline.getSelfLinkKeyFilter());
+
+                cache.put(key, resourceObject);
+
+                entityPipeline.getSubEntityPipeline().ifPresent(
+                        subEntityPipeline -> {
+
+                            List<HashMap<String, Object>> subResources = (List<HashMap<String, Object>>) resource.get(subEntityPipeline.getSubEntityName());
+
+                            if (subResources != null) {
+
+                                for (HashMap<String, Object> subResource : subResources) {
+                                    entityProducer.send(
+                                            EntityProducerRecord.builder()
+                                                    .topicNameParameters(subEntityPipeline.getTopicNameParameters())
+                                                    .key(key + "-" + subResource.get(subEntityPipeline.getKeySuffixFilter()))
+                                                    .value(subResource)
+                                                    .build()
+                                    );
+                                }
+
+                                subResources.clear();
                             }
-
-                            subResources.clear();
                         }
-                    }
-            );
+                );
 
-            entityProducer.send(
-                    EntityProducerRecord.builder()
-                            .topicNameParameters(entityPipeline.getTopicNameParameters())
-                            .key(key)
-                            .value(resource)
-                            .build()
-            );
-
+                entityProducer.send(
+                        EntityProducerRecord.builder()
+                                .topicNameParameters(entityPipeline.getTopicNameParameters())
+                                .key(key)
+                                .value(resource)
+                                .build()
+                );
+            } catch (ClassNotFoundException e) {
+                log.error(String.valueOf(e));
+            }
 
         }
         log.info(resources.size() + " entities sent to " + entityPipeline.getTopicNameParameters());

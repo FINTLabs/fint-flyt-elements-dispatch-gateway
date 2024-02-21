@@ -10,5 +10,7 @@ public class EntityPipelineConfiguration {
     private String kafkaTopic;
     private String fintEndpoint;
     private String selfLinkKeyFilter;
+    private String endpointClassPath;
+    private String classPath;
     private SubEntityPipelineConfiguration subEntityPipelineConfiguration;
 }
