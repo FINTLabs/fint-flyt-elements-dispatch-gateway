@@ -56,11 +56,11 @@ fint:
                 class-path: arkiv.noark
               - resource-reference: PersonalressursResource
                 class-path: administrasjon.personal
-                self-link-key-filter: ansattnummer
+                kafka-link-key-filter: ansattnummer
               - resource-reference: PersonResource
                 endpoint-class-path: administrasjon.personal
                 class-path: felles
-                self-link-key-filter: fodselsnummer
+                kafka-link-key-filter: fodselsnummer
 
   cache:
     defaultCacheEntryTimeToLiveMillis: 518400000

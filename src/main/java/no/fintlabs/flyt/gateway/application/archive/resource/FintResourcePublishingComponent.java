@@ -2,8 +2,10 @@ package no.fintlabs.flyt.gateway.application.archive.resource;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import no.fint.model.resource.FintLinks;
 import no.fintlabs.cache.FintCache;
 import no.fintlabs.cache.FintCacheManager;
+import no.fintlabs.flyt.gateway.application.archive.links.ResourceLinkUtil;
 import no.fintlabs.flyt.gateway.application.archive.resource.configuration.EntityPipeline;
 import no.fintlabs.flyt.gateway.application.archive.resource.configuration.EntityPipelineConfiguration;
 import no.fintlabs.flyt.gateway.application.archive.resource.configuration.EntityPipelineFactory;
@@ -111,9 +113,12 @@ public class FintResourcePublishingComponent {
                         clazz
                 );
 
-                String key = getKey(resource, entityPipeline.getSelfLinkKeyFilter());
+                if (resourceObject instanceof FintLinks fintLinkObject) {
+                    List<String> selfLinks = ResourceLinkUtil.getSelfLinks(fintLinkObject);
+                    selfLinks.forEach(key -> cache.put(key, resourceObject));
+                }
 
-                cache.put(key, resourceObject);
+                String key = getKey(resource, entityPipeline.getSelfLinkKeyFilter());
 
                 entityPipeline.getSubEntityPipeline().ifPresent(
                         subEntityPipeline -> {
@@ -170,7 +175,7 @@ public class FintResourcePublishingComponent {
         return selfLinks.stream()
                 .filter(o -> o.containsKey("href"))
                 .map(o -> o.get("href"))
-                .map(k -> k.replaceFirst("^https:/\\/.+\\.felleskomponent.no", ""))
+                .map(k -> k.replaceFirst("^https://.+\\.felleskomponent.no", ""))
                 .filter(o -> o.toLowerCase().contains(selfLinkKeyFilter))
                 .min(String::compareTo)
                 .orElseThrow(() -> new IllegalStateException(String.format("No %s to generate key for resource=%s", selfLinkKeyFilter, resource)));

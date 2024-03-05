@@ -33,8 +33,8 @@ public class EntityPipelineFactory {
                                 .replace("resource", ""))
                 .replace(".", "/");
 
-        String selfLinkKeyFilter = StringUtils.isNotEmpty(configuration.getSelfLinkKeyFilter())
-                ? configuration.getSelfLinkKeyFilter()
+        String selfLinkKeyFilter = StringUtils.isNotEmpty(configuration.getKafkaLinkKeyFilter())
+                ? configuration.getKafkaLinkKeyFilter()
                 : "systemid";
 
         String fullClassName = basePath + "." + configuration.getClassPath() + "." + configuration.getResourceReference();
