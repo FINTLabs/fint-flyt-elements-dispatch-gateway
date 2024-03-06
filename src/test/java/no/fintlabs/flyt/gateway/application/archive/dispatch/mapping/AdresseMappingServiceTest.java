@@ -1,7 +1,6 @@
-package no.fintlabs.mapping;
+package no.fintlabs.flyt.gateway.application.archive.dispatch.mapping;
 
 import no.fint.model.resource.felles.kompleksedatatyper.AdresseResource;
-import no.fintlabs.flyt.gateway.application.archive.dispatch.mapping.AdresseMappingService;
 import no.fintlabs.flyt.gateway.application.archive.dispatch.model.instance.AdresseDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

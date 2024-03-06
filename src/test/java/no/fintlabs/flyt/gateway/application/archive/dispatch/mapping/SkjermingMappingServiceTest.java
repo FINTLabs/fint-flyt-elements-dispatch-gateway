@@ -1,7 +1,6 @@
-package no.fintlabs.mapping;
+package no.fintlabs.flyt.gateway.application.archive.dispatch.mapping;
 
 import no.fint.model.resource.arkiv.noark.SkjermingResource;
-import no.fintlabs.flyt.gateway.application.archive.dispatch.mapping.SkjermingMappingService;
 import no.fintlabs.flyt.gateway.application.archive.dispatch.model.instance.SkjermingDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

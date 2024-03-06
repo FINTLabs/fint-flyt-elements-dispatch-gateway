@@ -1,13 +1,9 @@
-package no.fintlabs.mapping;
+package no.fintlabs.flyt.gateway.application.archive.dispatch.mapping;
 
 import no.fint.model.resource.Link;
 import no.fint.model.resource.arkiv.noark.PartResource;
 import no.fint.model.resource.arkiv.noark.SakResource;
 import no.fint.model.resource.arkiv.noark.SkjermingResource;
-import no.fintlabs.flyt.gateway.application.archive.dispatch.mapping.KlasseMappingService;
-import no.fintlabs.flyt.gateway.application.archive.dispatch.mapping.PartMappingService;
-import no.fintlabs.flyt.gateway.application.archive.dispatch.mapping.SakMappingService;
-import no.fintlabs.flyt.gateway.application.archive.dispatch.mapping.SkjermingMappingService;
 import no.fintlabs.flyt.gateway.application.archive.dispatch.model.instance.PartDto;
 import no.fintlabs.flyt.gateway.application.archive.dispatch.model.instance.SakDto;
 import no.fintlabs.flyt.gateway.application.archive.dispatch.model.instance.SkjermingDto;

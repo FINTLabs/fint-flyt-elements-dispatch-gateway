@@ -1,10 +1,9 @@
-package no.fintlabs.dispatch.journalpost;
+package no.fintlabs.flyt.gateway.application.archive.dispatch.journalpost;
 
 import no.fint.model.resource.Link;
 import no.fint.model.resource.arkiv.noark.JournalpostResource;
 import no.fintlabs.flyt.gateway.application.archive.dispatch.file.FilesDispatchService;
 import no.fintlabs.flyt.gateway.application.archive.dispatch.file.result.FilesDispatchResult;
-import no.fintlabs.flyt.gateway.application.archive.dispatch.journalpost.RecordDispatchService;
 import no.fintlabs.flyt.gateway.application.archive.dispatch.journalpost.result.RecordDispatchResult;
 import no.fintlabs.flyt.gateway.application.archive.dispatch.mapping.JournalpostMappingService;
 import no.fintlabs.flyt.gateway.application.archive.dispatch.model.instance.DokumentbeskrivelseDto;

@@ -1,8 +1,5 @@
-package no.fintlabs.dispatch;
+package no.fintlabs.flyt.gateway.application.archive.dispatch;
 
-import no.fintlabs.flyt.gateway.application.archive.dispatch.DispatchMessageFormattingService;
-import no.fintlabs.flyt.gateway.application.archive.dispatch.DispatchResult;
-import no.fintlabs.flyt.gateway.application.archive.dispatch.RecordsProcessingService;
 import no.fintlabs.flyt.gateway.application.archive.dispatch.journalpost.RecordsDispatchService;
 import no.fintlabs.flyt.gateway.application.archive.dispatch.journalpost.result.RecordsDispatchResult;
 import no.fintlabs.flyt.gateway.application.archive.dispatch.model.instance.JournalpostDto;

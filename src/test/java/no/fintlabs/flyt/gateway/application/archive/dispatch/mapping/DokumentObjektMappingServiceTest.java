@@ -1,8 +1,7 @@
-package no.fintlabs.mapping;
+package no.fintlabs.flyt.gateway.application.archive.dispatch.mapping;
 
 import no.fint.model.resource.Link;
 import no.fint.model.resource.arkiv.noark.DokumentobjektResource;
-import no.fintlabs.flyt.gateway.application.archive.dispatch.mapping.DokumentObjektMappingService;
 import no.fintlabs.flyt.gateway.application.archive.dispatch.model.instance.DokumentobjektDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -11,7 +10,8 @@ import org.mockito.InjectMocks;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 
 class DokumentObjektMappingServiceTest {

@@ -1,17 +1,14 @@
-package no.fintlabs.dispatch;
+package no.fintlabs.flyt.gateway.application.archive.dispatch;
 
 import no.fint.model.felles.kompleksedatatyper.Identifikator;
 import no.fint.model.resource.arkiv.noark.SakResource;
-import no.fintlabs.flyt.gateway.application.archive.dispatch.DispatchResult;
-import no.fintlabs.flyt.gateway.application.archive.dispatch.DispatchService;
-import no.fintlabs.flyt.gateway.application.archive.dispatch.RecordsProcessingService;
-import no.fintlabs.flyt.gateway.application.archive.dispatch.sak.CaseDispatchService;
-import no.fintlabs.flyt.gateway.application.archive.dispatch.sak.result.CaseDispatchResult;
-import no.fintlabs.flyt.kafka.headers.InstanceFlowHeaders;
 import no.fintlabs.flyt.gateway.application.archive.dispatch.model.CaseDispatchType;
 import no.fintlabs.flyt.gateway.application.archive.dispatch.model.instance.ArchiveInstance;
 import no.fintlabs.flyt.gateway.application.archive.dispatch.model.instance.JournalpostDto;
 import no.fintlabs.flyt.gateway.application.archive.dispatch.model.instance.SakDto;
+import no.fintlabs.flyt.gateway.application.archive.dispatch.sak.CaseDispatchService;
+import no.fintlabs.flyt.gateway.application.archive.dispatch.sak.result.CaseDispatchResult;
+import no.fintlabs.flyt.kafka.headers.InstanceFlowHeaders;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

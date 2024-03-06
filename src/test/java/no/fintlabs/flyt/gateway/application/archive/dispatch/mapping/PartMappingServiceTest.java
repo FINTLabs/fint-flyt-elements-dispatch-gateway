@@ -1,14 +1,11 @@
-package no.fintlabs.mapping;
+package no.fintlabs.flyt.gateway.application.archive.dispatch.mapping;
 
 import no.fint.model.felles.kompleksedatatyper.Kontaktinformasjon;
 import no.fint.model.resource.arkiv.noark.PartResource;
 import no.fint.model.resource.felles.kompleksedatatyper.AdresseResource;
-import no.fintlabs.flyt.gateway.application.archive.dispatch.mapping.AdresseMappingService;
-import no.fintlabs.flyt.gateway.application.archive.dispatch.mapping.KontaktinformasjonMappingService;
-import no.fintlabs.flyt.gateway.application.archive.dispatch.mapping.PartMappingService;
-import no.fintlabs.flyt.gateway.application.archive.dispatch.model.instance.PartDto;
 import no.fintlabs.flyt.gateway.application.archive.dispatch.model.instance.AdresseDto;
 import no.fintlabs.flyt.gateway.application.archive.dispatch.model.instance.KontaktinformasjonDto;
+import no.fintlabs.flyt.gateway.application.archive.dispatch.model.instance.PartDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -16,7 +13,9 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.util.ArrayList;
-import static org.junit.jupiter.api.Assertions.*;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.when;
 
 public class PartMappingServiceTest {

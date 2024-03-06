@@ -1,9 +1,7 @@
-package no.fintlabs.dispatch.file;
+package no.fintlabs.flyt.gateway.application.archive.dispatch.file;
 
 import lombok.AllArgsConstructor;
 import no.fint.model.resource.Link;
-import no.fintlabs.flyt.gateway.application.archive.dispatch.file.FileDispatchService;
-import no.fintlabs.flyt.gateway.application.archive.dispatch.file.FilesDispatchService;
 import no.fintlabs.flyt.gateway.application.archive.dispatch.file.result.FileDispatchResult;
 import no.fintlabs.flyt.gateway.application.archive.dispatch.file.result.FilesDispatchResult;
 import no.fintlabs.flyt.gateway.application.archive.dispatch.model.instance.DokumentobjektDto;

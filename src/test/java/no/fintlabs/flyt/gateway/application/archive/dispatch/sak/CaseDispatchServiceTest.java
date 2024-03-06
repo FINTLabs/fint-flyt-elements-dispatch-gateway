@@ -1,15 +1,14 @@
-package no.fintlabs.dispatch.sak;
+package no.fintlabs.flyt.gateway.application.archive.dispatch.sak;
 
 import no.fint.model.felles.kompleksedatatyper.Identifikator;
 import no.fint.model.resource.arkiv.noark.SakResource;
-import no.fintlabs.flyt.gateway.application.archive.dispatch.sak.CaseDispatchService;
-import no.fintlabs.flyt.gateway.application.archive.dispatch.sak.result.CaseDispatchResult;
 import no.fintlabs.flyt.gateway.application.archive.dispatch.mapping.SakMappingService;
 import no.fintlabs.flyt.gateway.application.archive.dispatch.model.instance.ArchiveInstance;
 import no.fintlabs.flyt.gateway.application.archive.dispatch.model.instance.CaseSearchParametersDto;
 import no.fintlabs.flyt.gateway.application.archive.dispatch.model.instance.SakDto;
-import no.fintlabs.flyt.gateway.application.archive.resource.web.CaseSearchParametersService;
+import no.fintlabs.flyt.gateway.application.archive.dispatch.sak.result.CaseDispatchResult;
 import no.fintlabs.flyt.gateway.application.archive.dispatch.web.FintArchiveDispatchClient;
+import no.fintlabs.flyt.gateway.application.archive.resource.web.CaseSearchParametersService;
 import no.fintlabs.flyt.gateway.application.archive.resource.web.FintArchiveResourceClient;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -130,10 +129,10 @@ class CaseDispatchServiceTest {
                 .expectNext(List.of(sakResource))
                 .verifyComplete();
 
-        verify(caseSearchParametersService,times(1)).createFilterQueryParamValue(sakDto, caseSearchParametersDto);
+        verify(caseSearchParametersService, times(1)).createFilterQueryParamValue(sakDto, caseSearchParametersDto);
         verifyNoMoreInteractions(caseSearchParametersService);
 
-        verify(fintArchiveResourceClient,times(1)).findCasesWithFilter("test case filter");
+        verify(fintArchiveResourceClient, times(1)).findCasesWithFilter("test case filter");
         verifyNoMoreInteractions(fintArchiveResourceClient);
     }
 
