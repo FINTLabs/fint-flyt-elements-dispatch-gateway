@@ -22,6 +22,20 @@ patches:
       - op: replace
         path: "/spec/env/1/value"
         value: "https://beta.felleskomponent.no"
+      - op: replace
+        path: "/spec/url/basePath"
+        value: "/beta/vlfk-no"
+      - op: replace
+        path: "/spec/ingress/basePath"
+        value: "/beta/vlfk-no/api/intern/arkiv"
+      - op: replace
+        path: "/spec/env/1/value"
+        value: |
+          {
+            "vlfk.no":["https://role-catalog.vigoiks.no/vigo/flyt/user"],
+            "vigo.no":["https://role-catalog.vigoiks.no/vigo/flyt/developer"],
+            "novari.no":["https://role-catalog.vigoiks.no/vigo/flyt/developer"]
+          }
     target:
       kind: Application
       name: fint-flyt-archive-gateway
