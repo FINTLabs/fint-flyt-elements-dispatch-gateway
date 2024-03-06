@@ -8,7 +8,7 @@ fint:
             fint-flyt-file:
               base-url: http://localhost:8091
             fint-archive:
-              base-url: https://api.felleskomponent.no
+              base-url: https://beta.felleskomponent.no
               authorization:
                 enable: true
     resource-server:
