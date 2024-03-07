@@ -20,16 +20,16 @@ patches:
         path: "/spec/orgId"
         value: "vlfk.no"
       - op: replace
-        path: "/spec/env/1/value"
-        value: "https://beta.felleskomponent.no"
-      - op: replace
         path: "/spec/url/basePath"
         value: "/beta/vlfk-no"
       - op: replace
         path: "/spec/ingress/basePath"
         value: "/beta/vlfk-no/api/intern/arkiv"
       - op: replace
-        path: "/spec/env/1/value"
+        path: "/spec/env/3/value"
+        value: "https://beta.felleskomponent.no"
+      - op: replace
+        path: "/spec/env/4/value"
         value: |
           {
             "vlfk.no":["https://role-catalog.vigoiks.no/vigo/flyt/user"],
