@@ -115,40 +115,44 @@ public class FintResourcePublishingComponent {
 
                 if (resourceObject instanceof FintLinks fintLinkObject) {
                     List<String> selfLinks = ResourceLinkUtil.getSelfLinks(fintLinkObject);
-                    selfLinks.forEach(key -> cache.put(key, resourceObject));
+                    selfLinks.forEach(
+                            key -> {
+                                cache.put(key, resourceObject);
+//                                String key = getKey(resource, entityPipeline.getSelfLinkKeyFilter());
+
+                                entityPipeline.getSubEntityPipeline().ifPresent(
+                                        subEntityPipeline -> {
+
+                                            List<HashMap<String, Object>> subResources = (List<HashMap<String, Object>>) resource.get(subEntityPipeline.getSubEntityName());
+
+                                            if (subResources != null) {
+
+                                                for (HashMap<String, Object> subResource : subResources) {
+                                                    entityProducer.send(
+                                                            EntityProducerRecord.builder()
+                                                                    .topicNameParameters(subEntityPipeline.getTopicNameParameters())
+                                                                    .key(key + "-" + subResource.get(subEntityPipeline.getKeySuffixFilter()))
+                                                                    .value(subResource)
+                                                                    .build()
+                                                    );
+                                                }
+
+                                                subResources.clear();
+                                            }
+                                        }
+                                );
+
+                                entityProducer.send(
+                                        EntityProducerRecord.builder()
+                                                .topicNameParameters(entityPipeline.getTopicNameParameters())
+                                                .key(key)
+                                                .value(resource)
+                                                .build()
+                                );
+                            }
+                    );
                 }
 
-                String key = getKey(resource, entityPipeline.getSelfLinkKeyFilter());
-
-                entityPipeline.getSubEntityPipeline().ifPresent(
-                        subEntityPipeline -> {
-
-                            List<HashMap<String, Object>> subResources = (List<HashMap<String, Object>>) resource.get(subEntityPipeline.getSubEntityName());
-
-                            if (subResources != null) {
-
-                                for (HashMap<String, Object> subResource : subResources) {
-                                    entityProducer.send(
-                                            EntityProducerRecord.builder()
-                                                    .topicNameParameters(subEntityPipeline.getTopicNameParameters())
-                                                    .key(key + "-" + subResource.get(subEntityPipeline.getKeySuffixFilter()))
-                                                    .value(subResource)
-                                                    .build()
-                                    );
-                                }
-
-                                subResources.clear();
-                            }
-                        }
-                );
-
-                entityProducer.send(
-                        EntityProducerRecord.builder()
-                                .topicNameParameters(entityPipeline.getTopicNameParameters())
-                                .key(key)
-                                .value(resource)
-                                .build()
-                );
             } catch (ClassNotFoundException e) {
                 log.error(String.valueOf(e));
             }

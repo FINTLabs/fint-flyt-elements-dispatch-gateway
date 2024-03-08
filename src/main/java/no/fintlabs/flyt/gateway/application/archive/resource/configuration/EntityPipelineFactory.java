@@ -16,7 +16,13 @@ public class EntityPipelineFactory {
 
         EntityTopicNameParameters topicNameParameters =
                 EntityTopicNameParameters.builder()
-                        .resource(configuration.getResourceReference())
+                        .resource(
+                                configuration.getClassPath() + "-" +
+                                        configuration
+                                                .getResourceReference()
+                                                .toLowerCase()
+                                                .replace("resource", "")
+                                                .replace(".", "-"))
                         .build();
 
         String effectiveClassPath = StringUtils.isNotEmpty(configuration.getEndpointClassPath())
