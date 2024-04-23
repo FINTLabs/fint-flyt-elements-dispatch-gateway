@@ -45,7 +45,6 @@ class SakMappingServiceTest {
                 .offentligTittel("testOffentligTittel")
                 .saksmappetype("testSaksmappetype")
                 .saksstatus("testSaksstatus")
-                .journalenhet("testJournalenhet")
                 .administrativEnhet("testAdministrativEnhet")
                 .saksansvarlig("testSaksansvarlig")
                 .arkivdel("testArkivdel")
@@ -73,7 +72,6 @@ class SakMappingServiceTest {
 
         assertEquals("testSaksmappetype", getLinkURL(resourceLinks, "saksmappetype"));
         assertEquals("testSaksstatus", getLinkURL(resourceLinks, "saksstatus"));
-        assertEquals("testJournalenhet", getLinkURL(resourceLinks, "journalenhet"));
         assertEquals("testAdministrativEnhet", getLinkURL(resourceLinks, "administrativEnhet"));
         assertEquals("testSaksansvarlig", getLinkURL(resourceLinks, "saksansvarlig"));
         assertEquals("testArkivdel", getLinkURL(resourceLinks, "arkivdel"));

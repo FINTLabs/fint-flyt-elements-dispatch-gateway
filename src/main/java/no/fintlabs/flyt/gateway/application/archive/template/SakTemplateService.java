@@ -71,21 +71,6 @@ public class SakTemplateService {
                 .addTemplate(
                         ElementConfig
                                 .builder()
-                                .key("journalenhet")
-                                .displayName("Journalenhet")
-                                .description("OBS: Ikke i bruk")
-                                .build(),
-                        SelectableValueTemplate
-                                .builder()
-                                .type(SelectableValueTemplate.Type.DYNAMIC_STRING_OR_SEARCH_SELECT)
-                                .selectablesSources(List.of(
-                                        UrlBuilder.builder().urlTemplate("api/intern/arkiv/kodeverk/administrativenhet").build()
-                                ))
-                                .build()
-                )
-                .addTemplate(
-                        ElementConfig
-                                .builder()
                                 .key("administrativEnhet")
                                 .displayName("Administrativ enhet")
                                 .description("Avdeling, kontor eller annen administrativ enhet som har " +
