@@ -6,15 +6,15 @@ import no.fint.model.resource.AbstractCollectionResources;
 
 import java.util.List;
 
-public class ObjectResources extends AbstractCollectionResources<Object> {
+public class ResourceCollection extends AbstractCollectionResources<Object> {
     @Override
     @JsonIgnore
     @Deprecated
     public TypeReference<List<Object>> getTypeReference() {
-        return new TypeReference<>(){
+        return new TypeReference<>() {
         };
     }
 
-    public ObjectResources() {
+    public ResourceCollection() {
     }
 }

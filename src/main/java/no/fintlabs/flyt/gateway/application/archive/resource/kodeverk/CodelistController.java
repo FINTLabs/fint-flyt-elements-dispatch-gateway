@@ -3,9 +3,11 @@ package no.fintlabs.flyt.gateway.application.archive.resource.kodeverk;
 import no.fint.model.felles.basisklasser.Begrep;
 import no.fint.model.felles.kompleksedatatyper.Identifikator;
 import no.fint.model.resource.FintLinks;
-import no.fint.model.resource.Link;
 import no.fint.model.resource.arkiv.kodeverk.*;
-import no.fint.model.resource.arkiv.noark.*;
+import no.fint.model.resource.arkiv.noark.AdministrativEnhetResource;
+import no.fint.model.resource.arkiv.noark.ArkivdelResource;
+import no.fint.model.resource.arkiv.noark.ArkivressursResource;
+import no.fint.model.resource.arkiv.noark.KlassifikasjonssystemResource;
 import no.fintlabs.cache.FintCache;
 import no.fintlabs.flyt.gateway.application.archive.links.ResourceLinkUtil;
 import org.springframework.http.ResponseEntity;
@@ -32,7 +34,6 @@ public class CodelistController {
     private final FintCache<String, DokumentStatusResource> dokumentStatusResourceCache;
     private final FintCache<String, DokumentTypeResource> dokumentTypeResourceCache;
     private final FintCache<String, KlassifikasjonssystemResource> klassifikasjonssystemResourceCache;
-    private final FintCache<String, KlasseResource> klasseResourceCache;
     private final FintCache<String, PartRolleResource> partRolleResourceCache;
     private final FintCache<String, KorrespondansepartTypeResource> korrespondansepartTypeResourceCache;
     private final FintCache<String, SaksstatusResource> saksstatusResourceCache;
@@ -53,7 +54,6 @@ public class CodelistController {
             FintCache<String, DokumentStatusResource> dokumentStatusResourceCache,
             FintCache<String, DokumentTypeResource> dokumentTypeResourceCache,
             FintCache<String, KlassifikasjonssystemResource> klassifikasjonssystemResourceCache,
-            FintCache<String, KlasseResource> klasseResourceCache,
             FintCache<String, PartRolleResource> partRolleResourceCache,
             FintCache<String, KorrespondansepartTypeResource> korrespondansepartTypeResourceCache,
             FintCache<String, SaksstatusResource> saksstatusResourceCache,
@@ -73,7 +73,6 @@ public class CodelistController {
         this.dokumentStatusResourceCache = dokumentStatusResourceCache;
         this.dokumentTypeResourceCache = dokumentTypeResourceCache;
         this.klassifikasjonssystemResourceCache = klassifikasjonssystemResourceCache;
-        this.klasseResourceCache = klasseResourceCache;
         this.partRolleResourceCache = partRolleResourceCache;
         this.korrespondansepartTypeResourceCache = korrespondansepartTypeResourceCache;
         this.saksstatusResourceCache = saksstatusResourceCache;
@@ -121,25 +120,18 @@ public class CodelistController {
 
     @GetMapping("klasse")
     public ResponseEntity<Collection<ResourceReference>> getKlasse(@RequestParam String klassifikasjonssystemLink) {
-        return ResponseEntity.ok(
-                klasseResourceCache
-                        .getAllDistinct()
-                        .stream()
-                        .filter(
-                                klasse -> klasse.getKlassifikasjonssystem()
-                                        .stream()
-                                        .map(Link::getHref)
-                                        .anyMatch(href -> href.equals(klassifikasjonssystemLink))
-                        )
+        return klassifikasjonssystemResourceCache.getOptional(klassifikasjonssystemLink)
+                .map(KlassifikasjonssystemResource::getKlasse)
+                .<Collection<ResourceReference>>map(klasseResources -> klasseResources.stream()
                         .map(klasse -> this.mapToResourceReference(
-                                        klasse.getKlasseId(),
-                                        new ResourceReferenceDisplayNameBuilder()
-                                                .functionalId(klasse.getKlasseId())
-                                                .name(klasse.getTittel())
-                                )
-                        )
-                        .collect(Collectors.toList())
-        );
+                                klasse.getKlasseId(),
+                                new ResourceReferenceDisplayNameBuilder()
+                                        .functionalId(klasse.getKlasseId())
+                                        .name(klasse.getTittel())
+                        )).toList()
+                )
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @GetMapping("arkivdel")

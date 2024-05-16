@@ -1,10 +1,13 @@
 package no.fintlabs.flyt.gateway.application.archive.resource.web;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import no.fint.model.resource.AbstractCollectionResources;
 import no.fint.model.resource.arkiv.noark.SakResource;
 import no.fint.model.resource.arkiv.noark.SakResources;
-import no.fintlabs.flyt.gateway.application.archive.resource.model.ObjectResources;
+import no.fintlabs.flyt.gateway.application.archive.resource.model.ResourceCollection;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
@@ -14,7 +17,6 @@ import java.net.URI;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 
 @Component
 @Slf4j
@@ -23,14 +25,28 @@ public class FintArchiveResourceClient {
 
     private final Map<String, Long> sinceTimestamp = new ConcurrentHashMap<>();
 
+    private final ObjectMapper objectMapper;
+
     public FintArchiveResourceClient(WebClient fintWebClient) {
         this.fintWebClient = fintWebClient;
+        this.objectMapper = new ObjectMapper();
     }
 
-    public Mono<List<Object>> getResourcesLastUpdated(String endpoint) {
-        return getLastUpdated(endpoint)
-                .flatMapIterable(ObjectResources::getContent)
-                .collect(Collectors.toList());
+    public <T> Mono<List<T>> getResourcesLastUpdated(String urlResourcePath, Class<T> resourceClass) {
+        return fintWebClient.get()
+                .uri(urlResourcePath.concat("/last-updated"))
+                .retrieve()
+                .bodyToMono(LastUpdated.class)
+                .flatMap(lastUpdated -> fintWebClient.get()
+                        .uri(urlResourcePath, uriBuilder -> uriBuilder.queryParam("sinceTimeStamp", sinceTimestamp.getOrDefault(urlResourcePath, 0L)).build())
+                        .retrieve()
+                        .bodyToMono(new ParameterizedTypeReference<ResourceCollection>() {
+                        })
+                        .flatMapIterable(AbstractCollectionResources::getContent)
+                        .map(resource -> objectMapper.convertValue(resource, resourceClass))
+                        .collectList()
+                        .doOnNext(it -> sinceTimestamp.put(urlResourcePath, lastUpdated.getLastUpdated()))
+                );
     }
 
     public void resetLastUpdatedTimestamps() {
@@ -51,24 +67,11 @@ public class FintArchiveResourceClient {
                 .onErrorReturn(WebClientResponseException.NotFound.class, List.of())
                 .doOnError(e -> {
                     if (e instanceof WebClientResponseException) {
-                        log.error(e + " body=" + ((WebClientResponseException) e).getResponseBodyAsString());
+                        log.error("{} body={}", e, ((WebClientResponseException) e).getResponseBodyAsString());
                     } else {
                         log.error(e.toString());
                     }
                 });
-    }
-
-    private Mono<ObjectResources> getLastUpdated(String endpoint) {
-        return fintWebClient.get()
-                .uri(endpoint.concat("/last-updated"))
-                .retrieve()
-                .bodyToMono(LastUpdated.class)
-                .flatMap(lastUpdated -> fintWebClient.get()
-                        .uri(endpoint, uriBuilder -> uriBuilder.queryParam("sinceTimeStamp", sinceTimestamp.getOrDefault(endpoint, 0L)).build())
-                        .retrieve()
-                        .bodyToMono(ObjectResources.class)
-                        .doOnNext(it -> sinceTimestamp.put(endpoint, lastUpdated.getLastUpdated()))
-                );
     }
 
     public <T> Mono<T> getResources(String endpoint, Class<T> clazz) {
@@ -81,10 +84,6 @@ public class FintArchiveResourceClient {
     @Data
     private static class LastUpdated {
         private Long lastUpdated;
-    }
-
-    public void reset() {
-        sinceTimestamp.clear();
     }
 
     public Mono<SakResource> getCase(URI uri) {
