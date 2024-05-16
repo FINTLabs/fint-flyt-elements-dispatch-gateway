@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Collection;
-import java.util.Optional;
 import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
@@ -156,26 +155,18 @@ public class CodelistController {
                 arkivressursResourceCache
                         .getAllDistinct()
                         .stream()
-                        .map(arkivressurs ->
-                                arkivressursDisplayNameMapper
-                                        .findPersonalressursBrukernavn(arkivressurs)
-                                        .map(personalressursBrukernavn -> new ResourceReferenceDisplayNameBuilder()
-                                                .functionalId(personalressursBrukernavn)
-                                        )
-                                        .flatMap(resourceReferenceDisplayNameBuilder ->
-                                                arkivressursDisplayNameMapper.findPersonNavn(arkivressurs)
-                                                        .map(resourceReferenceDisplayNameBuilder::name)
-                                        )
-                                        .map(resourceReferenceDisplayNameBuilder ->
-                                                resourceReferenceDisplayNameBuilder.technicalId(arkivressurs.getSystemId())
-                                        )
-                                        .map(resourceReferenceDisplayNameBuilder -> mapToResourceReference(
-                                                arkivressurs,
-                                                resourceReferenceDisplayNameBuilder
-                                        ))
-                        )
-                        .filter(Optional::isPresent)
-                        .map(Optional::get)
+                        .map(arkivressurs -> {
+                            ResourceReferenceDisplayNameBuilder resourceReferenceDisplayNameBuilder = new ResourceReferenceDisplayNameBuilder()
+                                    .technicalId(arkivressurs.getSystemId());
+
+                            arkivressursDisplayNameMapper.findPersonalressursBrukernavn(arkivressurs)
+                                    .ifPresent(resourceReferenceDisplayNameBuilder::functionalId);
+
+                            arkivressursDisplayNameMapper.findPersonNavn(arkivressurs)
+                                    .ifPresent(resourceReferenceDisplayNameBuilder::name);
+
+                            return mapToResourceReference(arkivressurs, resourceReferenceDisplayNameBuilder);
+                        })
                         .collect(Collectors.toList())
         );
     }
