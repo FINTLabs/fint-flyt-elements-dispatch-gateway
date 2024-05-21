@@ -12,11 +12,11 @@ import org.springframework.context.annotation.Configuration;
 import java.util.Locale;
 
 @Configuration
-public class ResourceEntityCacheConfiguration {
+public class ResourceCacheConfiguration {
 
     private final FintCacheManager fintCacheManager;
 
-    public ResourceEntityCacheConfiguration(FintCacheManager fintCacheManager) {
+    public ResourceCacheConfiguration(FintCacheManager fintCacheManager) {
         this.fintCacheManager = fintCacheManager;
     }
 
@@ -56,16 +56,6 @@ public class ResourceEntityCacheConfiguration {
     }
 
     @Bean
-    FintCache<String, KlasseResource> klasseResourceCache() {
-        return createCache(KlasseResource.class);
-    }
-
-    @Bean
-    FintCache<String, RolleResource> rolleResourceCache() {
-        return createCache(RolleResource.class);
-    }
-
-    @Bean
     FintCache<String, PartRolleResource> partRolleResourceCache() {
         return createCache(PartRolleResource.class);
     }
@@ -91,12 +81,12 @@ public class ResourceEntityCacheConfiguration {
     }
 
     @Bean
-    FintCache<String, JournalStatusResource> journalstatusResourceCache() {
+    FintCache<String, JournalStatusResource> journalStatusResourceCache() {
         return createCache(JournalStatusResource.class);
     }
 
     @Bean
-    FintCache<String, JournalpostTypeResource> journalposttypeResourceCache() {
+    FintCache<String, JournalpostTypeResource> journalpostTypeResourceCache() {
         return createCache(JournalpostTypeResource.class);
     }
 
