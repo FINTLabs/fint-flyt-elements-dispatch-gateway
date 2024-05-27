@@ -1,11 +1,11 @@
 package no.fintlabs.flyt.gateway.application.archive.dispatch;
 
 import lombok.extern.slf4j.Slf4j;
+import no.fintlabs.flyt.gateway.application.archive.dispatch.model.instance.ArchiveInstance;
+import no.fintlabs.flyt.gateway.application.archive.dispatch.model.instance.JournalpostDto;
 import no.fintlabs.flyt.gateway.application.archive.dispatch.sak.CaseDispatchService;
 import no.fintlabs.flyt.gateway.application.archive.dispatch.sak.result.CaseDispatchResult;
 import no.fintlabs.flyt.kafka.headers.InstanceFlowHeaders;
-import no.fintlabs.flyt.gateway.application.archive.dispatch.model.instance.ArchiveInstance;
-import no.fintlabs.flyt.gateway.application.archive.dispatch.model.instance.JournalpostDto;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
@@ -73,31 +73,27 @@ public class DispatchService {
 
     private Mono<DispatchResult> processBySearchOrNew(ArchiveInstance archiveInstance) {
         Optional<List<JournalpostDto>> journalpostDtosOptional = archiveInstance.getNewCase().getJournalpost();
-        if (journalpostDtosOptional.isEmpty() || journalpostDtosOptional.get().isEmpty()
-        ) {
-            return Mono.just(DispatchResult.declined("Instance contains no records"));
-        }
         return caseDispatchService.findCasesBySearch(archiveInstance)
                 .flatMap(cases -> {
                             if (cases.size() > 1) {
                                 return Mono.just(DispatchResult.declined("Found multiple cases"));
                             }
-                            return cases.size() == 1
-                                    ? recordsProcessingService.processRecords(
-                                    cases.get(0).getMappeId().getIdentifikatorverdi(),
-                                    false,
-                                    journalpostDtosOptional.get()
-                            )
-                                    : caseDispatchService.dispatch(archiveInstance.getNewCase())
+                            if (cases.size() == 1) {
+                                return recordsProcessingService.processRecords(
+                                        cases.get(0).getMappeId().getIdentifikatorverdi(),
+                                        false,
+                                        journalpostDtosOptional.orElse(List.of())
+                                );
+                            }
+                            return caseDispatchService.dispatch(archiveInstance.getNewCase())
                                     .map(CaseDispatchResult::getArchiveCaseId)
                                     .flatMap(caseId -> recordsProcessingService.processRecords(
                                             caseId,
                                             true,
-                                            journalpostDtosOptional.get()
+                                            journalpostDtosOptional.orElse(List.of())
                                     ));
                         }
                 );
     }
-
 
 }
