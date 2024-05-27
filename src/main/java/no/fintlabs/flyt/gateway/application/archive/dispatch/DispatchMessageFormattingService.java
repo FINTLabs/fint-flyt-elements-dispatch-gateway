@@ -32,6 +32,9 @@ public class DispatchMessageFormattingService {
     }
 
     public String formatCaseIdAndJournalpostIds(String caseId, List<Long> journalpostNumbers) {
+        if (journalpostNumbers.isEmpty()) {
+            return caseId;
+        }
         return caseId + journalpostNumbers
                 .stream()
                 .map(Object::toString)

@@ -227,26 +227,6 @@ class DispatchServiceTest {
         verifyNoMoreInteractions(recordsProcessingService);
     }
 
-
-    @Test
-    public void givenCaseTypeBySearchOrNewWithNoJournalPostShouldReturnDeclinedResultWithErrorMessage() {
-        doReturn(CaseDispatchType.BY_SEARCH_OR_NEW).when(archiveInstance).getType();
-
-        SakDto sakDto = mock(SakDto.class);
-        doReturn(sakDto).when(archiveInstance).getNewCase();
-        doReturn(Optional.of(List.of())).when(sakDto).getJournalpost();
-
-        StepVerifier.create(
-                        dispatchService.process(instanceFlowHeaders, archiveInstance)
-                )
-                .expectNext(DispatchResult.declined("Instance contains no records"))
-                .verifyComplete();
-
-        verify(archiveInstance, times(1)).getType();
-        verify(archiveInstance, times(1)).getNewCase();
-        verifyNoMoreInteractions(archiveInstance);
-    }
-
     @Test
     public void givenCaseTypeBySearchOrNewWithJournalPostShouldReturnDeclinedResultWhenMultipleCasesAreFound() {
         doReturn(CaseDispatchType.BY_SEARCH_OR_NEW).when(archiveInstance).getType();

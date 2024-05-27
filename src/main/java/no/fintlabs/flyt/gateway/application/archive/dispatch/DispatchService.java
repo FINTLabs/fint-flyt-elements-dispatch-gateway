@@ -1,11 +1,13 @@
 package no.fintlabs.flyt.gateway.application.archive.dispatch;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import no.fintlabs.flyt.gateway.application.archive.dispatch.model.instance.ArchiveInstance;
+import no.fintlabs.flyt.gateway.application.archive.dispatch.model.instance.JournalpostDto;
 import no.fintlabs.flyt.gateway.application.archive.dispatch.sak.CaseDispatchService;
 import no.fintlabs.flyt.gateway.application.archive.dispatch.sak.result.CaseDispatchResult;
 import no.fintlabs.flyt.kafka.headers.InstanceFlowHeaders;
-import no.fintlabs.flyt.gateway.application.archive.dispatch.model.instance.ArchiveInstance;
-import no.fintlabs.flyt.gateway.application.archive.dispatch.model.instance.JournalpostDto;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
@@ -71,33 +73,47 @@ public class DispatchService {
         return recordsProcessingService.processRecords(archiveInstance.getCaseId(), false, archiveInstance.getJournalpost());
     }
 
+    @Getter
+    @AllArgsConstructor
+    private static class CaseInfo {
+        private final boolean newCase;
+        private final String caseId;
+    }
+
     private Mono<DispatchResult> processBySearchOrNew(ArchiveInstance archiveInstance) {
         Optional<List<JournalpostDto>> journalpostDtosOptional = archiveInstance.getNewCase().getJournalpost();
-        if (journalpostDtosOptional.isEmpty() || journalpostDtosOptional.get().isEmpty()
-        ) {
-            return Mono.just(DispatchResult.declined("Instance contains no records"));
-        }
         return caseDispatchService.findCasesBySearch(archiveInstance)
                 .flatMap(cases -> {
                             if (cases.size() > 1) {
                                 return Mono.just(DispatchResult.declined("Found multiple cases"));
                             }
-                            return cases.size() == 1
-                                    ? recordsProcessingService.processRecords(
-                                    cases.get(0).getMappeId().getIdentifikatorverdi(),
-                                    false,
-                                    journalpostDtosOptional.get()
-                            )
-                                    : caseDispatchService.dispatch(archiveInstance.getNewCase())
-                                    .map(CaseDispatchResult::getArchiveCaseId)
-                                    .flatMap(caseId -> recordsProcessingService.processRecords(
-                                            caseId,
-                                            true,
-                                            journalpostDtosOptional.get()
-                                    ));
+
+                            return (
+                                    cases.size() == 1
+
+                                            ? Mono.just(new CaseInfo(
+                                            false,
+                                            cases.get(0).getMappeId().getIdentifikatorverdi()))
+
+                                            : caseDispatchService.dispatch(archiveInstance.getNewCase())
+                                            .map(CaseDispatchResult::getArchiveCaseId)
+                                            .map(caseId -> new CaseInfo(true, caseId))
+
+                            ).flatMap(caseInfo ->
+                                    journalpostDtosOptional
+                                            .filter(journalpostDtos -> !journalpostDtos.isEmpty())
+                                            .map(
+                                                    journalpostDtos -> recordsProcessingService.processRecords(
+                                                            caseInfo.getCaseId(),
+                                                            caseInfo.isNewCase(),
+                                                            journalpostDtos
+                                                    )
+                                            ).orElse(Mono.just(
+                                                    DispatchResult.accepted(caseInfo.getCaseId())
+                                            ))
+                            );
                         }
                 );
     }
-
 
 }
