@@ -88,7 +88,7 @@ public class DispatchService {
                             if (cases.size() > 1) {
                                 String caseIds = cases.stream()
                                         .map(sakResource -> sakResource.getMappeId().getIdentifikatorverdi())
-                                        .collect(Collectors.joining(","));
+                                        .collect(Collectors.joining(", "));
 
                                 return Mono.just(DispatchResult.declined("Found multiple cases: " + caseIds));
                             }
