@@ -14,6 +14,7 @@ import reactor.core.publisher.Mono;
 import javax.validation.Valid;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -85,7 +86,11 @@ public class DispatchService {
         return caseDispatchService.findCasesBySearch(archiveInstance)
                 .flatMap(cases -> {
                             if (cases.size() > 1) {
-                                return Mono.just(DispatchResult.declined("Found multiple cases"));
+                                String caseIds = cases.stream()
+                                        .map(sakResource -> sakResource.getMappeId().getIdentifikatorverdi())
+                                        .collect(Collectors.joining(", "));
+
+                                return Mono.just(DispatchResult.declined("Found multiple cases: " + caseIds));
                             }
 
                             return (

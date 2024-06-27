@@ -239,13 +239,21 @@ class DispatchServiceTest {
 
         SakResource sakResource1 = mock(SakResource.class);
         SakResource sakResource2 = mock(SakResource.class);
+        Identifikator identifikator1 = mock(Identifikator.class);
+        Identifikator identifikator2 = mock(Identifikator.class);
+
+        doReturn(identifikator1).when(sakResource1).getMappeId();
+        doReturn(identifikator2).when(sakResource2).getMappeId();
+        doReturn("caseId1").when(identifikator1).getIdentifikatorverdi();
+        doReturn("caseId2").when(identifikator2).getIdentifikatorverdi();
+
         doReturn(Mono.just(List.of(sakResource1, sakResource2))).when(caseDispatchService)
                 .findCasesBySearch(archiveInstance);
 
         StepVerifier.create(
                         dispatchService.process(instanceFlowHeaders, archiveInstance)
                 )
-                .expectNext(DispatchResult.declined("Found multiple cases"))
+                .expectNext(DispatchResult.declined("Found multiple cases: caseId1, caseId2"))
                 .verifyComplete();
 
         verify(archiveInstance, times(1)).getType();
