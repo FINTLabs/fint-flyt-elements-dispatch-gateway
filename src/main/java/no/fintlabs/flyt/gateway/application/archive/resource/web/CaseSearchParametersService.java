@@ -86,30 +86,43 @@ public class CaseSearchParametersService {
                     .map(Integer::parseInt)
                     .ifPresent(rekkefolge -> {
 
-                        Optional<KlasseDto> klasseDto = sakDto.getKlasse()
-                                .map(klasseDtos -> klasseDtos.get(rekkefolge - 1));
+                        Optional<Integer> minRekkefolge = sakDto.getKlasse()
+                                .flatMap(klasseDtos -> klasseDtos.stream()
+                                        .map(KlasseDto::getRekkefolge)
+                                        .flatMap(Optional::stream)
+                                        .min(Integer::compareTo));
 
-                        if (caseSearchParametersDto.getKlasseringKlassifikasjonssystem()) {
-                            klasseDto
-                                    .flatMap(KlasseDto::getKlassifikasjonssystem)
-                                    .map(klassifikasjonssystemResourceCache::get)
-                                    .map(KlassifikasjonssystemResource::getSystemId)
-                                    .map(Identifikator::getIdentifikatorverdi)
-                                    .map(value -> createFilterLine(
-                                            createKlasseringPrefix(rekkefolge) + "ordning",
-                                            value
-                                    ))
-                                    .ifPresent(filterJoiner::add);
+                        if (minRekkefolge.isPresent()) {
+
+                            int index = rekkefolge - minRekkefolge.get();
+
+                            Optional<KlasseDto> klasseDto = sakDto.getKlasse()
+                                    .filter(klasseDtos -> index >= 0 && index < klasseDtos.size())
+                                    .map(klasseDtos -> klasseDtos.get(index));
+
+                            if (caseSearchParametersDto.getKlasseringKlassifikasjonssystem()) {
+                                klasseDto
+                                        .flatMap(KlasseDto::getKlassifikasjonssystem)
+                                        .map(klassifikasjonssystemResourceCache::get)
+                                        .map(KlassifikasjonssystemResource::getSystemId)
+                                        .map(Identifikator::getIdentifikatorverdi)
+                                        .map(value -> createFilterLine(
+                                                createKlasseringPrefix(rekkefolge) + "ordning",
+                                                value
+                                        ))
+                                        .ifPresent(filterJoiner::add);
+                            }
+                            if (caseSearchParametersDto.getKlasseringKlasseId()) {
+                                klasseDto
+                                        .flatMap(KlasseDto::getKlasseId)
+                                        .map(klasseId -> createFilterLine(
+                                                createKlasseringPrefix(rekkefolge) + "verdi",
+                                                klasseId
+                                        ))
+                                        .ifPresent(filterJoiner::add);
+                            }
                         }
-                        if (caseSearchParametersDto.getKlasseringKlasseId()) {
-                            klasseDto
-                                    .flatMap(KlasseDto::getKlasseId)
-                                    .map(klasseId -> createFilterLine(
-                                            createKlasseringPrefix(rekkefolge) + "verdi",
-                                            klasseId
-                                    ))
-                                    .ifPresent(filterJoiner::add);
-                        }
+
                     });
         }
         return filterJoiner.toString();
