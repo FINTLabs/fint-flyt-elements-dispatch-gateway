@@ -14,7 +14,6 @@ import no.fintlabs.flyt.gateway.application.archive.dispatch.model.instance.SakD
 import no.fintlabs.flyt.gateway.application.archive.dispatch.model.instance.SkjermingDto;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
 import java.util.StringJoiner;
 
 @Service
@@ -86,43 +85,39 @@ public class CaseSearchParametersService {
                     .map(Integer::parseInt)
                     .ifPresent(rekkefolge -> {
 
-                        Optional<Integer> minRekkefolge = sakDto.getKlasse()
-                                .flatMap(klasseDtos -> klasseDtos.stream()
-                                        .map(KlasseDto::getRekkefolge)
-                                        .flatMap(Optional::stream)
-                                        .min(Integer::compareTo));
+                        KlasseDto klasseDtoMatchingRekkefolge = sakDto.getKlasse()
+                                .flatMap(
+                                        klasseDtos -> klasseDtos.stream()
+                                                .filter(
+                                                        klasseDto -> klasseDto.getRekkefolge()
+                                                                .map(rekkefolge::equals)
+                                                                .orElse(false)
+                                                )
+                                                .findFirst()
+                                )
+                                .orElseThrow(IllegalStateException::new);
 
-                        if (minRekkefolge.isPresent()) {
+                        //TODO: handle exception. map to caseSearchResult?
 
-                            int index = rekkefolge - minRekkefolge.get();
-
-                            Optional<KlasseDto> klasseDto = sakDto.getKlasse()
-                                    .filter(klasseDtos -> index >= 0 && index < klasseDtos.size())
-                                    .map(klasseDtos -> klasseDtos.get(index));
-
-                            if (caseSearchParametersDto.getKlasseringKlassifikasjonssystem()) {
-                                klasseDto
-                                        .flatMap(KlasseDto::getKlassifikasjonssystem)
-                                        .map(klassifikasjonssystemResourceCache::get)
-                                        .map(KlassifikasjonssystemResource::getSystemId)
-                                        .map(Identifikator::getIdentifikatorverdi)
-                                        .map(value -> createFilterLine(
-                                                createKlasseringPrefix(rekkefolge) + "ordning",
-                                                value
-                                        ))
-                                        .ifPresent(filterJoiner::add);
-                            }
-                            if (caseSearchParametersDto.getKlasseringKlasseId()) {
-                                klasseDto
-                                        .flatMap(KlasseDto::getKlasseId)
-                                        .map(klasseId -> createFilterLine(
-                                                createKlasseringPrefix(rekkefolge) + "verdi",
-                                                klasseId
-                                        ))
-                                        .ifPresent(filterJoiner::add);
-                            }
+                        if (caseSearchParametersDto.getKlasseringKlassifikasjonssystem()) {
+                            klasseDtoMatchingRekkefolge.getKlassifikasjonssystem()
+                                    .map(klassifikasjonssystemResourceCache::get)
+                                    .map(KlassifikasjonssystemResource::getSystemId)
+                                    .map(Identifikator::getIdentifikatorverdi)
+                                    .map(value -> createFilterLine(
+                                            createKlasseringPrefix(rekkefolge) + "ordning",
+                                            value
+                                    ))
+                                    .ifPresent(filterJoiner::add);
                         }
-
+                        if (caseSearchParametersDto.getKlasseringKlasseId()) {
+                            klasseDtoMatchingRekkefolge.getKlasseId()
+                                    .map(klasseId -> createFilterLine(
+                                            createKlasseringPrefix(rekkefolge) + "verdi",
+                                            klasseId
+                                    ))
+                                    .ifPresent(filterJoiner::add);
+                        }
                     });
         }
         return filterJoiner.toString();
