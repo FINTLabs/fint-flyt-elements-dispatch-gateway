@@ -8,3 +8,4 @@ spring:
   kafka:
     consumer:
       group-id: ${fint.application-id}
+      auto-offset-reset: earliest
