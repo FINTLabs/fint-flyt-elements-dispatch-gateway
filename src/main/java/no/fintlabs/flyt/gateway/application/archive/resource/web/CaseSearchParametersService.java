@@ -1,5 +1,6 @@
 package no.fintlabs.flyt.gateway.application.archive.resource.web;
 
+import lombok.extern.slf4j.Slf4j;
 import no.fint.model.felles.basisklasser.Begrep;
 import no.fint.model.felles.kompleksedatatyper.Identifikator;
 import no.fint.model.resource.arkiv.kodeverk.SaksmappetypeResource;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 import java.util.StringJoiner;
 
 @Service
+@Slf4j
 public class CaseSearchParametersService {
 
     private final FintCache<String, ArkivdelResource> arkivdelResourceCache;
@@ -96,6 +98,9 @@ public class CaseSearchParametersService {
                                                 .findFirst()
                                 )
                                 .orElseThrow(IllegalStateException::new);
+
+                        log.debug("KlasseDto rekkefølge: {}", klasseDtoMatchingRekkefolge.getRekkefolge());
+                        log.debug("Søkeparametere rekkefølge: {}", rekkefolge);
 
                         //TODO: handle exception. map to caseSearchResult?
 
