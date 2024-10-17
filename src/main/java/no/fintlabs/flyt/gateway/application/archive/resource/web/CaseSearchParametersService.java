@@ -99,7 +99,7 @@ public class CaseSearchParametersService {
                                 )
                                 .orElseThrow(IllegalStateException::new);
 
-                        log.debug("KlasseDto rekkefølge: {}", klasseDtoMatchingRekkefolge.getRekkefolge());
+                        klasseDtoMatchingRekkefolge.getRekkefolge().ifPresent(rf -> log.debug("KlasseDto rekkefolge: {}", rf));
                         log.debug("Søkeparametere rekkefølge: {}", rekkefolge);
 
                         //TODO: handle exception. map to caseSearchResult?
