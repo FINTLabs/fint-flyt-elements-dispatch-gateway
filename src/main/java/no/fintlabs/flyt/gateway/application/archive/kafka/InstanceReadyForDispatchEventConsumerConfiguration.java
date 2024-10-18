@@ -1,5 +1,6 @@
 package no.fintlabs.flyt.gateway.application.archive.kafka;
 
+import lombok.extern.slf4j.Slf4j;
 import no.fintlabs.flyt.gateway.application.archive.dispatch.DispatchService;
 import no.fintlabs.flyt.gateway.application.archive.dispatch.model.instance.ArchiveInstance;
 import no.fintlabs.flyt.gateway.application.archive.kafka.error.InstanceDispatchingErrorProducerService;
@@ -12,6 +13,7 @@ import org.springframework.kafka.listener.ConcurrentMessageListenerContainer;
 import org.springframework.kafka.listener.ContainerProperties;
 
 @Configuration
+@Slf4j
 public class InstanceReadyForDispatchEventConsumerConfiguration {
 
     @Bean
@@ -46,10 +48,20 @@ public class InstanceReadyForDispatchEventConsumerConfiguration {
                                         );
                                     }
                                 })
-                                .doOnError(e -> instanceDispatchingErrorProducerService.publishGeneralSystemErrorEvent(
-                                        instanceFlowConsumerRecord.getInstanceFlowHeaders(),
-                                        "An unexpected error occurred: " + e.getMessage()
-                                ))
+                                .doOnError(e -> {
+                                    log.error("An error occurred during dispatch", e);
+                                    if (e instanceof IllegalStateException) {
+                                        instanceDispatchingErrorProducerService.publishGeneralSystemErrorEvent(
+                                                instanceFlowConsumerRecord.getInstanceFlowHeaders(),
+                                                "An error occurred during dispatch: " + e.getMessage()
+                                        );
+                                    } else {
+                                        instanceDispatchingErrorProducerService.publishGeneralSystemErrorEvent(
+                                                instanceFlowConsumerRecord.getInstanceFlowHeaders(),
+                                                "An unexpected error occurred: " + e.getMessage()
+                                        );
+                                    }
+                                })
                                 .subscribe(),
                 EventConsumerConfiguration
                         .builder()
