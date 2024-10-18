@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.listener.ConcurrentMessageListenerContainer;
 import org.springframework.kafka.listener.ContainerProperties;
+import reactor.core.publisher.Mono;
 
 @Configuration
 @Slf4j
@@ -48,19 +49,29 @@ public class InstanceReadyForDispatchEventConsumerConfiguration {
                                         );
                                     }
                                 })
-                                .doOnError(e -> {
-                                    log.error("An error occurred during dispatch", e);
-                                    if (e instanceof IllegalStateException) {
-                                        instanceDispatchingErrorProducerService.publishGeneralSystemErrorEvent(
-                                                instanceFlowConsumerRecord.getInstanceFlowHeaders(),
-                                                "An error occurred during dispatch: " + e.getMessage()
-                                        );
-                                    } else {
-                                        instanceDispatchingErrorProducerService.publishGeneralSystemErrorEvent(
-                                                instanceFlowConsumerRecord.getInstanceFlowHeaders(),
-                                                "An unexpected error occurred: " + e.getMessage()
-                                        );
-                                    }
+                                .onErrorResume(IllegalStateException.class, e -> {
+                                    instanceDispatchingErrorProducerService.publishGeneralSystemErrorEvent(
+                                            instanceFlowConsumerRecord.getInstanceFlowHeaders(),
+                                            "An error occurred during dispatch: " + e.getMessage()
+                                    );
+                                    log.error("IllegalStateException encountered during dispatch: {}", e.getMessage(), e);
+                                    return Mono.empty();
+                                })
+                                .onErrorResume(NullPointerException.class, e -> {
+                                    instanceDispatchingErrorProducerService.publishGeneralSystemErrorEvent(
+                                            instanceFlowConsumerRecord.getInstanceFlowHeaders(),
+                                            "A NullPointerException occurred during dispatch: " + e.getMessage()
+                                    );
+                                    log.error("NullPointerException encountered during dispatch: {}", e.getMessage(), e);
+                                    return Mono.empty();
+                                })
+                                .onErrorResume(Throwable.class, e -> {
+                                    instanceDispatchingErrorProducerService.publishGeneralSystemErrorEvent(
+                                            instanceFlowConsumerRecord.getInstanceFlowHeaders(),
+                                            "An unexpected error occurred: " + e.getMessage()
+                                    );
+                                    log.error("Unexpected exception encountered during dispatch: {}", e.getMessage(), e);
+                                    return Mono.empty();
                                 })
                                 .subscribe(),
                 EventConsumerConfiguration
@@ -75,5 +86,4 @@ public class InstanceReadyForDispatchEventConsumerConfiguration {
                         .build()
         );
     }
-
 }
