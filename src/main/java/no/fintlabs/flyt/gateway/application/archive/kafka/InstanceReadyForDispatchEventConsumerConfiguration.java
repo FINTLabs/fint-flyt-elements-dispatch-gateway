@@ -53,16 +53,11 @@ public class InstanceReadyForDispatchEventConsumerConfiguration {
                                         );
                                     }
                                 })
-                                .doOnError(e -> log.error("Error before handling: {}", e.getMessage(), e))
                                 .onErrorResume(IllegalStateException.class, e -> handleDispatchError(instanceFlowConsumerRecord, e, "IllegalStateException encountered during dispatch", instanceDispatchingErrorProducerService))
                                 .onErrorResume(IllegalArgumentException.class, e -> handleDispatchError(instanceFlowConsumerRecord, e, "IllegalArgumentException encountered during dispatch", instanceDispatchingErrorProducerService))
                                 .onErrorResume(NullPointerException.class, e -> handleDispatchError(instanceFlowConsumerRecord, e, "NullPointerException encountered during dispatch", instanceDispatchingErrorProducerService))
                                 .onErrorResume(Throwable.class, e -> handleDispatchError(instanceFlowConsumerRecord, e, "Unexpected exception encountered during dispatch", instanceDispatchingErrorProducerService))
-                                .retry(1)
-                                .subscribe(
-                                        null,
-                                        error -> log.error("Unhandled error in subscriber: {}", error.getMessage(), error)
-                                ),
+                                .subscribe(),
                 EventConsumerConfiguration
                         .builder()
                         .maxPollIntervalMs(1800000)
