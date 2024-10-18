@@ -1,11 +1,11 @@
 package no.fintlabs.flyt.gateway.application.archive.kafka;
 
 import no.fintlabs.flyt.gateway.application.archive.dispatch.DispatchService;
+import no.fintlabs.flyt.gateway.application.archive.dispatch.model.instance.ArchiveInstance;
 import no.fintlabs.flyt.gateway.application.archive.kafka.error.InstanceDispatchingErrorProducerService;
 import no.fintlabs.flyt.kafka.event.InstanceFlowEventConsumerFactoryService;
 import no.fintlabs.kafka.event.EventConsumerConfiguration;
 import no.fintlabs.kafka.event.topic.EventTopicNameParameters;
-import no.fintlabs.flyt.gateway.application.archive.dispatch.model.instance.ArchiveInstance;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.listener.ConcurrentMessageListenerContainer;
@@ -23,36 +23,34 @@ public class InstanceReadyForDispatchEventConsumerConfiguration {
     ) {
         return instanceFlowEventConsumerFactoryService.createRecordFactory(
                 ArchiveInstance.class,
-                instanceFlowConsumerRecord -> {
-                    try {
+                instanceFlowConsumerRecord ->
                         dispatchService.process(
-                                instanceFlowConsumerRecord.getInstanceFlowHeaders(),
-                                instanceFlowConsumerRecord.getConsumerRecord().value()
-                        ).doOnNext(dispatchResult -> {
-                            switch (dispatchResult.getStatus()) {
-                                case ACCEPTED -> instanceDispatchedEventProducerService.publish(
-                                        instanceFlowConsumerRecord.getInstanceFlowHeaders()
-                                                .toBuilder()
-                                                .archiveInstanceId(dispatchResult.getArchiveCaseAndRecordsIds())
-                                                .build()
-                                );
-                                case DECLINED -> instanceDispatchingErrorProducerService.publishInstanceDispatchDeclinedErrorEvent(
                                         instanceFlowConsumerRecord.getInstanceFlowHeaders(),
-                                        dispatchResult.getErrorMessage()
-                                );
-                                case FAILED -> instanceDispatchingErrorProducerService.publishGeneralSystemErrorEvent(
+                                        instanceFlowConsumerRecord.getConsumerRecord().value()
+                                ).doOnNext(dispatchResult -> {
+                                    switch (dispatchResult.getStatus()) {
+                                        case ACCEPTED -> instanceDispatchedEventProducerService.publish(
+                                                instanceFlowConsumerRecord.getInstanceFlowHeaders()
+                                                        .toBuilder()
+                                                        .archiveInstanceId(dispatchResult.getArchiveCaseAndRecordsIds())
+                                                        .build()
+                                        );
+                                        case DECLINED ->
+                                                instanceDispatchingErrorProducerService.publishInstanceDispatchDeclinedErrorEvent(
+                                                        instanceFlowConsumerRecord.getInstanceFlowHeaders(),
+                                                        dispatchResult.getErrorMessage()
+                                                );
+                                        case FAILED -> instanceDispatchingErrorProducerService.publishGeneralSystemErrorEvent(
+                                                instanceFlowConsumerRecord.getInstanceFlowHeaders(),
+                                                dispatchResult.getErrorMessage()
+                                        );
+                                    }
+                                })
+                                .doOnError(e -> instanceDispatchingErrorProducerService.publishGeneralSystemErrorEvent(
                                         instanceFlowConsumerRecord.getInstanceFlowHeaders(),
-                                        dispatchResult.getErrorMessage()
-                                );
-                            }
-                        }).block();
-                    } catch (Exception ex) {
-                        instanceDispatchingErrorProducerService.publishGeneralSystemErrorEvent(
-                                instanceFlowConsumerRecord.getInstanceFlowHeaders(),
-                                ex.getMessage()
-                        );
-                    }
-                },
+                                        "An unexpected error occurred: " + e.getMessage()
+                                ))
+                                .subscribe(),
                 EventConsumerConfiguration
                         .builder()
                         .maxPollIntervalMs(1800000)
