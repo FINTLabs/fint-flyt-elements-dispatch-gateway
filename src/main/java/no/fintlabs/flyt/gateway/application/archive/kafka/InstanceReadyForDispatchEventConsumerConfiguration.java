@@ -75,12 +75,13 @@ public class InstanceReadyForDispatchEventConsumerConfiguration {
             String logMessage,
             InstanceDispatchingErrorProducerService instanceDispatchingErrorProducerService
     ) {
+        String errorMessage = e.getMessage() != null ? e.getMessage() : "Unknown error occurred";
         instanceDispatchingErrorProducerService.publishGeneralSystemErrorEvent(
                 instanceFlowConsumerRecord.getInstanceFlowHeaders(),
-                "An error occurred during dispatch: " + e.getMessage()
+                "An error occurred during dispatch: " + errorMessage
         );
-        log.error("{}: {}", logMessage, e.getMessage(), e);
-        return Mono.just(DispatchResult.failed("An error occurred during dispatch: " + e.getMessage()));
+        log.error("{}: {}", logMessage, errorMessage, e);
+        return Mono.just(DispatchResult.failed("An error occurred during dispatch: " + errorMessage));
     }
 
 }
