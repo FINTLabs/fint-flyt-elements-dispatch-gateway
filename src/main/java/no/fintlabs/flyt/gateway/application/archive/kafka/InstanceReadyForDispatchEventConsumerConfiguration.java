@@ -1,9 +1,11 @@
 package no.fintlabs.flyt.gateway.application.archive.kafka;
 
 import lombok.extern.slf4j.Slf4j;
+import no.fintlabs.flyt.gateway.application.archive.dispatch.DispatchResult;
 import no.fintlabs.flyt.gateway.application.archive.dispatch.DispatchService;
 import no.fintlabs.flyt.gateway.application.archive.dispatch.model.instance.ArchiveInstance;
 import no.fintlabs.flyt.gateway.application.archive.kafka.error.InstanceDispatchingErrorProducerService;
+import no.fintlabs.flyt.kafka.InstanceFlowConsumerRecord;
 import no.fintlabs.flyt.kafka.event.InstanceFlowEventConsumerFactoryService;
 import no.fintlabs.kafka.event.EventConsumerConfiguration;
 import no.fintlabs.kafka.event.topic.EventTopicNameParameters;
@@ -49,30 +51,10 @@ public class InstanceReadyForDispatchEventConsumerConfiguration {
                                         );
                                     }
                                 })
-                                .onErrorResume(IllegalStateException.class, e -> {
-                                    instanceDispatchingErrorProducerService.publishGeneralSystemErrorEvent(
-                                            instanceFlowConsumerRecord.getInstanceFlowHeaders(),
-                                            "An error occurred during dispatch: " + e.getMessage()
-                                    );
-                                    log.error("IllegalStateException encountered during dispatch: {}", e.getMessage(), e);
-                                    return Mono.empty();
-                                })
-                                .onErrorResume(NullPointerException.class, e -> {
-                                    instanceDispatchingErrorProducerService.publishGeneralSystemErrorEvent(
-                                            instanceFlowConsumerRecord.getInstanceFlowHeaders(),
-                                            "A NullPointerException occurred during dispatch: " + e.getMessage()
-                                    );
-                                    log.error("NullPointerException encountered during dispatch: {}", e.getMessage(), e);
-                                    return Mono.empty();
-                                })
-                                .onErrorResume(Throwable.class, e -> {
-                                    instanceDispatchingErrorProducerService.publishGeneralSystemErrorEvent(
-                                            instanceFlowConsumerRecord.getInstanceFlowHeaders(),
-                                            "An unexpected error occurred: " + e.getMessage()
-                                    );
-                                    log.error("Unexpected exception encountered during dispatch: {}", e.getMessage(), e);
-                                    return Mono.empty();
-                                })
+                                .onErrorResume(IllegalStateException.class, e -> handleDispatchError(instanceFlowConsumerRecord, e, "IllegalStateException encountered during dispatch", instanceDispatchingErrorProducerService))
+                                .onErrorResume(IllegalArgumentException.class, e -> handleDispatchError(instanceFlowConsumerRecord, e, "IllegalArgumentException encountered during dispatch", instanceDispatchingErrorProducerService))
+                                .onErrorResume(NullPointerException.class, e -> handleDispatchError(instanceFlowConsumerRecord, e, "NullPointerException encountered during dispatch", instanceDispatchingErrorProducerService))
+                                .onErrorResume(Throwable.class, e -> handleDispatchError(instanceFlowConsumerRecord, e, "Unexpected exception encountered during dispatch", instanceDispatchingErrorProducerService))
                                 .subscribe(),
                 EventConsumerConfiguration
                         .builder()
@@ -86,4 +68,19 @@ public class InstanceReadyForDispatchEventConsumerConfiguration {
                         .build()
         );
     }
+
+    private Mono<DispatchResult> handleDispatchError(
+            InstanceFlowConsumerRecord<ArchiveInstance> instanceFlowConsumerRecord,
+            Throwable e,
+            String logMessage,
+            InstanceDispatchingErrorProducerService instanceDispatchingErrorProducerService
+    ) {
+        instanceDispatchingErrorProducerService.publishGeneralSystemErrorEvent(
+                instanceFlowConsumerRecord.getInstanceFlowHeaders(),
+                "An error occurred during dispatch: " + e.getMessage()
+        );
+        log.error("{}: {}", logMessage, e.getMessage(), e);
+        return Mono.just(DispatchResult.failed("An error occurred during dispatch: " + e.getMessage()));
+    }
+
 }
