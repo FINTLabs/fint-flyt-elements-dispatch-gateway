@@ -23,7 +23,8 @@ public class InstanceReadyForDispatchEventConsumerConfiguration {
     ) {
         return instanceFlowEventConsumerFactoryService.createRecordFactory(
                 ArchiveInstance.class,
-                instanceFlowConsumerRecord ->
+                instanceFlowConsumerRecord -> {
+                    try {
                         dispatchService.process(
                                 instanceFlowConsumerRecord.getInstanceFlowHeaders(),
                                 instanceFlowConsumerRecord.getConsumerRecord().value()
@@ -44,7 +45,14 @@ public class InstanceReadyForDispatchEventConsumerConfiguration {
                                         dispatchResult.getErrorMessage()
                                 );
                             }
-                        }).block(),
+                        }).block();
+                    } catch (Exception ex) {
+                        instanceDispatchingErrorProducerService.publishGeneralSystemErrorEvent(
+                                instanceFlowConsumerRecord.getInstanceFlowHeaders(),
+                                ex.getMessage()
+                        );
+                    }
+                },
                 EventConsumerConfiguration
                         .builder()
                         .maxPollIntervalMs(1800000)
