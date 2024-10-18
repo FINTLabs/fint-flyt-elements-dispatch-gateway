@@ -15,6 +15,8 @@ import org.springframework.kafka.listener.ConcurrentMessageListenerContainer;
 import org.springframework.kafka.listener.ContainerProperties;
 import reactor.core.publisher.Mono;
 
+import java.util.Objects;
+
 @Configuration
 @Slf4j
 public class InstanceReadyForDispatchEventConsumerConfiguration {
@@ -51,11 +53,16 @@ public class InstanceReadyForDispatchEventConsumerConfiguration {
                                         );
                                     }
                                 })
+                                .doOnError(e -> log.error("Error before handling: {}", e.getMessage(), e))
                                 .onErrorResume(IllegalStateException.class, e -> handleDispatchError(instanceFlowConsumerRecord, e, "IllegalStateException encountered during dispatch", instanceDispatchingErrorProducerService))
                                 .onErrorResume(IllegalArgumentException.class, e -> handleDispatchError(instanceFlowConsumerRecord, e, "IllegalArgumentException encountered during dispatch", instanceDispatchingErrorProducerService))
                                 .onErrorResume(NullPointerException.class, e -> handleDispatchError(instanceFlowConsumerRecord, e, "NullPointerException encountered during dispatch", instanceDispatchingErrorProducerService))
                                 .onErrorResume(Throwable.class, e -> handleDispatchError(instanceFlowConsumerRecord, e, "Unexpected exception encountered during dispatch", instanceDispatchingErrorProducerService))
-                                .subscribe(),
+                                .retry(1)
+                                .subscribe(
+                                        null,
+                                        error -> log.error("Unhandled error in subscriber: {}", error.getMessage(), error)
+                                ),
                 EventConsumerConfiguration
                         .builder()
                         .maxPollIntervalMs(1800000)
@@ -80,16 +87,21 @@ public class InstanceReadyForDispatchEventConsumerConfiguration {
         log.error("{}: {}", logMessage, errorMessage, e);
 
         if (instanceFlowConsumerRecord != null && instanceFlowConsumerRecord.getInstanceFlowHeaders() != null) {
-            instanceDispatchingErrorProducerService.publishGeneralSystemErrorEvent(
-                    instanceFlowConsumerRecord.getInstanceFlowHeaders(),
-                    "An error occurred during dispatch: " + errorMessage
-            );
+            try {
+                instanceDispatchingErrorProducerService.publishGeneralSystemErrorEvent(
+                        instanceFlowConsumerRecord.getInstanceFlowHeaders(),
+                        "An error occurred during dispatch: " + errorMessage
+                );
+            } catch (Exception ex) {
+                log.error("Failed to publish general system error event to Kafka: {}", ex.getMessage(), ex);
+            }
         } else {
             log.error("Cannot publish error event because InstanceFlowHeaders is null");
         }
 
-        return Mono.just(DispatchResult.failed("An error occurred during dispatch: " + errorMessage));
+        return Mono.error(Objects.requireNonNullElseGet(e, () -> new IllegalStateException("An unknown error occurred during dispatch")));
     }
+
 
 
 }
