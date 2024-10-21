@@ -44,10 +44,17 @@ public class DispatchService {
             case BY_SEARCH_OR_NEW -> processBySearchOrNew(archiveInstance);
         })
                 .doOnNext(dispatchResult -> logDispatchResult(instanceFlowHeaders, dispatchResult))
-                .onErrorResume(IllegalStateException.class, e -> handleDispatchError(instanceFlowHeaders, e, "IllegalStateException encountered during dispatch", instanceDispatchingErrorProducerService))
-                .onErrorResume(IllegalArgumentException.class, e -> handleDispatchError(instanceFlowHeaders, e, "IllegalArgumentException encountered during dispatch", instanceDispatchingErrorProducerService))
-                .onErrorResume(NullPointerException.class, e -> handleDispatchError(instanceFlowHeaders, e, "NullPointerException encountered during dispatch", instanceDispatchingErrorProducerService))
-                .onErrorResume(Throwable.class, e -> handleDispatchError(instanceFlowHeaders, e, "Unexpected exception encountered during dispatch", instanceDispatchingErrorProducerService))
+                .onErrorResume(e -> {
+                    if (e instanceof IllegalStateException) {
+                        return handleDispatchError(instanceFlowHeaders, e, "IllegalStateException encountered during dispatch", instanceDispatchingErrorProducerService);
+                    } else if (e instanceof IllegalArgumentException) {
+                        return handleDispatchError(instanceFlowHeaders, e, "IllegalArgumentException encountered during dispatch", instanceDispatchingErrorProducerService);
+                    } else if (e instanceof NullPointerException) {
+                        return handleDispatchError(instanceFlowHeaders, e, "NullPointerException encountered during dispatch", instanceDispatchingErrorProducerService);
+                    } else {
+                        return handleDispatchError(instanceFlowHeaders, e, "Unexpected exception encountered during dispatch", instanceDispatchingErrorProducerService);
+                    }
+                })
                 .doOnError(e -> log.error("Failed to dispatch instance with headers={}", instanceFlowHeaders, e))
                 .onErrorReturn(RuntimeException.class, DispatchResult.failed());
     }
