@@ -54,17 +54,17 @@ public class InstanceDispatchingErrorProducerService {
         );
     }
 
-    public void publishGeneralSystemErrorEvent(
-            InstanceFlowHeaders instanceFlowHeaders
-    ) {
-        publishGeneralSystemErrorEvent(instanceFlowHeaders, "");
-    }
+//    public void publishGeneralSystemErrorEvent(
+//            InstanceFlowHeaders instanceFlowHeaders
+//    ) {
+//        publishGeneralSystemErrorEvent(instanceFlowHeaders, "");
+//    }
 
     public void publishGeneralSystemErrorEvent(
             InstanceFlowHeaders instanceFlowHeaders,
             String errorMessage
     ) {
-        String safeErrorMessage = (errorMessage != null && !errorMessage.isEmpty()) ? errorMessage : "Did I get here";
+        String safeErrorMessage = (errorMessage != null && !errorMessage.isEmpty()) ? errorMessage : "Unknown error occurred";
 
         errorEventProducer.send(
                 InstanceFlowErrorEventProducerRecord
