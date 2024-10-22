@@ -16,7 +16,6 @@ import reactor.core.publisher.Mono;
 
 import javax.validation.Valid;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 @Slf4j
@@ -55,9 +54,7 @@ public class DispatchService {
                     } else {
                         return handleDispatchError(instanceFlowHeaders, e, "Unexpected exception encountered during dispatch", instanceDispatchingErrorProducerService);
                     }
-                })
-                .doOnError(e -> log.error("Failed to dispatch instance with headers={}", instanceFlowHeaders, e))
-                .onErrorReturn(RuntimeException.class, DispatchResult.failed());
+                });
     }
 
     private void logDispatchResult(InstanceFlowHeaders instanceFlowHeaders, DispatchResult dispatchResult) {
@@ -149,7 +146,7 @@ public class DispatchService {
                 "An error occurred during dispatch: " + errorMessage
         );
 
-        return Mono.error(Objects.requireNonNullElseGet(e, () -> new IllegalStateException("An unknown error occurred during dispatch")));
+        return Mono.just(DispatchResult.failed("An error occurred during dispatch: " + errorMessage));
     }
 
 }
