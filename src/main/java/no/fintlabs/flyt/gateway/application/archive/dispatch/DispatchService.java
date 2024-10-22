@@ -144,7 +144,7 @@ public class DispatchService {
             String logMessage,
             InstanceDispatchingErrorProducerService instanceDispatchingErrorProducerService
     ) {
-        String errorMessage = (e != null && e.getMessage() != null) ? e.getMessage() : "Unknown error occurred";
+        String errorMessage = (e != null && e.getMessage() != null) ? e.getMessage() : "Unknown error occurred test";
 
         log.error("{}: {}", logMessage, errorMessage, e);
 

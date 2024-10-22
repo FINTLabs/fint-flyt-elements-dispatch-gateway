@@ -64,7 +64,7 @@ public class InstanceDispatchingErrorProducerService {
             InstanceFlowHeaders instanceFlowHeaders,
             String errorMessage
     ) {
-        String safeErrorMessage = (errorMessage != null && !errorMessage.isEmpty()) ? errorMessage : "Unknown error occurred";
+//        String safeErrorMessage = (errorMessage != null && !errorMessage.isEmpty()) ? errorMessage : "Unknown error occurred";
 
         errorEventProducer.send(
                 InstanceFlowErrorEventProducerRecord
@@ -76,7 +76,7 @@ public class InstanceDispatchingErrorProducerService {
                                         Error
                                                 .builder()
                                                 .errorCode(GENERAL_SYSTEM_ERROR.getCode())
-                                                .args(Map.of("errorMessage", safeErrorMessage))
+                                                .args(Map.of("errorMessage", errorMessage))
                                                 .build()
                                 )
                         )
