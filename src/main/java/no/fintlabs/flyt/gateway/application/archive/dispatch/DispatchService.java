@@ -44,6 +44,7 @@ public class DispatchService {
             case BY_SEARCH_OR_NEW -> processBySearchOrNew(archiveInstance);
         })
                 .doOnNext(dispatchResult -> logDispatchResult(instanceFlowHeaders, dispatchResult))
+                .doOnError(e -> log.error("Failed to dispatch instance with headers={}", instanceFlowHeaders, e))
                 .onErrorResume(e -> {
                     if (e instanceof SearchKlasseOrderNotFoundInCaseException) {
                         return handleDispatchError(instanceFlowHeaders, e, "SearchKlasseOrderNotFoundInCaseException encountered during dispatch", instanceDispatchingErrorProducerService);
