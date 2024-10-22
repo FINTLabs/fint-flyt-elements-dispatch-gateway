@@ -14,7 +14,6 @@ import reactor.core.publisher.Mono;
 
 import javax.validation.Valid;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 @Slf4j
@@ -44,16 +43,13 @@ public class DispatchService {
         })
                 .doOnNext(dispatchResult -> logDispatchResult(instanceFlowHeaders, dispatchResult))
                 .onErrorResume(e -> {
-                    if (e instanceof IllegalStateException) {
-                        return handleDispatchError(instanceFlowHeaders, e, "IllegalStateException encountered during dispatch", instanceDispatchingErrorProducerService);
-                    } else if (e instanceof IllegalArgumentException) {
-                        return handleDispatchError(instanceFlowHeaders, e, "IllegalArgumentException encountered during dispatch", instanceDispatchingErrorProducerService);
-                    } else if (e instanceof NullPointerException) {
-                        return handleDispatchError(instanceFlowHeaders, e, "NullPointerException encountered during dispatch", instanceDispatchingErrorProducerService);
-                    } else {
-                        return handleDispatchError(instanceFlowHeaders, e, "Unexpected exception encountered during dispatch", instanceDispatchingErrorProducerService);
-                    }
-                })
+                            instanceDispatchingErrorProducerService.publishGeneralSystemErrorEvent(
+                                    instanceFlowHeaders,
+                                    "An error occurred during dispatch: " + e.getMessage()
+                            );
+                            return Mono.just(DispatchResult.failed());
+                        }
+                )
                 .doOnError(e -> log.error("Failed to dispatch instance with headers={}", instanceFlowHeaders, e))
                 .onErrorReturn(RuntimeException.class, DispatchResult.failed());
     }
@@ -130,24 +126,6 @@ public class DispatchService {
                             );
                         }
                 );
-    }
-
-    private Mono<DispatchResult> handleDispatchError(
-            InstanceFlowHeaders instanceFlowHeaders,
-            Throwable e,
-            String logMessage,
-            InstanceDispatchingErrorProducerService instanceDispatchingErrorProducerService
-    ) {
-        String errorMessage = (e != null && e.getMessage() != null) ? e.getMessage() : "Unknown error occurred";
-
-        log.error("{}: {}", logMessage, errorMessage, e);
-
-        instanceDispatchingErrorProducerService.publishGeneralSystemErrorEvent(
-                instanceFlowHeaders,
-                "An error occurred during dispatch: " + errorMessage
-        );
-
-        return Mono.error(Objects.requireNonNullElseGet(e, () -> new IllegalStateException("An unknown error occurred during dispatch")));
     }
 
 }
