@@ -13,8 +13,12 @@ import no.fintlabs.flyt.gateway.application.archive.dispatch.model.instance.Case
 import no.fintlabs.flyt.gateway.application.archive.dispatch.model.instance.KlasseDto;
 import no.fintlabs.flyt.gateway.application.archive.dispatch.model.instance.SakDto;
 import no.fintlabs.flyt.gateway.application.archive.dispatch.model.instance.SkjermingDto;
+import no.fintlabs.flyt.gateway.application.archive.resource.web.exceptions.KlasseOrderOutOfBoundsException;
+import no.fintlabs.flyt.gateway.application.archive.resource.web.exceptions.SearchKlasseOrderNotFoundInCaseException;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.Optional;
 import java.util.StringJoiner;
 
 @Service
@@ -97,12 +101,20 @@ public class CaseSearchParametersService {
                                                 )
                                                 .findFirst()
                                 )
-                                .orElseThrow(IllegalStateException::new);
+                                .orElseThrow(() -> new SearchKlasseOrderNotFoundInCaseException(
+                                        sakDto
+                                                .getKlasse()
+                                                .map(klasseDtos -> klasseDtos.stream()
+                                                        .map(KlasseDto::getRekkefolge)
+                                                        .filter(Optional::isPresent)
+                                                        .map(Optional::get)
+                                                        .toList()
+                                                )
+                                                .orElse(List.of()), rekkefolge)
+                                );
 
                         klasseDtoMatchingRekkefolge.getRekkefolge().ifPresent(rf -> log.debug("KlasseDto rekkefolge: {}", rf));
                         log.debug("Søkeparametere rekkefølge: {}", rekkefolge);
-
-                        //TODO: handle exception. map to caseSearchResult?
 
                         if (caseSearchParametersDto.getKlasseringKlassifikasjonssystem()) {
                             klasseDtoMatchingRekkefolge.getKlassifikasjonssystem()
@@ -137,7 +149,7 @@ public class CaseSearchParametersService {
             case 1 -> "primar";
             case 2 -> "sekundar";
             case 3 -> "tertiar";
-            default -> throw new IllegalArgumentException("Rekkefolge must be 1, 2 or 3");
+            default -> throw new KlasseOrderOutOfBoundsException("Rekkefolge must be 1, 2 or 3");
         };
         return "klassifikasjon/" + klassifikasjonName + "/";
     }

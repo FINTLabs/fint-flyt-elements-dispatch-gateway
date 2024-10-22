@@ -1,13 +1,12 @@
 package no.fintlabs.flyt.gateway.application.archive.dispatch;
 
-import no.fint.model.felles.kompleksedatatyper.Identifikator;
-import no.fint.model.resource.arkiv.noark.SakResource;
 import no.fintlabs.flyt.gateway.application.archive.dispatch.model.CaseDispatchType;
 import no.fintlabs.flyt.gateway.application.archive.dispatch.model.instance.ArchiveInstance;
 import no.fintlabs.flyt.gateway.application.archive.dispatch.model.instance.JournalpostDto;
 import no.fintlabs.flyt.gateway.application.archive.dispatch.model.instance.SakDto;
 import no.fintlabs.flyt.gateway.application.archive.dispatch.sak.CaseDispatchService;
 import no.fintlabs.flyt.gateway.application.archive.dispatch.sak.result.CaseDispatchResult;
+import no.fintlabs.flyt.gateway.application.archive.dispatch.sak.result.CaseSearchResult;
 import no.fintlabs.flyt.kafka.headers.InstanceFlowHeaders;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -237,18 +236,10 @@ class DispatchServiceTest {
         JournalpostDto journalpostDto = mock(JournalpostDto.class);
         doReturn(Optional.of(List.of(journalpostDto))).when(sakDto).getJournalpost();
 
-        SakResource sakResource1 = mock(SakResource.class);
-        SakResource sakResource2 = mock(SakResource.class);
-        Identifikator identifikator1 = mock(Identifikator.class);
-        Identifikator identifikator2 = mock(Identifikator.class);
+        CaseSearchResult caseSearchResult = mock(CaseSearchResult.class);
+        doReturn(List.of("caseId1", "caseId2")).when(caseSearchResult).getArchiveCaseIds();
 
-        doReturn(identifikator1).when(sakResource1).getMappeId();
-        doReturn(identifikator2).when(sakResource2).getMappeId();
-        doReturn("caseId1").when(identifikator1).getIdentifikatorverdi();
-        doReturn("caseId2").when(identifikator2).getIdentifikatorverdi();
-
-        doReturn(Mono.just(List.of(sakResource1, sakResource2))).when(caseDispatchService)
-                .findCasesBySearch(archiveInstance);
+        doReturn(Mono.just(caseSearchResult)).when(caseDispatchService).findSingleCaseBySearch(archiveInstance);
 
         StepVerifier.create(
                         dispatchService.process(instanceFlowHeaders, archiveInstance)
@@ -260,7 +251,7 @@ class DispatchServiceTest {
         verify(archiveInstance, times(1)).getNewCase();
         verifyNoMoreInteractions(archiveInstance);
 
-        verify(caseDispatchService, times(1)).findCasesBySearch(archiveInstance);
+        verify(caseDispatchService, times(1)).findSingleCaseBySearch(archiveInstance);
         verifyNoMoreInteractions(caseDispatchService);
     }
 
@@ -274,15 +265,10 @@ class DispatchServiceTest {
         JournalpostDto journalpostDto = mock(JournalpostDto.class);
         doReturn(Optional.of(List.of(journalpostDto))).when(sakDto).getJournalpost();
 
-        SakResource sakResource = mock(SakResource.class);
-        doReturn(Mono.just(List.of(sakResource))).when(caseDispatchService).findCasesBySearch(archiveInstance);
-        Identifikator identifikator = mock(Identifikator.class);
-        doReturn(identifikator).when(sakResource).getMappeId();
-        doReturn("testCaseId").when(identifikator).getIdentifikatorverdi();
+        CaseSearchResult caseSearchResult = mock(CaseSearchResult.class);
+        doReturn(List.of("testCaseId")).when(caseSearchResult).getArchiveCaseIds();
 
-        doReturn(Mono.just(DispatchResult.accepted("testCaseId")))
-                .when(recordsProcessingService)
-                .processRecords("testCaseId", false, List.of(journalpostDto));
+        doReturn(Mono.just(caseSearchResult)).when(caseDispatchService).findSingleCaseBySearch(archiveInstance);
 
         StepVerifier.create(
                         dispatchService.process(instanceFlowHeaders, archiveInstance)
@@ -294,7 +280,7 @@ class DispatchServiceTest {
         verify(archiveInstance, times(1)).getNewCase();
         verifyNoMoreInteractions(archiveInstance);
 
-        verify(caseDispatchService, times(1)).findCasesBySearch(archiveInstance);
+        verify(caseDispatchService, times(1)).findSingleCaseBySearch(archiveInstance);
         verifyNoMoreInteractions(caseDispatchService);
 
         verify(recordsProcessingService, times(1))
@@ -312,9 +298,13 @@ class DispatchServiceTest {
         JournalpostDto journalpostDto = mock(JournalpostDto.class);
         doReturn(Optional.of(List.of(journalpostDto))).when(sakDto).getJournalpost();
 
-        doReturn(Mono.just(List.of())).when(caseDispatchService).findCasesBySearch(archiveInstance);
         doReturn(Mono.just(CaseDispatchResult.accepted("testCaseId"))).when(caseDispatchService)
                 .dispatch(sakDto);
+
+        CaseSearchResult caseSearchResult = mock(CaseSearchResult.class);
+        doReturn(List.of()).when(caseSearchResult).getArchiveCaseIds();
+
+        doReturn(Mono.just(caseSearchResult)).when(caseDispatchService).findSingleCaseBySearch(archiveInstance);
 
         doReturn(Mono.just(DispatchResult.accepted("testCaseId")))
                 .when(recordsProcessingService)
@@ -330,7 +320,7 @@ class DispatchServiceTest {
         verify(archiveInstance, times(2)).getNewCase();
         verifyNoMoreInteractions(archiveInstance);
 
-        verify(caseDispatchService, times(1)).findCasesBySearch(archiveInstance);
+        verify(caseDispatchService, times(1)).findSingleCaseBySearch(archiveInstance);
         verifyNoMoreInteractions(caseDispatchService);
 
         verify(recordsProcessingService, times(1))

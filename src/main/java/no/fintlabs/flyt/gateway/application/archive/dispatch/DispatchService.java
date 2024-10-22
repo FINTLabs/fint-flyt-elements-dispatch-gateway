@@ -16,7 +16,6 @@ import javax.validation.Valid;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -100,27 +99,22 @@ public class DispatchService {
 
     private Mono<DispatchResult> processBySearchOrNew(ArchiveInstance archiveInstance) {
         Optional<List<JournalpostDto>> journalpostDtosOptional = archiveInstance.getNewCase().getJournalpost();
-        return caseDispatchService.findCasesBySearch(archiveInstance)
-                .flatMap(cases -> {
-                            if (cases.size() > 1) {
-                                String caseIds = cases.stream()
-                                        .map(sakResource -> sakResource.getMappeId().getIdentifikatorverdi())
-                                        .collect(Collectors.joining(", "));
+        return caseDispatchService.findSingleCaseBySearch(archiveInstance)
+                .flatMap(caseSearchResult -> {
+                            if (caseSearchResult.getArchiveCaseIds().size() > 1) {
+                                String caseIds = String.join(", ", caseSearchResult.getArchiveCaseIds());
 
                                 return Mono.just(DispatchResult.declined("Found multiple cases: " + caseIds));
                             }
 
                             return (
-                                    cases.size() == 1
-
+                                    caseSearchResult.getArchiveCaseIds().size() == 1
                                             ? Mono.just(new CaseInfo(
                                             false,
-                                            cases.get(0).getMappeId().getIdentifikatorverdi()))
-
+                                            caseSearchResult.getArchiveCaseIds().get(0)))
                                             : caseDispatchService.dispatch(archiveInstance.getNewCase())
                                             .map(CaseDispatchResult::getArchiveCaseId)
                                             .map(caseId -> new CaseInfo(true, caseId))
-
                             ).flatMap(caseInfo ->
                                     journalpostDtosOptional
                                             .filter(journalpostDtos -> !journalpostDtos.isEmpty())
@@ -144,7 +138,7 @@ public class DispatchService {
             String logMessage,
             InstanceDispatchingErrorProducerService instanceDispatchingErrorProducerService
     ) {
-        String errorMessage = (e != null && e.getMessage() != null) ? e.getMessage() : "Unknown error occurred test";
+        String errorMessage = (e != null && e.getMessage() != null) ? e.getMessage() : "Unknown error occurred";
 
         log.error("{}: {}", logMessage, errorMessage, e);
 
