@@ -19,6 +19,7 @@ import reactor.test.StepVerifier;
 import java.util.List;
 import java.util.Optional;
 
+import static no.fintlabs.flyt.gateway.application.archive.dispatch.DispatchStatus.ACCEPTED;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -238,8 +239,9 @@ class DispatchServiceTest {
 
         CaseSearchResult caseSearchResult = mock(CaseSearchResult.class);
         doReturn(List.of("caseId1", "caseId2")).when(caseSearchResult).getArchiveCaseIds();
+        doReturn(ACCEPTED).when(caseSearchResult).getStatus();
 
-        doReturn(Mono.just(caseSearchResult)).when(caseDispatchService).findSingleCaseBySearch(archiveInstance);
+        doReturn(Mono.just(caseSearchResult)).when(caseDispatchService).findCasesBySearch(archiveInstance);
 
         StepVerifier.create(
                         dispatchService.process(instanceFlowHeaders, archiveInstance)
@@ -251,7 +253,7 @@ class DispatchServiceTest {
         verify(archiveInstance, times(1)).getNewCase();
         verifyNoMoreInteractions(archiveInstance);
 
-        verify(caseDispatchService, times(1)).findSingleCaseBySearch(archiveInstance);
+        verify(caseDispatchService, times(1)).findCasesBySearch(archiveInstance);
         verifyNoMoreInteractions(caseDispatchService);
     }
 
@@ -267,8 +269,9 @@ class DispatchServiceTest {
 
         CaseSearchResult caseSearchResult = mock(CaseSearchResult.class);
         doReturn(List.of("testCaseId")).when(caseSearchResult).getArchiveCaseIds();
+        doReturn(ACCEPTED).when(caseSearchResult).getStatus();
 
-        doReturn(Mono.just(caseSearchResult)).when(caseDispatchService).findSingleCaseBySearch(archiveInstance);
+        doReturn(Mono.just(caseSearchResult)).when(caseDispatchService).findCasesBySearch(archiveInstance);
 
         StepVerifier.create(
                         dispatchService.process(instanceFlowHeaders, archiveInstance)
@@ -280,7 +283,7 @@ class DispatchServiceTest {
         verify(archiveInstance, times(1)).getNewCase();
         verifyNoMoreInteractions(archiveInstance);
 
-        verify(caseDispatchService, times(1)).findSingleCaseBySearch(archiveInstance);
+        verify(caseDispatchService, times(1)).findCasesBySearch(archiveInstance);
         verifyNoMoreInteractions(caseDispatchService);
 
         verify(recordsProcessingService, times(1))
@@ -303,8 +306,9 @@ class DispatchServiceTest {
 
         CaseSearchResult caseSearchResult = mock(CaseSearchResult.class);
         doReturn(List.of()).when(caseSearchResult).getArchiveCaseIds();
+        doReturn(ACCEPTED).when(caseSearchResult).getStatus();
 
-        doReturn(Mono.just(caseSearchResult)).when(caseDispatchService).findSingleCaseBySearch(archiveInstance);
+        doReturn(Mono.just(caseSearchResult)).when(caseDispatchService).findCasesBySearch(archiveInstance);
 
         doReturn(Mono.just(DispatchResult.accepted("testCaseId")))
                 .when(recordsProcessingService)
@@ -320,7 +324,7 @@ class DispatchServiceTest {
         verify(archiveInstance, times(2)).getNewCase();
         verifyNoMoreInteractions(archiveInstance);
 
-        verify(caseDispatchService, times(1)).findSingleCaseBySearch(archiveInstance);
+        verify(caseDispatchService, times(1)).findCasesBySearch(archiveInstance);
         verifyNoMoreInteractions(caseDispatchService);
 
         verify(recordsProcessingService, times(1))

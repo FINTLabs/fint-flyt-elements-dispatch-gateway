@@ -7,9 +7,6 @@ import no.fintlabs.flyt.gateway.application.archive.dispatch.model.instance.Arch
 import no.fintlabs.flyt.gateway.application.archive.dispatch.model.instance.JournalpostDto;
 import no.fintlabs.flyt.gateway.application.archive.dispatch.sak.CaseDispatchService;
 import no.fintlabs.flyt.gateway.application.archive.dispatch.sak.result.CaseDispatchResult;
-import no.fintlabs.flyt.gateway.application.archive.kafka.error.InstanceDispatchingErrorProducerService;
-import no.fintlabs.flyt.gateway.application.archive.resource.web.exceptions.KlasseOrderOutOfBoundsException;
-import no.fintlabs.flyt.gateway.application.archive.resource.web.exceptions.SearchKlasseOrderNotFoundInCaseException;
 import no.fintlabs.flyt.kafka.headers.InstanceFlowHeaders;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
@@ -24,16 +21,13 @@ public class DispatchService {
 
     private final CaseDispatchService caseDispatchService;
     private final RecordsProcessingService recordsProcessingService;
-    private final InstanceDispatchingErrorProducerService instanceDispatchingErrorProducerService;
 
     public DispatchService(
             CaseDispatchService caseDispatchService,
-            RecordsProcessingService recordsProcessingService,
-            InstanceDispatchingErrorProducerService instanceDispatchingErrorProducerService
+            RecordsProcessingService recordsProcessingService
     ) {
         this.caseDispatchService = caseDispatchService;
         this.recordsProcessingService = recordsProcessingService;
-        this.instanceDispatchingErrorProducerService = instanceDispatchingErrorProducerService;
     }
 
     public Mono<DispatchResult> process(InstanceFlowHeaders instanceFlowHeaders, @Valid ArchiveInstance archiveInstance) {
@@ -44,18 +38,7 @@ public class DispatchService {
             case BY_SEARCH_OR_NEW -> processBySearchOrNew(archiveInstance);
         })
                 .doOnNext(dispatchResult -> logDispatchResult(instanceFlowHeaders, dispatchResult))
-                .doOnError(e -> log.error("Failed to dispatch instance with headers={}", instanceFlowHeaders, e))
-                .onErrorResume(e -> {
-                    if (e instanceof SearchKlasseOrderNotFoundInCaseException) {
-                        return handleDispatchError(instanceFlowHeaders, e, "SearchKlasseOrderNotFoundInCaseException encountered during dispatch", instanceDispatchingErrorProducerService);
-                    } else if (e instanceof KlasseOrderOutOfBoundsException) {
-                        return handleDispatchError(instanceFlowHeaders, e, "KlasseOrderOutOfBoundsException encountered during dispatch", instanceDispatchingErrorProducerService);
-                    } else if (e instanceof NullPointerException) {
-                        return handleDispatchError(instanceFlowHeaders, e, "NullPointerException encountered during dispatch", instanceDispatchingErrorProducerService);
-                    } else {
-                        return handleDispatchError(instanceFlowHeaders, e, "Unexpected exception encountered during dispatch", instanceDispatchingErrorProducerService);
-                    }
-                });
+                .doOnError(e -> log.error("Failed to dispatch instance with headers={}", instanceFlowHeaders, e));
     }
 
     private void logDispatchResult(InstanceFlowHeaders instanceFlowHeaders, DispatchResult dispatchResult) {
@@ -99,55 +82,41 @@ public class DispatchService {
 
     private Mono<DispatchResult> processBySearchOrNew(ArchiveInstance archiveInstance) {
         Optional<List<JournalpostDto>> journalpostDtosOptional = archiveInstance.getNewCase().getJournalpost();
-        return caseDispatchService.findSingleCaseBySearch(archiveInstance)
-                .flatMap(caseSearchResult -> {
-                            if (caseSearchResult.getArchiveCaseIds().size() > 1) {
-                                String caseIds = String.join(", ", caseSearchResult.getArchiveCaseIds());
+        return caseDispatchService.findCasesBySearch(archiveInstance)
+                .flatMap(caseSearchResult -> switch (caseSearchResult.getStatus()) {
+                            case ACCEPTED -> {
+                                if (caseSearchResult.getArchiveCaseIds().size() > 1) {
+                                    String caseIds = String.join(", ", caseSearchResult.getArchiveCaseIds());
 
-                                return Mono.just(DispatchResult.declined("Found multiple cases: " + caseIds));
+                                    yield Mono.just(DispatchResult.declined("Found multiple cases: " + caseIds));
+                                } else {
+                                    yield (
+                                            caseSearchResult.getArchiveCaseIds().size() == 1
+                                                    ? Mono.just(new CaseInfo(
+                                                    false,
+                                                    caseSearchResult.getArchiveCaseIds().get(0)))
+                                                    : caseDispatchService.dispatch(archiveInstance.getNewCase())
+                                                    .map(CaseDispatchResult::getArchiveCaseId)
+                                                    .map(caseId -> new CaseInfo(true, caseId))
+                                    ).flatMap(caseInfo ->
+                                            journalpostDtosOptional
+                                                    .filter(journalpostDtos -> !journalpostDtos.isEmpty())
+                                                    .map(
+                                                            journalpostDtos -> recordsProcessingService.processRecords(
+                                                                    caseInfo.getCaseId(),
+                                                                    caseInfo.isNewCase(),
+                                                                    journalpostDtos
+                                                            )
+                                                    ).orElse(Mono.just(
+                                                            DispatchResult.accepted(caseInfo.getCaseId())
+                                                    ))
+                                    );
+                                }
+
                             }
-
-                            return (
-                                    caseSearchResult.getArchiveCaseIds().size() == 1
-                                            ? Mono.just(new CaseInfo(
-                                            false,
-                                            caseSearchResult.getArchiveCaseIds().get(0)))
-                                            : caseDispatchService.dispatch(archiveInstance.getNewCase())
-                                            .map(CaseDispatchResult::getArchiveCaseId)
-                                            .map(caseId -> new CaseInfo(true, caseId))
-                            ).flatMap(caseInfo ->
-                                    journalpostDtosOptional
-                                            .filter(journalpostDtos -> !journalpostDtos.isEmpty())
-                                            .map(
-                                                    journalpostDtos -> recordsProcessingService.processRecords(
-                                                            caseInfo.getCaseId(),
-                                                            caseInfo.isNewCase(),
-                                                            journalpostDtos
-                                                    )
-                                            ).orElse(Mono.just(
-                                                    DispatchResult.accepted(caseInfo.getCaseId())
-                                            ))
-                            );
+                            case DECLINED -> Mono.just(DispatchResult.declined(caseSearchResult.getErrorMessage()));
+                            case FAILED -> Mono.just(DispatchResult.failed());
                         }
                 );
     }
-
-    private Mono<DispatchResult> handleDispatchError(
-            InstanceFlowHeaders instanceFlowHeaders,
-            Throwable e,
-            String logMessage,
-            InstanceDispatchingErrorProducerService instanceDispatchingErrorProducerService
-    ) {
-        String errorMessage = (e != null && e.getMessage() != null) ? e.getMessage() : "Unknown error occurred";
-
-        log.error("{}: {}", logMessage, errorMessage, e);
-
-        instanceDispatchingErrorProducerService.publishGeneralSystemErrorEvent(
-                instanceFlowHeaders,
-                "An error occurred during dispatch: " + errorMessage
-        );
-
-        return Mono.just(DispatchResult.failed("An error occurred during dispatch: " + errorMessage));
-    }
-
 }

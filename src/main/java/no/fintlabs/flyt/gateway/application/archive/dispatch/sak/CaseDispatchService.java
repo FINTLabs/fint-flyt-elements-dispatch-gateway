@@ -54,7 +54,7 @@ public class CaseDispatchService {
                 }).doOnNext(result -> log.info("Dispatch result: {}", result.toString()));
     }
 
-    public Mono<CaseSearchResult> findSingleCaseBySearch(ArchiveInstance archiveInstance) {
+    public Mono<CaseSearchResult> findCasesBySearch(ArchiveInstance archiveInstance) {
 
         String caseFilter = caseSearchParametersService.createFilterQueryParamValue(
                 archiveInstance.getNewCase(),

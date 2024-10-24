@@ -130,7 +130,7 @@ class CaseDispatchServiceTest {
         doReturn("caseId1").when(identifikator).getIdentifikatorverdi();
 
         StepVerifier.create(
-                        caseDispatchService.findSingleCaseBySearch(archiveInstance)
+                        caseDispatchService.findCasesBySearch(archiveInstance)
                 )
                 .expectNext(CaseSearchResult.accepted(List.of("caseId1")))
                 .verifyComplete();

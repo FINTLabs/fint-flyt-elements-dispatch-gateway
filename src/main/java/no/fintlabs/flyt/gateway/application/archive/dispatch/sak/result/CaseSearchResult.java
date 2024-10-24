@@ -17,11 +17,11 @@ public class CaseSearchResult {
     }
 
     public static CaseSearchResult declined(String errorMessage) {
-        return new CaseSearchResult(DispatchStatus.DECLINED, new ArrayList<>(), errorMessage);
+        return new CaseSearchResult(DispatchStatus.DECLINED, null, errorMessage);
     }
 
     public static CaseSearchResult failed() {
-        return new CaseSearchResult(DispatchStatus.FAILED, new ArrayList<>(), null);
+        return new CaseSearchResult(DispatchStatus.FAILED, null, null);
     }
 
     private final DispatchStatus status;
