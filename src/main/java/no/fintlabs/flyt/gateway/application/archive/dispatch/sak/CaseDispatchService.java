@@ -56,27 +56,27 @@ public class CaseDispatchService {
 
     public Mono<CaseSearchResult> findCasesBySearch(ArchiveInstance archiveInstance) {
 
-        String caseFilter = caseSearchParametersService.createFilterQueryParamValue(
-                archiveInstance.getNewCase(),
-                archiveInstance.getCaseSearchParameters()
-        );
+        try {
+            String caseFilter = caseSearchParametersService.createFilterQueryParamValue(
+                    archiveInstance.getNewCase(),
+                    archiveInstance.getCaseSearchParameters()
+            );
+            return fintArchiveResourceClient.findCasesWithFilter(caseFilter)
+                    .map(sakResources -> sakResources.stream()
+                            .map(SakResource::getMappeId)
+                            .map(Identifikator::getIdentifikatorverdi)
+                            .toList()
+                    )
+                    .map(CaseSearchResult::accepted)
+                    .onErrorResume(Exception.class, e ->
+                            Mono.just(CaseSearchResult.failed())
+                    );
+        } catch (SearchKlasseOrderNotFoundInCaseException | KlasseOrderOutOfBoundsException e) {
+            return Mono.just(CaseSearchResult.declined(e.getMessage()));
+        } catch (Exception e) {
+            return Mono.just(CaseSearchResult.failed());
+        }
 
-        return fintArchiveResourceClient.findCasesWithFilter(caseFilter)
-                .map(sakResources -> sakResources.stream()
-                        .map(SakResource::getMappeId)
-                        .map(Identifikator::getIdentifikatorverdi)
-                        .toList()
-                )
-                .map(CaseSearchResult::accepted)
-                .onErrorResume(SearchKlasseOrderNotFoundInCaseException.class, e ->
-                        Mono.just(CaseSearchResult.declined(e.getMessage()))
-                )
-                .onErrorResume(KlasseOrderOutOfBoundsException.class, e ->
-                        Mono.just(CaseSearchResult.declined(e.getMessage()))
-                )
-                .onErrorResume(Exception.class, e ->
-                        Mono.just(CaseSearchResult.failed())
-                );
     }
 
 }
