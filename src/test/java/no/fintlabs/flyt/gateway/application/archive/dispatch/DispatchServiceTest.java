@@ -332,5 +332,59 @@ class DispatchServiceTest {
         verifyNoMoreInteractions(recordsProcessingService);
     }
 
+    @Test
+    public void givenCaseTypeBySearchOrNewAndDeclinedCaseSearchShouldReturnDeclinedResult() {
+        doReturn(CaseDispatchType.BY_SEARCH_OR_NEW).when(archiveInstance).getType();
+
+        SakDto sakDto = mock(SakDto.class);
+        doReturn(sakDto).when(archiveInstance).getNewCase();
+        doReturn(Optional.of(List.of())).when(sakDto).getJournalpost();
+
+        CaseSearchResult caseSearchResult = mock(CaseSearchResult.class);
+        doReturn(DispatchStatus.DECLINED).when(caseSearchResult).getStatus();
+        doReturn("test errormessage").when(caseSearchResult).getErrorMessage();
+
+        doReturn(Mono.just(caseSearchResult)).when(caseDispatchService).findCasesBySearch(archiveInstance);
+
+        StepVerifier.create(
+                        dispatchService.process(instanceFlowHeaders, archiveInstance)
+                )
+                .expectNext(DispatchResult.declined("test errormessage"))
+                .verifyComplete();
+
+        verify(archiveInstance, times(1)).getType();
+        verify(archiveInstance, times(1)).getNewCase();
+        verifyNoMoreInteractions(archiveInstance);
+
+        verify(caseDispatchService, times(1)).findCasesBySearch(archiveInstance);
+        verifyNoMoreInteractions(caseDispatchService);
+    }
+
+    @Test
+    public void givenCaseTypeBySearchOrNewAndFailedCaseSearchShouldReturnFailedResult() {
+        doReturn(CaseDispatchType.BY_SEARCH_OR_NEW).when(archiveInstance).getType();
+
+        SakDto sakDto = mock(SakDto.class);
+        doReturn(sakDto).when(archiveInstance).getNewCase();
+        doReturn(Optional.of(List.of())).when(sakDto).getJournalpost();
+
+        CaseSearchResult caseSearchResult = mock(CaseSearchResult.class);
+        doReturn(DispatchStatus.FAILED).when(caseSearchResult).getStatus();
+
+        doReturn(Mono.just(caseSearchResult)).when(caseDispatchService).findCasesBySearch(archiveInstance);
+
+        StepVerifier.create(
+                        dispatchService.process(instanceFlowHeaders, archiveInstance)
+                )
+                .expectNext(DispatchResult.failed())
+                .verifyComplete();
+
+        verify(archiveInstance, times(1)).getType();
+        verify(archiveInstance, times(1)).getNewCase();
+        verifyNoMoreInteractions(archiveInstance);
+
+        verify(caseDispatchService, times(1)).findCasesBySearch(archiveInstance);
+        verifyNoMoreInteractions(caseDispatchService);
+    }
 
 }
