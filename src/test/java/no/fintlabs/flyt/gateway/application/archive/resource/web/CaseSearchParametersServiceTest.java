@@ -11,6 +11,8 @@ import no.fintlabs.flyt.gateway.application.archive.dispatch.model.instance.Case
 import no.fintlabs.flyt.gateway.application.archive.dispatch.model.instance.KlasseDto;
 import no.fintlabs.flyt.gateway.application.archive.dispatch.model.instance.SakDto;
 import no.fintlabs.flyt.gateway.application.archive.dispatch.model.instance.SkjermingDto;
+import no.fintlabs.flyt.gateway.application.archive.resource.web.exceptions.KlasseOrderOutOfBoundsException;
+import no.fintlabs.flyt.gateway.application.archive.resource.web.exceptions.SearchKlasseOrderNotFoundInCaseException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,6 +23,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -142,7 +145,7 @@ class CaseSearchParametersServiceTest {
     }
 
     @Test
-    void shouldCreateFilterQueryParamValueForKlasseringKlasseId() {
+    void givenKlasseringRekkefolgeExistsInCaseAndIs1ShouldCreateFilterQueryParamValueForPrimarKlassifikasjon() {
         CaseSearchParametersDto caseSearchParametersDto = caseSearchParametersDtoBuilder
                 .klassering(true)
                 .klasseringRekkefolge("1")
@@ -159,6 +162,151 @@ class CaseSearchParametersServiceTest {
         String result = caseSearchParametersService.createFilterQueryParamValue(sakDto, caseSearchParametersDto);
 
         assertEquals("klassifikasjon/primar/verdi eq 'klasseId'", result);
+    }
+
+    @Test
+    void givenKlasseringRekkefolgeExistsInCaseAndIs2ShouldCreateFilterQueryParamValueForSekundarKlassifikasjon() {
+        CaseSearchParametersDto caseSearchParametersDto = caseSearchParametersDtoBuilder
+                .klassering(true)
+                .klasseringRekkefolge("2")
+                .klasseringKlasseId(true)
+                .build();
+
+        KlasseDto klasseDto = KlasseDto.builder()
+                .rekkefolge(2)
+                .klasseId("klasseId")
+                .build();
+
+        when(sakDto.getKlasse()).thenReturn(Optional.of(List.of(klasseDto)));
+
+        String result = caseSearchParametersService.createFilterQueryParamValue(sakDto, caseSearchParametersDto);
+
+        assertEquals("klassifikasjon/sekundar/verdi eq 'klasseId'", result);
+    }
+
+    @Test
+    void givenKlasseringRekkefolgeExistsInCaseAndIs3ShouldCreateFilterQueryParamValueForTertiarKlassifikasjon() {
+        CaseSearchParametersDto caseSearchParametersDto = caseSearchParametersDtoBuilder
+                .klassering(true)
+                .klasseringRekkefolge("3")
+                .klasseringKlasseId(true)
+                .build();
+
+        KlasseDto klasseDto = KlasseDto.builder()
+                .rekkefolge(3)
+                .klasseId("klasseId")
+                .build();
+
+        when(sakDto.getKlasse()).thenReturn(Optional.of(List.of(klasseDto)));
+
+        String result = caseSearchParametersService.createFilterQueryParamValue(sakDto, caseSearchParametersDto);
+
+        assertEquals("klassifikasjon/tertiar/verdi eq 'klasseId'", result);
+    }
+
+    @Test
+    void givenKlasseringRekkefolgeExistsInCaseAndIs0ShouldThrowKlasseOrderOutOfBoundsException() {
+        CaseSearchParametersDto caseSearchParametersDto = caseSearchParametersDtoBuilder
+                .klassering(true)
+                .klasseringRekkefolge("0")
+                .klasseringKlasseId(true)
+                .build();
+
+        KlasseDto klasseDto = KlasseDto.builder()
+                .rekkefolge(0)
+                .klasseId("klasseId")
+                .build();
+
+        when(sakDto.getKlasse()).thenReturn(Optional.of(List.of(klasseDto)));
+
+        assertThrows(
+                KlasseOrderOutOfBoundsException.class,
+                () -> caseSearchParametersService.createFilterQueryParamValue(sakDto, caseSearchParametersDto),
+                "Rekkefolge=0 is out of bounds. Rekkefolge must be 1, 2 or 3."
+        );
+    }
+
+    @Test
+    void givenKlasseringRekkefolgeExistsInCaseAndIsMinus1ShouldThrowKlasseOrderOutOfBoundsException() {
+        CaseSearchParametersDto caseSearchParametersDto = caseSearchParametersDtoBuilder
+                .klassering(true)
+                .klasseringRekkefolge("-1")
+                .klasseringKlasseId(true)
+                .build();
+
+        KlasseDto klasseDto = KlasseDto.builder()
+                .rekkefolge(-1)
+                .klasseId("klasseId")
+                .build();
+
+        when(sakDto.getKlasse()).thenReturn(Optional.of(List.of(klasseDto)));
+
+        assertThrows(
+                KlasseOrderOutOfBoundsException.class,
+                () -> caseSearchParametersService.createFilterQueryParamValue(sakDto, caseSearchParametersDto),
+                "Rekkefolge=-1 is out of bounds. Rekkefolge must be 1, 2 or 3."
+        );
+    }
+
+    @Test
+    void givenKlasseringRekkefolgeExistsInCaseAndIs4ShouldThrowKlasseOrderOutOfBoundsException() {
+        CaseSearchParametersDto caseSearchParametersDto = caseSearchParametersDtoBuilder
+                .klassering(true)
+                .klasseringRekkefolge("4")
+                .klasseringKlasseId(true)
+                .build();
+
+        KlasseDto klasseDto = KlasseDto.builder()
+                .rekkefolge(4)
+                .klasseId("klasseId")
+                .build();
+
+        when(sakDto.getKlasse()).thenReturn(Optional.of(List.of(klasseDto)));
+
+        assertThrows(
+                KlasseOrderOutOfBoundsException.class,
+                () -> caseSearchParametersService.createFilterQueryParamValue(sakDto, caseSearchParametersDto),
+                "Rekkefolge=4 is out of bounds. Rekkefolge must be 1, 2 or 3."
+        );
+    }
+
+    @Test
+    void givenKlasseringRekkefolgeNotExistsInCaseWithKlasseShouldThrowSearchKlasseOrderNotFoundInCaseException() {
+        CaseSearchParametersDto caseSearchParametersDto = caseSearchParametersDtoBuilder
+                .klassering(true)
+                .klasseringRekkefolge("1")
+                .klasseringKlasseId(true)
+                .build();
+
+        KlasseDto klasseDto = KlasseDto.builder()
+                .rekkefolge(2)
+                .klasseId("klasseId")
+                .build();
+
+        when(sakDto.getKlasse()).thenReturn(Optional.of(List.of(klasseDto)));
+
+        assertThrows(
+                SearchKlasseOrderNotFoundInCaseException.class,
+                () -> caseSearchParametersService.createFilterQueryParamValue(sakDto, caseSearchParametersDto),
+                "Could not find search klasse order=1 in case klasse orders=[2]"
+        );
+    }
+
+    @Test
+    void givenKlasseringRekkefolgeSearchWithCaseWithoutKlasseShouldThrowSearchKlasseOrderNotFoundInCaseException() {
+        CaseSearchParametersDto caseSearchParametersDto = caseSearchParametersDtoBuilder
+                .klassering(true)
+                .klasseringRekkefolge("1")
+                .klasseringKlasseId(true)
+                .build();
+
+        when(sakDto.getKlasse()).thenReturn(Optional.of(List.of()));
+
+        assertThrows(
+                SearchKlasseOrderNotFoundInCaseException.class,
+                () -> caseSearchParametersService.createFilterQueryParamValue(sakDto, caseSearchParametersDto),
+                "Could not find search klasse order=1 in case klasse orders=[]"
+        );
     }
 
 }

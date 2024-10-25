@@ -149,7 +149,7 @@ public class CaseSearchParametersService {
             case 1 -> "primar";
             case 2 -> "sekundar";
             case 3 -> "tertiar";
-            default -> throw new KlasseOrderOutOfBoundsException("Rekkefolge must be 1, 2 or 3");
+            default -> throw new KlasseOrderOutOfBoundsException(rekkefolge);
         };
         return "klassifikasjon/" + klassifikasjonName + "/";
     }
