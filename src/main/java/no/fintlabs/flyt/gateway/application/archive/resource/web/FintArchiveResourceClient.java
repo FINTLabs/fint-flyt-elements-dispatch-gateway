@@ -16,6 +16,7 @@ import reactor.core.publisher.Mono;
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
@@ -51,6 +52,20 @@ public class FintArchiveResourceClient {
 
     public void resetLastUpdatedTimestamps() {
         this.sinceTimestamp.clear();
+    }
+
+
+    public Mono<Optional<SakResource>> findCase(String caseId) {
+        return fintWebClient
+                .get()
+                .uri("/arkiv/noark/sak/mappeid/" + caseId)
+                .retrieve()
+                .bodyToMono(SakResource.class)
+                .map(Optional::of)
+                .onErrorReturn(
+                        e -> e instanceof WebClientResponseException && ((WebClientResponseException) e).getRawStatusCode() == 404,
+                        Optional.empty()
+                );
     }
 
     public Mono<List<SakResource>> findCasesWithFilter(String caseFilter) {

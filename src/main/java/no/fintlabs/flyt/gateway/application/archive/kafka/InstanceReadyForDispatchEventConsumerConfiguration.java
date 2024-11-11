@@ -27,28 +27,27 @@ public class InstanceReadyForDispatchEventConsumerConfiguration {
                 ArchiveInstance.class,
                 instanceFlowConsumerRecord ->
                         dispatchService.process(
-                                        instanceFlowConsumerRecord.getInstanceFlowHeaders(),
-                                        instanceFlowConsumerRecord.getConsumerRecord().value()
-                                ).doOnNext(dispatchResult -> {
-                                    switch (dispatchResult.getStatus()) {
-                                        case ACCEPTED -> instanceDispatchedEventProducerService.publish(
-                                                instanceFlowConsumerRecord.getInstanceFlowHeaders()
-                                                        .toBuilder()
-                                                        .archiveInstanceId(dispatchResult.getArchiveCaseAndRecordsIds())
-                                                        .build()
-                                        );
-                                        case DECLINED ->
-                                                instanceDispatchingErrorProducerService.publishInstanceDispatchDeclinedErrorEvent(
-                                                        instanceFlowConsumerRecord.getInstanceFlowHeaders(),
-                                                        dispatchResult.getErrorMessage()
-                                                );
-                                        case FAILED -> instanceDispatchingErrorProducerService.publishGeneralSystemErrorEvent(
+                                instanceFlowConsumerRecord.getInstanceFlowHeaders(),
+                                instanceFlowConsumerRecord.getConsumerRecord().value()
+                        ).doOnNext(dispatchResult -> {
+                            switch (dispatchResult.getStatus()) {
+                                case ACCEPTED -> instanceDispatchedEventProducerService.publish(
+                                        instanceFlowConsumerRecord.getInstanceFlowHeaders()
+                                                .toBuilder()
+                                                .archiveInstanceId(dispatchResult.getArchiveCaseAndRecordsIds())
+                                                .build()
+                                );
+                                case DECLINED ->
+                                        instanceDispatchingErrorProducerService.publishInstanceDispatchDeclinedErrorEvent(
                                                 instanceFlowConsumerRecord.getInstanceFlowHeaders(),
                                                 dispatchResult.getErrorMessage()
                                         );
-                                    }
-                                })
-                                .subscribe(),
+                                case FAILED -> instanceDispatchingErrorProducerService.publishGeneralSystemErrorEvent(
+                                        instanceFlowConsumerRecord.getInstanceFlowHeaders(),
+                                        dispatchResult.getErrorMessage()
+                                );
+                            }
+                        }).block(),
                 EventConsumerConfiguration
                         .builder()
                         .maxPollIntervalMs(1800000)

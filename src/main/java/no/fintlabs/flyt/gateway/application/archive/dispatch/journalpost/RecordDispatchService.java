@@ -10,6 +10,7 @@ import no.fintlabs.flyt.gateway.application.archive.dispatch.model.instance.Doku
 import no.fintlabs.flyt.gateway.application.archive.dispatch.model.instance.DokumentobjektDto;
 import no.fintlabs.flyt.gateway.application.archive.dispatch.model.instance.JournalpostDto;
 import no.fintlabs.flyt.gateway.application.archive.dispatch.web.FintArchiveDispatchClient;
+import no.fintlabs.flyt.gateway.application.archive.resource.web.FintArchiveResourceClient;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
@@ -22,21 +23,49 @@ public class RecordDispatchService {
 
     private final JournalpostMappingService journalpostMappingService;
     private final FilesDispatchService filesDispatchService;
+    private final FintArchiveResourceClient fintArchiveResourceClient;
 
     private final FintArchiveDispatchClient fintArchiveDispatchClient;
 
     public RecordDispatchService(
             JournalpostMappingService journalpostMappingService,
             FilesDispatchService filesDispatchService,
+            FintArchiveResourceClient fintArchiveResourceClient,
             FintArchiveDispatchClient fintArchiveDispatchClient
     ) {
         this.journalpostMappingService = journalpostMappingService;
         this.filesDispatchService = filesDispatchService;
+        this.fintArchiveResourceClient = fintArchiveResourceClient;
         this.fintArchiveDispatchClient = fintArchiveDispatchClient;
     }
 
     public Mono<RecordDispatchResult> dispatch(String caseId, JournalpostDto journalpostDto) {
         log.info("Dispatching record");
+        return findDuplicateRecordId(caseId, journalpostDto)
+                .flatMap(duplicateRecordIdOptional -> duplicateRecordIdOptional
+                        .map(duplicateRecordId -> {
+                            log.info("Found duplicate record with id{} in case with id={}", duplicateRecordId, caseId);
+                            return Mono.just(RecordDispatchResult.accepted(duplicateRecordId));
+                        })
+                        .orElseGet(() -> dispatchNewJournalpost(caseId, journalpostDto))
+                );
+    }
+
+    private Mono<Optional<Long>> findDuplicateRecordId(String caseId, JournalpostDto journalpostDto) {
+        if (journalpostDto.getTittel().isEmpty()) {
+            return Mono.just(Optional.empty());
+        }
+        String tittel = journalpostDto.getTittel().get();
+        return fintArchiveResourceClient.findCase(caseId)
+                .map(sak -> sak.flatMap(sakResource -> sakResource.getJournalpost()
+                        .stream()
+                        .filter(existingJournalpost -> existingJournalpost.getTittel().equals(tittel))
+                        .findFirst()
+                        .map(JournalpostResource::getJournalPostnummer)
+                ));
+    }
+
+    private Mono<RecordDispatchResult> dispatchNewJournalpost(String caseId, JournalpostDto journalpostDto) {
         List<DokumentobjektDto> dokumentobjektDtos = journalpostDto.getDokumentbeskrivelse()
                 .map(this::getDokumentObjektDtos)
                 .orElse(List.of());
