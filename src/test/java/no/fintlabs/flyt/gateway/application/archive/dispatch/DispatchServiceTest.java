@@ -321,7 +321,7 @@ class DispatchServiceTest {
                 .verifyComplete();
 
         verify(archiveInstance, times(1)).getType();
-        verify(archiveInstance, times(2)).getNewCase();
+        verify(archiveInstance, times(3)).getNewCase();
         verifyNoMoreInteractions(archiveInstance);
 
         verify(caseDispatchService, times(1)).findCasesBySearch(archiveInstance);
