@@ -6,7 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import no.fintlabs.flyt.gateway.application.archive.dispatch.model.instance.ArchiveInstance;
 import no.fintlabs.flyt.gateway.application.archive.dispatch.model.instance.JournalpostDto;
 import no.fintlabs.flyt.gateway.application.archive.dispatch.sak.CaseDispatchService;
-import no.fintlabs.flyt.gateway.application.archive.dispatch.sak.result.CaseDispatchResult;
 import no.fintlabs.flyt.kafka.headers.InstanceFlowHeaders;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
@@ -87,32 +86,24 @@ public class DispatchService {
                             case ACCEPTED -> {
                                 if (caseSearchResult.getArchiveCaseIds().size() > 1) {
                                     String caseIds = String.join(", ", caseSearchResult.getArchiveCaseIds());
-
                                     yield Mono.just(DispatchResult.declined("Found multiple cases: " + caseIds));
                                 } else {
-                                    yield (
-                                            caseSearchResult.getArchiveCaseIds().size() == 1
-                                                    ? Mono.just(new CaseInfo(
-                                                    false,
-                                                    caseSearchResult.getArchiveCaseIds().get(0)))
-                                                    : caseDispatchService.dispatch(archiveInstance.getNewCase())
-                                                    .map(CaseDispatchResult::getArchiveCaseId)
-                                                    .map(caseId -> new CaseInfo(true, caseId))
-                                    ).flatMap(caseInfo ->
-                                            journalpostDtosOptional
-                                                    .filter(journalpostDtos -> !journalpostDtos.isEmpty())
-                                                    .map(
-                                                            journalpostDtos -> recordsProcessingService.processRecords(
-                                                                    caseInfo.getCaseId(),
-                                                                    caseInfo.isNewCase(),
-                                                                    journalpostDtos
-                                                            )
-                                                    ).orElse(Mono.just(
-                                                            DispatchResult.accepted(caseInfo.getCaseId())
-                                                    ))
-                                    );
+                                    if (caseSearchResult.getArchiveCaseIds().isEmpty()) {
+                                        yield processNew(archiveInstance);
+                                    } else {
+                                        yield journalpostDtosOptional
+                                                .filter(journalpostDtos -> !journalpostDtos.isEmpty())
+                                                .map(
+                                                        journalpostDtos -> recordsProcessingService.processRecords(
+                                                                caseSearchResult.getArchiveCaseIds().get(0),
+                                                                false,
+                                                                journalpostDtos
+                                                        )
+                                                ).orElse(Mono.just(
+                                                        DispatchResult.accepted(caseSearchResult.getArchiveCaseIds().get(0)))
+                                                );
+                                    }
                                 }
-
                             }
                             case DECLINED -> Mono.just(DispatchResult.declined(caseSearchResult.getErrorMessage()));
                             case FAILED -> Mono.just(DispatchResult.failed());
