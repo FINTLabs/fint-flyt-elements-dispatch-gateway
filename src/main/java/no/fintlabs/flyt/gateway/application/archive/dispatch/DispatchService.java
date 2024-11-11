@@ -1,7 +1,5 @@
 package no.fintlabs.flyt.gateway.application.archive.dispatch;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import no.fintlabs.flyt.gateway.application.archive.dispatch.model.instance.ArchiveInstance;
 import no.fintlabs.flyt.gateway.application.archive.dispatch.model.instance.JournalpostDto;
@@ -70,13 +68,6 @@ public class DispatchService {
 
     private Mono<DispatchResult> processById(ArchiveInstance archiveInstance) {
         return recordsProcessingService.processRecords(archiveInstance.getCaseId(), false, archiveInstance.getJournalpost());
-    }
-
-    @Getter
-    @AllArgsConstructor
-    private static class CaseInfo {
-        private final boolean newCase;
-        private final String caseId;
     }
 
     private Mono<DispatchResult> processBySearchOrNew(ArchiveInstance archiveInstance) {
