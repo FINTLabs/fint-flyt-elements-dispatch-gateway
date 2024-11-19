@@ -321,7 +321,7 @@ class DispatchServiceTest {
                 .verifyComplete();
 
         verify(archiveInstance, times(1)).getType();
-        verify(archiveInstance, times(2)).getNewCase();
+        verify(archiveInstance, times(3)).getNewCase();
         verifyNoMoreInteractions(archiveInstance);
 
         verify(caseDispatchService, times(1)).findCasesBySearch(archiveInstance);
@@ -384,6 +384,71 @@ class DispatchServiceTest {
         verifyNoMoreInteractions(archiveInstance);
 
         verify(caseDispatchService, times(1)).findCasesBySearch(archiveInstance);
+        verifyNoMoreInteractions(caseDispatchService);
+    }
+
+    @Test
+    public void givenCaseTypeBySearchOrNewAndNoCaseFoundAndNewCaseDeclinedShouldReturnDeclinedResult() {
+        doReturn(CaseDispatchType.BY_SEARCH_OR_NEW).when(archiveInstance).getType();
+
+        SakDto sakDto = mock(SakDto.class);
+        doReturn(sakDto).when(archiveInstance).getNewCase();
+        doReturn(Optional.of(List.of())).when(sakDto).getJournalpost();
+
+        CaseSearchResult caseSearchResult = mock(CaseSearchResult.class);
+        doReturn(ACCEPTED).when(caseSearchResult).getStatus();
+        doReturn(List.of()).when(caseSearchResult).getArchiveCaseIds();
+        doReturn(Mono.just(caseSearchResult)).when(caseDispatchService).findCasesBySearch(archiveInstance);
+
+        CaseDispatchResult caseDispatchResult = mock(CaseDispatchResult.class);
+        doReturn(DispatchStatus.DECLINED).when(caseDispatchResult).getStatus();
+        doReturn("testErrorMessage").when(caseDispatchResult).getErrorMessage();
+        doReturn(Mono.just(caseDispatchResult)).when(caseDispatchService).dispatch(sakDto);
+
+        StepVerifier.create(
+                        dispatchService.process(instanceFlowHeaders, archiveInstance)
+                )
+                .expectNext(DispatchResult.declined("Sak was declined by the destination with message='testErrorMessage'"))
+                .verifyComplete();
+
+        verify(archiveInstance, times(1)).getType();
+        verify(archiveInstance, times(2)).getNewCase();
+        verifyNoMoreInteractions(archiveInstance);
+
+        verify(caseDispatchService, times(1)).findCasesBySearch(archiveInstance);
+        verify(caseDispatchService, times(1)).dispatch(sakDto);
+        verifyNoMoreInteractions(caseDispatchService);
+    }
+
+    @Test
+    public void givenCaseTypeBySearchOrNewAndNoCaseFoundAndNewCaseFailedShouldReturnFailedResult() {
+        doReturn(CaseDispatchType.BY_SEARCH_OR_NEW).when(archiveInstance).getType();
+
+        SakDto sakDto = mock(SakDto.class);
+        doReturn(sakDto).when(archiveInstance).getNewCase();
+        doReturn(Optional.of(List.of())).when(sakDto).getJournalpost();
+
+        CaseSearchResult caseSearchResult = mock(CaseSearchResult.class);
+        doReturn(ACCEPTED).when(caseSearchResult).getStatus();
+        doReturn(List.of()).when(caseSearchResult).getArchiveCaseIds();
+        doReturn(Mono.just(caseSearchResult)).when(caseDispatchService).findCasesBySearch(archiveInstance);
+
+        CaseDispatchResult caseDispatchResult = mock(CaseDispatchResult.class);
+        doReturn(DispatchStatus.FAILED).when(caseDispatchResult).getStatus();
+        doReturn(Mono.just(caseDispatchResult)).when(caseDispatchService).dispatch(sakDto);
+
+        StepVerifier.create(
+                        dispatchService.process(instanceFlowHeaders, archiveInstance)
+                )
+                .expectNext(DispatchResult.failed("Sak dispatch failed"))
+                .verifyComplete();
+
+        verify(archiveInstance, times(1)).getType();
+        verify(archiveInstance, times(2)).getNewCase();
+        verifyNoMoreInteractions(archiveInstance);
+
+        verify(caseDispatchService, times(1)).findCasesBySearch(archiveInstance);
+        verify(caseDispatchService, times(1)).dispatch(sakDto);
         verifyNoMoreInteractions(caseDispatchService);
     }
 
