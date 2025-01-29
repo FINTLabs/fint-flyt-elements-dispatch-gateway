@@ -21,8 +21,8 @@ public class WebClientConfiguration {
                                 .maxLifeTime(Duration.ofMinutes(30))
                                 .maxIdleTime(Duration.ofMinutes(5))
                                 .build())
-                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 300000)
-                .responseTimeout(Duration.ofMinutes(5)
+                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 120000)
+                .responseTimeout(Duration.ofSeconds(310)
                 ));
     }
 
