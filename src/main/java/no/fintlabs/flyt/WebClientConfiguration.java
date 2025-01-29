@@ -22,8 +22,8 @@ public class WebClientConfiguration {
                                 .maxIdleTime(Duration.ofMinutes(5))
                                 .build())
                 .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 120000)
-                .responseTimeout(Duration.ofSeconds(310)
-                ));
+                .responseTimeout(Duration.ofSeconds(310))
+        );
     }
 
 }
